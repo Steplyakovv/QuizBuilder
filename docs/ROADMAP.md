@@ -9,7 +9,7 @@
 - ESLint (`@angular-eslint`) + Prettier
 - Git-репозиторий, docs/SPEC.md, docs/ROADMAP.md, CLAUDE.md
 
-## Phase 1 — Доменная модель и хранение ⬜
+## Phase 1 — Доменная модель и хранение ✅
 - TypeScript-типы из SPEC.md (`Quiz`, `Question`, `Option`, `QuizAttempt`)
 - `QuizRepository` — интерфейс + localStorage-реализация
 - `QuizStore` (сервис на signals) — CRUD опросников в памяти + синхронизация с репозиторием
