@@ -1,0 +1,56 @@
+<div class="quiz-list">
+  <h1>Опросники</h1>
+
+  <form class="new-quiz-form" (submit)="createQuiz(); $event.preventDefault()">
+    <mat-form-field appearance="outline">
+      <mat-label>Название нового опросника</mat-label>
+      <input
+        matInput
+        [value]="newQuizTitle()"
+        (input)="newQuizTitle.set($any($event.target).value)"
+        placeholder="Например: Опрос о продукте"
+      />
+    </mat-form-field>
+    <button mat-flat-button type="submit">
+      <mat-icon>add</mat-icon>
+      Создать
+    </button>
+  </form>
+
+  @if (quizzes().length === 0) {
+    <p class="empty-state">Опросников пока нет — создайте первый выше.</p>
+  } @else {
+    <div class="quiz-cards">
+      @for (quiz of quizzes(); track quiz.id) {
+        <mat-card class="quiz-card">
+          @if (editingQuizId() === quiz.id) {
+            <mat-form-field appearance="outline" class="rename-field">
+              <input
+                matInput
+                [value]="editingTitle()"
+                (input)="editingTitle.set($any($event.target).value)"
+                (blur)="confirmRename(quiz)"
+                (keydown.enter)="$any($event.target).blur()"
+                (keydown.escape)="cancelRename()"
+              />
+            </mat-form-field>
+          } @else {
+            <a class="quiz-title" [routerLink]="['/quiz', quiz.id]">{{ quiz.title }}</a>
+          }
+          <div class="quiz-meta">{{ quiz.questions.length }} вопрос(ов)</div>
+          <div class="quiz-actions">
+            <button mat-icon-button (click)="startRename(quiz)" aria-label="Переименовать">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="duplicateQuiz(quiz.id)" aria-label="Дублировать">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteQuiz(quiz)" aria-label="Удалить">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

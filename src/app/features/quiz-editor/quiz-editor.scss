@@ -1,0 +1,54 @@
+.quiz-editor {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+.title-field,
+.description-field {
+  width: 100%;
+}
+
+.empty-state {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.question-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 4px;
+  background: var(--mat-sys-surface);
+}
+
+.drag-handle {
+  cursor: grab;
+  display: flex;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.question-prompt {
+  flex: 1;
+}
+
+.add-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}

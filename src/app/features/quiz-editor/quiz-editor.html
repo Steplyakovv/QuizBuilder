@@ -1,0 +1,67 @@
+@if (quiz(); as quiz) {
+  <div class="quiz-editor">
+    <a routerLink="/" class="back-link">← К списку опросников</a>
+
+    <mat-form-field appearance="outline" class="title-field">
+      <mat-label>Название опросника</mat-label>
+      <input matInput [value]="quiz.title" (blur)="updateTitle(quiz, $any($event.target).value)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="description-field">
+      <mat-label>Описание</mat-label>
+      <textarea
+        matInput
+        [value]="quiz.description ?? ''"
+        (blur)="updateDescription(quiz, $any($event.target).value)"
+      ></textarea>
+    </mat-form-field>
+
+    <h2>Вопросы</h2>
+
+    @if (quiz.questions.length === 0) {
+      <p class="empty-state">Вопросов пока нет — добавьте первый ниже.</p>
+    }
+
+    <div cdkDropList class="question-list" (cdkDropListDropped)="drop(quiz, $event)">
+      @for (question of quiz.questions; track question.id) {
+        <div cdkDrag class="question-item">
+          <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+            <mat-icon>drag_indicator</mat-icon>
+          </span>
+          <mat-form-field appearance="outline" class="question-prompt">
+            <mat-label>{{ questionTypeLabels[question.type] }}</mat-label>
+            <input
+              matInput
+              [value]="question.prompt"
+              (blur)="updateQuestionPrompt(quiz, question.id, $any($event.target).value)"
+            />
+          </mat-form-field>
+          <button
+            mat-icon-button
+            (click)="removeQuestion(quiz, question.id)"
+            aria-label="Удалить вопрос"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="add-question">
+      <mat-form-field appearance="outline">
+        <mat-label>Тип вопроса</mat-label>
+        <mat-select [value]="newQuestionType()" (valueChange)="newQuestionType.set($event)">
+          @for (type of questionTypes; track type) {
+            <mat-option [value]="type">{{ questionTypeLabels[type] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-flat-button (click)="addQuestion(quiz)">
+        <mat-icon>add</mat-icon>
+        Добавить вопрос
+      </button>
+    </div>
+  </div>
+} @else {
+  <p class="empty-state">Опросник не найден.</p>
+}
