@@ -1,0 +1,16 @@
+<div class="text-editor">
+  <mat-checkbox [checked]="question().multiline" (change)="onMultilineChange($event.checked)">
+    Многострочный ответ
+  </mat-checkbox>
+
+  <mat-form-field appearance="outline" class="max-length-field">
+    <mat-label>Максимум символов</mat-label>
+    <input
+      matInput
+      type="number"
+      min="1"
+      [value]="question().maxLength ?? ''"
+      (blur)="onMaxLengthChange($any($event.target).value)"
+    />
+  </mat-form-field>
+</div>

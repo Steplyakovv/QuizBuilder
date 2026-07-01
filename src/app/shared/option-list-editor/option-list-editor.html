@@ -1,0 +1,47 @@
+<div class="option-list">
+  @for (option of options(); track option.id) {
+    <div class="option-row">
+      @if (showCorrectMarking()) {
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-pressed]="isCorrect(option.id)"
+          [attr.aria-label]="isCorrect(option.id) ? 'Правильный ответ' : 'Отметить как правильный'"
+          (click)="toggleCorrect(option.id)"
+        >
+          <mat-icon>{{ isCorrect(option.id) ? 'star' : 'star_border' }}</mat-icon>
+        </button>
+      }
+      <mat-form-field appearance="outline" class="option-label">
+        <input
+          matInput
+          [value]="option.label"
+          (blur)="updateLabel(option.id, $any($event.target).value)"
+          placeholder="Текст варианта"
+        />
+      </mat-form-field>
+      @if (showImageUrl()) {
+        <mat-form-field appearance="outline" class="option-image-url">
+          <input
+            matInput
+            [value]="option.imageUrl ?? ''"
+            (blur)="updateImageUrl(option.id, $any($event.target).value)"
+            placeholder="URL картинки"
+          />
+        </mat-form-field>
+      }
+      <button
+        mat-icon-button
+        type="button"
+        (click)="removeOption(option.id)"
+        aria-label="Удалить вариант"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+  <button mat-stroked-button type="button" (click)="addOption()">
+    <mat-icon>add</mat-icon>
+    Добавить вариант
+  </button>
+</div>

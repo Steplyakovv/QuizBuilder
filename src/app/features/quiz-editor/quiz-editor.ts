@@ -2,12 +2,13 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { QUESTION_TYPE_LABELS, QuestionType } from '../../core/models/question.factory';
-import { Quiz } from '../../core/models/quiz.models';
+import { Question, Quiz } from '../../core/models/quiz.models';
 import {
   addQuestion,
   removeQuestion,
@@ -15,6 +16,10 @@ import {
   replaceQuestion,
 } from '../../core/models/quiz-questions';
 import { QuizStore } from '../../core/state/quiz-store';
+import { ImageChoiceEditor } from './question-editors/image-choice-editor';
+import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
+import { SingleChoiceEditor } from './question-editors/single-choice-editor';
+import { TextEditor } from './question-editors/text-editor';
 
 @Component({
   selector: 'app-quiz-editor',
@@ -22,10 +27,15 @@ import { QuizStore } from '../../core/state/quiz-store';
     RouterLink,
     DragDropModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    ImageChoiceEditor,
+    MultipleChoiceEditor,
+    SingleChoiceEditor,
+    TextEditor,
   ],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
@@ -60,6 +70,10 @@ export class QuizEditor {
     await this.store.update({ ...quiz, description: trimmed || undefined });
   }
 
+  async updateGraded(quiz: Quiz, isGraded: boolean): Promise<void> {
+    await this.store.update({ ...quiz, settings: { ...quiz.settings, isGraded } });
+  }
+
   async addQuestion(quiz: Quiz): Promise<void> {
     await this.store.update(addQuestion(quiz, this.newQuestionType()));
   }
@@ -73,7 +87,19 @@ export class QuizEditor {
     if (!question) {
       return;
     }
-    await this.store.update(replaceQuestion(quiz, { ...question, prompt }));
+    await this.saveQuestion(quiz, { ...question, prompt });
+  }
+
+  async updateQuestionRequired(quiz: Quiz, questionId: string, required: boolean): Promise<void> {
+    const question = quiz.questions.find((existing) => existing.id === questionId);
+    if (!question) {
+      return;
+    }
+    await this.saveQuestion(quiz, { ...question, required });
+  }
+
+  async saveQuestion(quiz: Quiz, updated: Question): Promise<void> {
+    await this.store.update(replaceQuestion(quiz, updated));
   }
 
   async drop(quiz: Quiz, event: CdkDragDrop<unknown>): Promise<void> {

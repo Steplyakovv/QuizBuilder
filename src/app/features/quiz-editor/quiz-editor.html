@@ -16,6 +16,10 @@
       ></textarea>
     </mat-form-field>
 
+    <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded(quiz, $event.checked)">
+      Квиз с баллами (отмечать правильные ответы)
+    </mat-checkbox>
+
     <h2>Вопросы</h2>
 
     @if (quiz.questions.length === 0) {
@@ -25,24 +29,59 @@
     <div cdkDropList class="question-list" (cdkDropListDropped)="drop(quiz, $event)">
       @for (question of quiz.questions; track question.id) {
         <div cdkDrag class="question-item">
-          <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
-            <mat-icon>drag_indicator</mat-icon>
-          </span>
-          <mat-form-field appearance="outline" class="question-prompt">
-            <mat-label>{{ questionTypeLabels[question.type] }}</mat-label>
-            <input
-              matInput
-              [value]="question.prompt"
-              (blur)="updateQuestionPrompt(quiz, question.id, $any($event.target).value)"
-            />
-          </mat-form-field>
-          <button
-            mat-icon-button
-            (click)="removeQuestion(quiz, question.id)"
-            aria-label="Удалить вопрос"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
+          <div class="question-header">
+            <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+              <mat-icon>drag_indicator</mat-icon>
+            </span>
+            <mat-form-field appearance="outline" class="question-prompt">
+              <mat-label>{{ questionTypeLabels[question.type] }}</mat-label>
+              <input
+                matInput
+                [value]="question.prompt"
+                (blur)="updateQuestionPrompt(quiz, question.id, $any($event.target).value)"
+              />
+            </mat-form-field>
+            <mat-checkbox
+              [checked]="question.required"
+              (change)="updateQuestionRequired(quiz, question.id, $event.checked)"
+            >
+              Обязательный
+            </mat-checkbox>
+            <button
+              mat-icon-button
+              (click)="removeQuestion(quiz, question.id)"
+              aria-label="Удалить вопрос"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <div class="question-body">
+            @if (question.type === 'single-choice') {
+              <app-single-choice-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion(quiz, $event)"
+              />
+            } @else if (question.type === 'multiple-choice') {
+              <app-multiple-choice-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion(quiz, $event)"
+              />
+            } @else if (question.type === 'text') {
+              <app-text-editor
+                [question]="question"
+                (questionChange)="saveQuestion(quiz, $event)"
+              />
+            } @else if (question.type === 'image-choice') {
+              <app-image-choice-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion(quiz, $event)"
+              />
+            }
+          </div>
         </div>
       }
     </div>

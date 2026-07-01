@@ -1,0 +1,19 @@
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.option-label {
+  flex: 1;
+}
+
+.option-image-url {
+  flex: 1;
+}

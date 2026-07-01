@@ -32,6 +32,56 @@ test('adds a question and renames the quiz from the editor', async ({ page }) =>
   await expect(page.getByRole('link', { name: 'Опрос про чай' })).toBeVisible();
 });
 
+test('adds options to a single-choice question and marks a correct answer in graded mode', async ({
+  page,
+}) => {
+  await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+  await page.getByRole('button', { name: 'Создать' }).click();
+  await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+
+  await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+
+  const questionItem = page.locator('.question-item').first();
+  await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+  await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+
+  const optionInputs = questionItem.locator('.option-row input');
+  await optionInputs.nth(0).fill('Латте');
+  await optionInputs.nth(0).blur();
+  await optionInputs.nth(1).fill('Эспрессо');
+  await optionInputs.nth(1).blur();
+
+  await expect(questionItem.getByRole('button', { name: /Отметить как правильный/ })).toHaveCount(
+    0,
+  );
+
+  await page.getByRole('checkbox', { name: 'Квиз с баллами' }).click();
+
+  await questionItem.getByRole('button', { name: 'Отметить как правильный' }).first().click();
+  await expect(
+    questionItem.getByRole('button', { name: 'Правильный ответ' }),
+  ).toBeVisible();
+});
+
+test('configures a text question as multiline with a max length', async ({ page }) => {
+  await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+  await page.getByRole('button', { name: 'Создать' }).click();
+  await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+
+  await page.getByLabel('Тип вопроса').click();
+  await page.getByRole('option', { name: 'Текстовый ответ' }).click();
+  await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+
+  const questionItem = page.locator('.question-item').first();
+  await questionItem.getByRole('checkbox', { name: 'Многострочный ответ' }).click();
+  const maxLengthField = questionItem.getByLabel('Максимум символов');
+  await maxLengthField.fill('200');
+  await maxLengthField.blur();
+
+  await expect(questionItem.getByRole('checkbox', { name: 'Многострочный ответ' })).toBeChecked();
+  await expect(maxLengthField).toHaveValue('200');
+});
+
 test('duplicates and deletes a quiz from the list', async ({ page }) => {
   await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
   await page.getByRole('button', { name: 'Создать' }).click();

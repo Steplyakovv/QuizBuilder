@@ -1,0 +1,15 @@
+<div class="image-choice-editor">
+  <mat-checkbox [checked]="question().multiple" (change)="onMultipleChange($event.checked)">
+    Несколько правильных вариантов
+  </mat-checkbox>
+
+  <app-option-list-editor
+    [options]="question().options"
+    [correctOptionIds]="question().correctOptionIds ?? []"
+    [selectionMode]="question().multiple ? 'multiple' : 'single'"
+    [showCorrectMarking]="graded()"
+    [showImageUrl]="true"
+    (optionsChange)="onOptionsChange($event)"
+    (correctOptionIdsChange)="onCorrectChange($event)"
+  />
+</div>
