@@ -1,10 +1,5 @@
 import { createQuiz } from './quiz.factory';
-import {
-  addQuestion,
-  removeQuestion,
-  reorderQuestions,
-  updateQuestionPrompt,
-} from './quiz-questions';
+import { addQuestion, removeQuestion, reorderQuestions, replaceQuestion } from './quiz-questions';
 
 describe('addQuestion', () => {
   it('appends a question of the given type', () => {
@@ -27,16 +22,23 @@ describe('removeQuestion', () => {
   });
 });
 
-describe('updateQuestionPrompt', () => {
-  it('updates the prompt of the matching question only', () => {
+describe('replaceQuestion', () => {
+  it('replaces the question with the matching id, leaving others untouched', () => {
     let quiz = addQuestion(createQuiz('Опрос'), 'text');
     quiz = addQuestion(quiz, 'text');
     const [first, second] = quiz.questions;
 
-    quiz = updateQuestionPrompt(quiz, first.id, 'Как вас зовут?');
+    quiz = replaceQuestion(quiz, { ...first, prompt: 'Как вас зовут?' });
 
     expect(quiz.questions[0].prompt).toBe('Как вас зовут?');
-    expect(quiz.questions[1].prompt).toBe(second.prompt);
+    expect(quiz.questions[1]).toEqual(second);
+  });
+
+  it('is a no-op when no question matches the id', () => {
+    const quiz = addQuestion(createQuiz('Опрос'), 'text');
+    const unrelated = { ...quiz.questions[0], id: 'missing', prompt: 'x' };
+
+    expect(replaceQuestion(quiz, unrelated)).toEqual(quiz);
   });
 });
 

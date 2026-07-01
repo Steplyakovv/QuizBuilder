@@ -1,5 +1,5 @@
 import { createQuestion, QuestionType } from './question.factory';
-import { Quiz } from './quiz.models';
+import { Question, Quiz } from './quiz.models';
 
 export function addQuestion(quiz: Quiz, type: QuestionType): Quiz {
   return { ...quiz, questions: [...quiz.questions, createQuestion(type)] };
@@ -9,12 +9,10 @@ export function removeQuestion(quiz: Quiz, questionId: string): Quiz {
   return { ...quiz, questions: quiz.questions.filter((question) => question.id !== questionId) };
 }
 
-export function updateQuestionPrompt(quiz: Quiz, questionId: string, prompt: string): Quiz {
+export function replaceQuestion(quiz: Quiz, updated: Question): Quiz {
   return {
     ...quiz,
-    questions: quiz.questions.map((question) =>
-      question.id === questionId ? { ...question, prompt } : question,
-    ),
+    questions: quiz.questions.map((question) => (question.id === updated.id ? updated : question)),
   };
 }
 

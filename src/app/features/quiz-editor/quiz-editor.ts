@@ -12,7 +12,7 @@ import {
   addQuestion,
   removeQuestion,
   reorderQuestions,
-  updateQuestionPrompt,
+  replaceQuestion,
 } from '../../core/models/quiz-questions';
 import { QuizStore } from '../../core/state/quiz-store';
 
@@ -69,7 +69,11 @@ export class QuizEditor {
   }
 
   async updateQuestionPrompt(quiz: Quiz, questionId: string, prompt: string): Promise<void> {
-    await this.store.update(updateQuestionPrompt(quiz, questionId, prompt));
+    const question = quiz.questions.find((existing) => existing.id === questionId);
+    if (!question) {
+      return;
+    }
+    await this.store.update(replaceQuestion(quiz, { ...question, prompt }));
   }
 
   async drop(quiz: Quiz, event: CdkDragDrop<unknown>): Promise<void> {
