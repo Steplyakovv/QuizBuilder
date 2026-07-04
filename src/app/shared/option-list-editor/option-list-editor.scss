@@ -17,3 +17,10 @@
 .option-image-url {
   flex: 1;
 }
+
+.option-image-preview {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border-radius: 4px;
+}

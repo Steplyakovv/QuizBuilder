@@ -21,6 +21,9 @@
         />
       </mat-form-field>
       @if (showImageUrl()) {
+        @if (option.imageUrl) {
+          <img class="option-image-preview" [src]="option.imageUrl" alt="" />
+        }
         <mat-form-field appearance="outline" class="option-image-url">
           <input
             matInput
@@ -29,6 +32,23 @@
             placeholder="URL картинки"
           />
         </mat-form-field>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="fileInput.click()"
+          aria-label="Загрузить картинку с диска"
+        >
+          <mat-icon>upload</mat-icon>
+        </button>
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="
+            onFileSelected(option.id, $any($event.target).files); $any($event.target).value = ''
+          "
+        />
       }
       <button
         mat-icon-button

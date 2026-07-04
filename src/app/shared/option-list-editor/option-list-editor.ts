@@ -53,6 +53,16 @@ export class OptionListEditor {
     this.optionsChange.emit(updateOptionImageUrl(this.options(), optionId, imageUrl));
   }
 
+  onFileSelected(optionId: string, files: FileList | null): void {
+    const file = files?.[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => this.updateImageUrl(optionId, reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
   toggleCorrect(optionId: string): void {
     if (this.selectionMode() === 'single') {
       const current = this.correctOptionIds()[0];

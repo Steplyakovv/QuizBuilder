@@ -75,6 +75,32 @@ describe('OptionListEditor', () => {
     });
   });
 
+  it('reads a selected file as a data URL and emits it as the image url', async () => {
+    const option: Option = { id: 'a', label: 'Да' };
+    const fixture = await createComponent([option]);
+    const emitted = new Promise<Option[]>((resolve) =>
+      fixture.componentInstance.optionsChange.subscribe(resolve),
+    );
+
+    const file = new File(['fake-image-bytes'], 'photo.png', { type: 'image/png' });
+    const fileList = { 0: file, length: 1, item: () => file } as unknown as FileList;
+    fixture.componentInstance.onFileSelected('a', fileList);
+
+    const options = await emitted;
+    expect(options[0].imageUrl).toMatch(/^data:image\/png;base64,/);
+  });
+
+  it('does nothing when no file is selected', async () => {
+    const option: Option = { id: 'a', label: 'Да' };
+    const fixture = await createComponent([option]);
+    let emitted: Option[] | undefined;
+    fixture.componentInstance.optionsChange.subscribe((value) => (emitted = value));
+
+    fixture.componentInstance.onFileSelected('a', null);
+
+    expect(emitted).toBeUndefined();
+  });
+
   describe('multiple selection mode', () => {
     it('adds to the correct ids without removing existing ones', async () => {
       const fixture = await createComponent(
