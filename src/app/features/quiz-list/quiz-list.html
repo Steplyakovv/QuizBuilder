@@ -35,12 +35,22 @@
               />
             </mat-form-field>
           } @else {
-            <a class="quiz-title" [routerLink]="['/quiz', quiz.id]">{{ quiz.title }}</a>
+            <a
+              class="quiz-title"
+              [routerLink]="['/quiz', quiz.id]"
+              title="Открыть редактор вопросов"
+              >{{ quiz.title }}</a
+            >
           }
           <div class="quiz-meta">{{ quiz.questions.length }} вопрос(ов)</div>
           <div class="quiz-actions">
-            <button mat-icon-button (click)="startRename(quiz)" aria-label="Переименовать">
-              <mat-icon>edit</mat-icon>
+            <button
+              mat-icon-button
+              (click)="startRename(quiz)"
+              aria-label="Переименовать"
+              title="Переименовать"
+            >
+              <mat-icon>drive_file_rename_outline</mat-icon>
             </button>
             <button mat-icon-button (click)="duplicateQuiz(quiz.id)" aria-label="Дублировать">
               <mat-icon>content_copy</mat-icon>
