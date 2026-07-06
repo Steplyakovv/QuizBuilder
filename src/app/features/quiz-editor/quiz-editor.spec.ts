@@ -94,6 +94,71 @@ describe('QuizEditor', () => {
     expect(fixture.componentInstance.draft()?.questions[0].prompt).toBe('Как вас зовут?');
   });
 
+  it('surfaces a quota-exceeded error without clearing the dirty draft', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    repository.save = () => Promise.reject(new DOMException('full', 'QuotaExceededError'));
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.updateTitle('Опрос про чай');
+    await fixture.componentInstance.save();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.saveError()).toContain('лимит хранилища браузера');
+    expect(fixture.componentInstance.dirty()).toBe(true);
+  });
+
+  it('surfaces a generic error for other save failures', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    repository.save = () => Promise.reject(new Error('offline'));
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.updateTitle('Опрос про чай');
+    await fixture.componentInstance.save();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.saveError()).toBe(
+      'Не удалось сохранить опросник. Попробуйте ещё раз.',
+    );
+  });
+
+  it('clears a previous save error once the draft is edited again', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const originalSave = repository.save.bind(repository);
+    repository.save = () => Promise.reject(new Error('offline'));
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.updateTitle('Опрос про чай');
+    await fixture.componentInstance.save();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.saveError()).not.toBeNull();
+
+    repository.save = originalSave;
+    fixture.componentInstance.updateTitle('Опрос про латте');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.saveError()).toBeNull();
+  });
+
+  it('blocks the browser tab from closing while there are unsaved changes', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    const cleanEvent = { preventDefault: vi.fn() } as unknown as BeforeUnloadEvent;
+    fixture.componentInstance.onBeforeUnload(cleanEvent);
+    expect(cleanEvent.preventDefault).not.toHaveBeenCalled();
+
+    fixture.componentInstance.updateTitle('Опрос про чай');
+    await fixture.whenStable();
+
+    const dirtyEvent = { preventDefault: vi.fn() } as unknown as BeforeUnloadEvent;
+    fixture.componentInstance.onBeforeUnload(dirtyEvent);
+    expect(dirtyEvent.preventDefault).toHaveBeenCalled();
+  });
+
   it('reorders questions on drop', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await repository.save(quiz);

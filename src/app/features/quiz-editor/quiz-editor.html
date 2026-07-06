@@ -13,6 +13,10 @@
       </div>
     </div>
 
+    @if (saveError()) {
+      <p class="save-error">{{ saveError() }}</p>
+    }
+
     <mat-form-field appearance="outline" class="title-field">
       <mat-label>Название опросника</mat-label>
       <input matInput [value]="quiz.title" (blur)="updateTitle($any($event.target).value)" />

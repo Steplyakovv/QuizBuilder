@@ -39,6 +39,9 @@ import { TextEditor } from './question-editors/text-editor';
   ],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
+  host: {
+    '(window:beforeunload)': 'onBeforeUnload($event)',
+  },
 })
 export class QuizEditor {
   private readonly store = inject(QuizStore);
@@ -51,6 +54,7 @@ export class QuizEditor {
   readonly draft = signal<Quiz | undefined>(undefined);
   readonly dirty = signal(false);
   readonly saving = signal(false);
+  readonly saveError = signal<string | null>(null);
 
   readonly questionTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
   readonly questionTypeLabels = QUESTION_TYPE_LABELS;
@@ -76,6 +80,7 @@ export class QuizEditor {
     }
     this.draft.set(mutate(current));
     this.dirty.set(true);
+    this.saveError.set(null);
   }
 
   updateTitle(title: string): void {
@@ -141,11 +146,26 @@ export class QuizEditor {
       return;
     }
     this.saving.set(true);
+    this.saveError.set(null);
     try {
       await this.store.update(current);
       this.dirty.set(false);
+    } catch (error) {
+      this.saveError.set(
+        error instanceof DOMException && error.name === 'QuotaExceededError'
+          ? 'Не удалось сохранить: превышен лимит хранилища браузера. Попробуйте использовать картинки меньшего размера.'
+          : 'Не удалось сохранить опросник. Попробуйте ещё раз.',
+      );
     } finally {
       this.saving.set(false);
     }
+  }
+
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.dirty()) {
+      return;
+    }
+    event.preventDefault();
+    event.returnValue = true;
   }
 }
