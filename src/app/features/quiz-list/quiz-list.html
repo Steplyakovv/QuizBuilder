@@ -44,6 +44,14 @@
           }
           <div class="quiz-meta">{{ quiz.questions.length }} вопрос(ов)</div>
           <div class="quiz-actions">
+            <a
+              mat-icon-button
+              [routerLink]="['/quiz', quiz.id, 'run']"
+              aria-label="Пройти опросник"
+              title="Пройти опросник"
+            >
+              <mat-icon>play_arrow</mat-icon>
+            </a>
             <button
               mat-icon-button
               (click)="startRename(quiz)"

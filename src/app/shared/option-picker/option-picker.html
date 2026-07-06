@@ -1,0 +1,30 @@
+<div class="option-picker">
+  @if (selectionMode() === 'single') {
+    <mat-radio-group class="option-picker-group" [value]="selected()[0] ?? null">
+      @for (option of options(); track option.id) {
+        <div class="option-picker-item">
+          <mat-radio-button [value]="option.id" (change)="onSingleChange(option.id)">
+            @if (showImages() && option.imageUrl) {
+              <img class="option-picker-image" [src]="option.imageUrl" [alt]="option.label" />
+            }
+            {{ option.label }}
+          </mat-radio-button>
+        </div>
+      }
+    </mat-radio-group>
+  } @else {
+    @for (option of options(); track option.id) {
+      <div class="option-picker-item">
+        <mat-checkbox
+          [checked]="isSelected(option.id)"
+          (change)="onMultipleChange(option.id, $event.checked)"
+        >
+          @if (showImages() && option.imageUrl) {
+            <img class="option-picker-image" [src]="option.imageUrl" [alt]="option.label" />
+          }
+          {{ option.label }}
+        </mat-checkbox>
+      </div>
+    }
+  }
+</div>

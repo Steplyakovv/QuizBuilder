@@ -9,4 +9,8 @@ export const routes: Routes = [
     path: 'quiz/:id',
     loadComponent: () => import('./features/quiz-editor/quiz-editor').then((m) => m.QuizEditor),
   },
+  {
+    path: 'quiz/:id/run',
+    loadComponent: () => import('./features/quiz-runner/quiz-runner').then((m) => m.QuizRunner),
+  },
 ];

@@ -107,6 +107,38 @@ test('configures a text question as multiline with a max length', async ({ page 
   await expect(maxLengthField).toHaveValue('200');
 });
 
+test('respondent must answer a required question before results are graded', async ({ page }) => {
+  await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+  await page.getByRole('button', { name: 'Создать' }).click();
+  await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+
+  await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+  const questionItem = page.locator('.question-item').first();
+  await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+  await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+  const optionInputs = questionItem.locator('.option-row input');
+  await optionInputs.nth(0).fill('Латте');
+  await optionInputs.nth(0).blur();
+  await optionInputs.nth(1).fill('Эспрессо');
+  await optionInputs.nth(1).blur();
+
+  await page.getByRole('checkbox', { name: 'Квиз с баллами' }).click();
+  await questionItem.getByRole('button', { name: 'Отметить как правильный' }).first().click();
+  await page.getByRole('button', { name: 'Сохранить' }).click();
+
+  await page.getByRole('link', { name: '← К списку опросников' }).click();
+  await page.getByRole('link', { name: 'Пройти опросник' }).click();
+
+  await page.getByRole('button', { name: 'Отправить ответы' }).click();
+  await expect(page.getByText('Это поле обязательно для заполнения')).toBeVisible();
+
+  await page.getByRole('radio', { name: 'Латте' }).click();
+  await page.getByRole('button', { name: 'Отправить ответы' }).click();
+
+  await expect(page.getByText('Спасибо! Ваши ответы сохранены.')).toBeVisible();
+  await expect(page.getByText('Результат: 1 из 1 правильных ответов')).toBeVisible();
+});
+
 test('duplicates and deletes a quiz from the list', async ({ page }) => {
   await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
   await page.getByRole('button', { name: 'Создать' }).click();

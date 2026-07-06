@@ -1,0 +1,74 @@
+@if (quiz(); as quiz) {
+  <div class="quiz-runner">
+    <a routerLink="/" class="back-link">← К списку опросников</a>
+
+    <h1>{{ quiz.title }}</h1>
+    @if (quiz.description) {
+      <p class="quiz-description">{{ quiz.description }}</p>
+    }
+
+    @if (!submitted()) {
+      @if (saveError()) {
+        <p class="save-error">{{ saveError() }}</p>
+      }
+
+      <form (submit)="submit(); $event.preventDefault()">
+        @for (question of quiz.questions; track question.id) {
+          <div class="question-item" [class.invalid]="validationErrors().has(question.id)">
+            <p class="question-prompt">
+              {{ question.prompt }}
+              @if (question.required) {
+                <span class="required-marker">*</span>
+              }
+            </p>
+
+            @if (question.type === 'single-choice') {
+              <app-single-choice-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            } @else if (question.type === 'multiple-choice') {
+              <app-multiple-choice-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            } @else if (question.type === 'text') {
+              <app-text-runner
+                [question]="question"
+                [text]="textResponse(question.id)"
+                (textChange)="setText(question.id, $event)"
+              />
+            } @else if (question.type === 'image-choice') {
+              <app-image-choice-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            }
+
+            @if (validationErrors().has(question.id)) {
+              <p class="field-error">Это поле обязательно для заполнения</p>
+            }
+          </div>
+        }
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+          Отправить ответы
+        </button>
+      </form>
+    } @else {
+      <div class="quiz-runner-result">
+        <p>Спасибо! Ваши ответы сохранены.</p>
+        @if (result(); as result) {
+          <p class="score">
+            Результат: {{ result.correct }} из {{ result.total }} правильных ответов
+          </p>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <p class="empty-state">Опросник не найден.</p>
+}
