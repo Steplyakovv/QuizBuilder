@@ -27,6 +27,33 @@ test('adds a question and renames the quiz from the editor', async ({ page }) =>
   const titleField = page.getByLabel('Название опросника');
   await titleField.fill('Опрос про чай');
   await titleField.blur();
+  await page.getByRole('button', { name: 'Сохранить' }).click();
+
+  await page.getByRole('link', { name: '← К списку опросников' }).click();
+  await expect(page.getByRole('link', { name: 'Опрос про чай' })).toBeVisible();
+});
+
+test('quiz edits are not persisted until Save is pressed', async ({ page }) => {
+  await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+  await page.getByRole('button', { name: 'Создать' }).click();
+  await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+
+  const titleField = page.getByLabel('Название опросника');
+  const saveButton = page.getByRole('button', { name: 'Сохранить' });
+  await expect(saveButton).toBeDisabled();
+
+  await titleField.fill('Опрос про чай');
+  await titleField.blur();
+  await expect(saveButton).toBeEnabled();
+
+  await page.getByRole('link', { name: '← К списку опросников' }).click();
+  await expect(page.getByRole('link', { name: 'Опрос про кофе' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Опрос про чай' })).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+  await page.getByLabel('Название опросника').fill('Опрос про чай');
+  await page.getByLabel('Название опросника').blur();
+  await page.getByRole('button', { name: 'Сохранить' }).click();
 
   await page.getByRole('link', { name: '← К списку опросников' }).click();
   await expect(page.getByRole('link', { name: 'Опрос про чай' })).toBeVisible();
@@ -58,9 +85,7 @@ test('adds options to a single-choice question and marks a correct answer in gra
   await page.getByRole('checkbox', { name: 'Квиз с баллами' }).click();
 
   await questionItem.getByRole('button', { name: 'Отметить как правильный' }).first().click();
-  await expect(
-    questionItem.getByRole('button', { name: 'Правильный ответ' }),
-  ).toBeVisible();
+  await expect(questionItem.getByRole('button', { name: 'Правильный ответ' })).toBeVisible();
 });
 
 test('configures a text question as multiline with a max length', async ({ page }) => {

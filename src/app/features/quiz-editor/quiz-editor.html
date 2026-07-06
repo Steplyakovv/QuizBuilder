@@ -1,10 +1,21 @@
-@if (quiz(); as quiz) {
+@if (draft(); as quiz) {
   <div class="quiz-editor">
-    <a routerLink="/" class="back-link">← К списку опросников</a>
+    <div class="editor-header">
+      <a routerLink="/" class="back-link">← К списку опросников</a>
+      <div class="save-actions">
+        @if (dirty()) {
+          <span class="unsaved-indicator">Есть несохранённые изменения</span>
+        }
+        <button mat-flat-button color="primary" [disabled]="!dirty() || saving()" (click)="save()">
+          <mat-icon>save</mat-icon>
+          Сохранить
+        </button>
+      </div>
+    </div>
 
     <mat-form-field appearance="outline" class="title-field">
       <mat-label>Название опросника</mat-label>
-      <input matInput [value]="quiz.title" (blur)="updateTitle(quiz, $any($event.target).value)" />
+      <input matInput [value]="quiz.title" (blur)="updateTitle($any($event.target).value)" />
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="description-field">
@@ -12,11 +23,11 @@
       <textarea
         matInput
         [value]="quiz.description ?? ''"
-        (blur)="updateDescription(quiz, $any($event.target).value)"
+        (blur)="updateDescription($any($event.target).value)"
       ></textarea>
     </mat-form-field>
 
-    <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded(quiz, $event.checked)">
+    <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded($event.checked)">
       Квиз с баллами (отмечать правильные ответы)
     </mat-checkbox>
 
@@ -26,7 +37,7 @@
       <p class="empty-state">Вопросов пока нет — добавьте первый ниже.</p>
     }
 
-    <div cdkDropList class="question-list" (cdkDropListDropped)="drop(quiz, $event)">
+    <div cdkDropList class="question-list" (cdkDropListDropped)="drop($event)">
       @for (question of quiz.questions; track question.id) {
         <div cdkDrag class="question-item">
           <div class="question-header">
@@ -38,18 +49,18 @@
               <input
                 matInput
                 [value]="question.prompt"
-                (blur)="updateQuestionPrompt(quiz, question.id, $any($event.target).value)"
+                (blur)="updateQuestionPrompt(question.id, $any($event.target).value)"
               />
             </mat-form-field>
             <mat-checkbox
               [checked]="question.required"
-              (change)="updateQuestionRequired(quiz, question.id, $event.checked)"
+              (change)="updateQuestionRequired(question.id, $event.checked)"
             >
               Обязательный
             </mat-checkbox>
             <button
               mat-icon-button
-              (click)="removeQuestion(quiz, question.id)"
+              (click)="removeQuestion(question.id)"
               aria-label="Удалить вопрос"
             >
               <mat-icon>delete</mat-icon>
@@ -61,24 +72,21 @@
               <app-single-choice-editor
                 [question]="question"
                 [graded]="quiz.settings.isGraded"
-                (questionChange)="saveQuestion(quiz, $event)"
+                (questionChange)="saveQuestion($event)"
               />
             } @else if (question.type === 'multiple-choice') {
               <app-multiple-choice-editor
                 [question]="question"
                 [graded]="quiz.settings.isGraded"
-                (questionChange)="saveQuestion(quiz, $event)"
+                (questionChange)="saveQuestion($event)"
               />
             } @else if (question.type === 'text') {
-              <app-text-editor
-                [question]="question"
-                (questionChange)="saveQuestion(quiz, $event)"
-              />
+              <app-text-editor [question]="question" (questionChange)="saveQuestion($event)" />
             } @else if (question.type === 'image-choice') {
               <app-image-choice-editor
                 [question]="question"
                 [graded]="quiz.settings.isGraded"
-                (questionChange)="saveQuestion(quiz, $event)"
+                (questionChange)="saveQuestion($event)"
               />
             }
           </div>
@@ -95,7 +103,7 @@
           }
         </mat-select>
       </mat-form-field>
-      <button mat-flat-button (click)="addQuestion(quiz)">
+      <button mat-flat-button (click)="addQuestion()">
         <mat-icon>add</mat-icon>
         Добавить вопрос
       </button>

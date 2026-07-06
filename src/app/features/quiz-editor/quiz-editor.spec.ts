@@ -37,55 +37,61 @@ describe('QuizEditor', () => {
 
     const fixture = await createComponent(quiz.id);
 
-    expect(fixture.componentInstance.quiz()?.title).toBe('Опрос про кофе');
+    expect(fixture.componentInstance.draft()?.title).toBe('Опрос про кофе');
+    expect(fixture.componentInstance.dirty()).toBe(false);
   });
 
-  it('updates the quiz title', async () => {
+  it('edits the draft without persisting until save is called', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await repository.save(quiz);
     const fixture = await createComponent(quiz.id);
 
-    await fixture.componentInstance.updateTitle(quiz, 'Опрос про чай');
+    fixture.componentInstance.updateTitle('Опрос про чай');
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.quiz()?.title).toBe('Опрос про чай');
+    expect(fixture.componentInstance.draft()?.title).toBe('Опрос про чай');
+    expect(fixture.componentInstance.dirty()).toBe(true);
+    expect((await repository.getById(quiz.id))?.title).toBe('Опрос про кофе');
+
+    await fixture.componentInstance.save();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.dirty()).toBe(false);
+    expect((await repository.getById(quiz.id))?.title).toBe('Опрос про чай');
   });
 
-  it('adds and removes a question', async () => {
+  it('adds and removes a question in the draft', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await repository.save(quiz);
     const fixture = await createComponent(quiz.id);
 
     fixture.componentInstance.newQuestionType.set('text');
-    await fixture.componentInstance.addQuestion(fixture.componentInstance.quiz()!);
+    fixture.componentInstance.addQuestion();
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.quiz()?.questions).toHaveLength(1);
-    const questionId = fixture.componentInstance.quiz()!.questions[0].id;
+    expect(fixture.componentInstance.draft()?.questions).toHaveLength(1);
+    const questionId = fixture.componentInstance.draft()!.questions[0].id;
 
-    await fixture.componentInstance.removeQuestion(fixture.componentInstance.quiz()!, questionId);
+    fixture.componentInstance.removeQuestion(questionId);
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.quiz()?.questions).toHaveLength(0);
+    expect(fixture.componentInstance.draft()?.questions).toHaveLength(0);
+    expect((await repository.getById(quiz.id))?.questions).toHaveLength(0);
   });
 
-  it('updates a question prompt', async () => {
+  it('updates a question prompt in the draft', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await repository.save(quiz);
     const fixture = await createComponent(quiz.id);
 
-    await fixture.componentInstance.addQuestion(fixture.componentInstance.quiz()!);
+    fixture.componentInstance.addQuestion();
     await fixture.whenStable();
-    const questionId = fixture.componentInstance.quiz()!.questions[0].id;
+    const questionId = fixture.componentInstance.draft()!.questions[0].id;
 
-    await fixture.componentInstance.updateQuestionPrompt(
-      fixture.componentInstance.quiz()!,
-      questionId,
-      'Как вас зовут?',
-    );
+    fixture.componentInstance.updateQuestionPrompt(questionId, 'Как вас зовут?');
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.quiz()?.questions[0].prompt).toBe('Как вас зовут?');
+    expect(fixture.componentInstance.draft()?.questions[0].prompt).toBe('Как вас зовут?');
   });
 
   it('reorders questions on drop', async () => {
@@ -93,19 +99,19 @@ describe('QuizEditor', () => {
     await repository.save(quiz);
     const fixture = await createComponent(quiz.id);
 
-    await fixture.componentInstance.addQuestion(fixture.componentInstance.quiz()!);
+    fixture.componentInstance.addQuestion();
     fixture.componentInstance.newQuestionType.set('single-choice');
-    await fixture.componentInstance.addQuestion(fixture.componentInstance.quiz()!);
+    fixture.componentInstance.addQuestion();
     await fixture.whenStable();
-    const ids = fixture.componentInstance.quiz()!.questions.map((question) => question.id);
+    const ids = fixture.componentInstance.draft()!.questions.map((question) => question.id);
 
-    await fixture.componentInstance.drop(fixture.componentInstance.quiz()!, {
+    fixture.componentInstance.drop({
       previousIndex: 0,
       currentIndex: 1,
     } as CdkDragDrop<unknown>);
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.quiz()!.questions.map((question) => question.id)).toEqual([
+    expect(fixture.componentInstance.draft()!.questions.map((question) => question.id)).toEqual([
       ids[1],
       ids[0],
     ]);

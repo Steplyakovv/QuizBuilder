@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,7 +44,13 @@ export class QuizEditor {
   private readonly store = inject(QuizStore);
 
   readonly id = input.required<string>();
-  readonly quiz = computed(() => this.store.quizzes().find((quiz) => quiz.id === this.id()));
+  private readonly sourceQuiz = computed(() =>
+    this.store.quizzes().find((quiz) => quiz.id === this.id()),
+  );
+
+  readonly draft = signal<Quiz | undefined>(undefined);
+  readonly dirty = signal(false);
+  readonly saving = signal(false);
 
   readonly questionTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
   readonly questionTypeLabels = QUESTION_TYPE_LABELS;
@@ -52,60 +58,94 @@ export class QuizEditor {
 
   constructor() {
     void this.store.load();
+    effect(() => {
+      const quiz = this.sourceQuiz();
+      untracked(() => {
+        if (quiz && this.draft()?.id !== quiz.id) {
+          this.draft.set(quiz);
+          this.dirty.set(false);
+        }
+      });
+    });
   }
 
-  async updateTitle(quiz: Quiz, title: string): Promise<void> {
+  private updateDraft(mutate: (quiz: Quiz) => Quiz): void {
+    const current = this.draft();
+    if (!current) {
+      return;
+    }
+    this.draft.set(mutate(current));
+    this.dirty.set(true);
+  }
+
+  updateTitle(title: string): void {
+    const current = this.draft();
     const trimmed = title.trim();
-    if (!trimmed || trimmed === quiz.title) {
+    if (!current || !trimmed || trimmed === current.title) {
       return;
     }
-    await this.store.update({ ...quiz, title: trimmed });
+    this.updateDraft((quiz) => ({ ...quiz, title: trimmed }));
   }
 
-  async updateDescription(quiz: Quiz, description: string): Promise<void> {
+  updateDescription(description: string): void {
+    const current = this.draft();
     const trimmed = description.trim();
-    if (trimmed === (quiz.description ?? '')) {
+    if (!current || trimmed === (current.description ?? '')) {
       return;
     }
-    await this.store.update({ ...quiz, description: trimmed || undefined });
+    this.updateDraft((quiz) => ({ ...quiz, description: trimmed || undefined }));
   }
 
-  async updateGraded(quiz: Quiz, isGraded: boolean): Promise<void> {
-    await this.store.update({ ...quiz, settings: { ...quiz.settings, isGraded } });
+  updateGraded(isGraded: boolean): void {
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, isGraded } }));
   }
 
-  async addQuestion(quiz: Quiz): Promise<void> {
-    await this.store.update(addQuestion(quiz, this.newQuestionType()));
+  addQuestion(): void {
+    this.updateDraft((quiz) => addQuestion(quiz, this.newQuestionType()));
   }
 
-  async removeQuestion(quiz: Quiz, questionId: string): Promise<void> {
-    await this.store.update(removeQuestion(quiz, questionId));
+  removeQuestion(questionId: string): void {
+    this.updateDraft((quiz) => removeQuestion(quiz, questionId));
   }
 
-  async updateQuestionPrompt(quiz: Quiz, questionId: string, prompt: string): Promise<void> {
-    const question = quiz.questions.find((existing) => existing.id === questionId);
+  updateQuestionPrompt(questionId: string, prompt: string): void {
+    const question = this.draft()?.questions.find((existing) => existing.id === questionId);
     if (!question) {
       return;
     }
-    await this.saveQuestion(quiz, { ...question, prompt });
+    this.saveQuestion({ ...question, prompt });
   }
 
-  async updateQuestionRequired(quiz: Quiz, questionId: string, required: boolean): Promise<void> {
-    const question = quiz.questions.find((existing) => existing.id === questionId);
+  updateQuestionRequired(questionId: string, required: boolean): void {
+    const question = this.draft()?.questions.find((existing) => existing.id === questionId);
     if (!question) {
       return;
     }
-    await this.saveQuestion(quiz, { ...question, required });
+    this.saveQuestion({ ...question, required });
   }
 
-  async saveQuestion(quiz: Quiz, updated: Question): Promise<void> {
-    await this.store.update(replaceQuestion(quiz, updated));
+  saveQuestion(updated: Question): void {
+    this.updateDraft((quiz) => replaceQuestion(quiz, updated));
   }
 
-  async drop(quiz: Quiz, event: CdkDragDrop<unknown>): Promise<void> {
+  drop(event: CdkDragDrop<unknown>): void {
     if (event.previousIndex === event.currentIndex) {
       return;
     }
-    await this.store.update(reorderQuestions(quiz, event.previousIndex, event.currentIndex));
+    this.updateDraft((quiz) => reorderQuestions(quiz, event.previousIndex, event.currentIndex));
+  }
+
+  async save(): Promise<void> {
+    const current = this.draft();
+    if (!current) {
+      return;
+    }
+    this.saving.set(true);
+    try {
+      await this.store.update(current);
+      this.dirty.set(false);
+    } finally {
+      this.saving.set(false);
+    }
   }
 }

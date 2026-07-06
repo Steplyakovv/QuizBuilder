@@ -4,11 +4,28 @@
   padding: 2rem 1rem;
 }
 
-.back-link {
-  display: inline-block;
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.back-link {
   color: var(--mat-sys-primary);
   text-decoration: none;
+}
+
+.save-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.unsaved-indicator {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
 }
 
 .title-field,
