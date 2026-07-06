@@ -64,6 +64,11 @@ export class QuizStore {
     return copy;
   }
 
+  async import(quiz: Quiz): Promise<void> {
+    await this.repository.save(quiz);
+    this.quizzesState.update((quizzes) => [...quizzes, quiz]);
+  }
+
   async remove(id: string): Promise<void> {
     await this.repository.delete(id);
     this.quizzesState.update((quizzes) => quizzes.filter((quiz) => quiz.id !== id));

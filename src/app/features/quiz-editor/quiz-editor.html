@@ -6,12 +6,22 @@
         @if (dirty()) {
           <span class="unsaved-indicator">Есть несохранённые изменения</span>
         }
+        <button mat-button (click)="togglePreview()">
+          <mat-icon>visibility</mat-icon>
+          {{ previewing() ? 'Закрыть предпросмотр' : 'Предпросмотр' }}
+        </button>
         <button mat-flat-button color="primary" [disabled]="!dirty() || saving()" (click)="save()">
           <mat-icon>save</mat-icon>
           Сохранить
         </button>
       </div>
     </div>
+
+    @if (previewing()) {
+      <div class="preview-panel">
+        <app-quiz-runner [previewQuiz]="quiz" />
+      </div>
+    }
 
     @if (saveError()) {
       <p class="save-error">{{ saveError() }}</p>

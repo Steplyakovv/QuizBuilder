@@ -1,6 +1,10 @@
 @if (quiz(); as quiz) {
   <div class="quiz-runner">
-    <a routerLink="/" class="back-link">← К списку опросников</a>
+    @if (!isPreview()) {
+      <a routerLink="/" class="back-link">← К списку опросников</a>
+    } @else {
+      <p class="preview-banner">Это предпросмотр — ответы не сохраняются.</p>
+    }
 
     <h1>{{ quiz.title }}</h1>
     @if (quiz.description) {
@@ -69,7 +73,11 @@
       </form>
     } @else {
       <div class="quiz-runner-result">
-        <p>Спасибо! Ваши ответы сохранены.</p>
+        @if (isPreview()) {
+          <p>Это предпросмотр — ответы не сохранены.</p>
+        } @else {
+          <p>Спасибо! Ваши ответы сохранены.</p>
+        }
         @if (result(); as result) {
           <p class="score">
             Результат: {{ result.correct }} из {{ result.total }} правильных ответов

@@ -70,6 +70,15 @@ describe('QuizStore', () => {
     expect(await store.duplicate('missing')).toBeUndefined();
   });
 
+  it('imports a quiz, persisting it and adding it to state as-is', async () => {
+    const quiz = { id: 'imported-1', title: 'Импортированный опрос' } as Quiz;
+
+    await store.import(quiz);
+
+    expect(store.quizzes()).toContainEqual(quiz);
+    expect(await repository.getById(quiz.id)).toEqual(quiz);
+  });
+
   it('removes a quiz from state and repository', async () => {
     const quiz = await store.create('Опрос про кофе');
 

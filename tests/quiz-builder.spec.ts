@@ -187,6 +187,62 @@ test.describe('as admin', () => {
     await expect(page.locator('.attempt-detail')).toContainText('Латте');
   });
 
+  test('previews a quiz from the editor without saving an attempt', async ({ page }) => {
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+    await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+
+    await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+    const questionItem = page.locator('.question-item').first();
+    await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+    await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+    const optionInputs = questionItem.locator('.option-row input');
+    await optionInputs.nth(0).fill('Латте');
+    await optionInputs.nth(0).blur();
+    await optionInputs.nth(1).fill('Эспрессо');
+    await optionInputs.nth(1).blur();
+
+    await page.getByRole('button', { name: 'Предпросмотр' }).click();
+    await expect(page.getByText('Это предпросмотр — ответы не сохраняются.')).toBeVisible();
+
+    await page.getByRole('radio', { name: 'Латте' }).click();
+    await page.getByRole('button', { name: 'Отправить ответы' }).click();
+    await expect(page.getByText('Это предпросмотр — ответы не сохранены.')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Закрыть предпросмотр' }).click();
+    await expect(page.locator('app-quiz-runner')).toHaveCount(0);
+
+    await page.getByRole('link', { name: '← К списку опросников' }).click();
+    await page.getByRole('link', { name: 'Результаты' }).click();
+    await expect(page.getByText('Пока никто не прошёл этот опросник.')).toBeVisible();
+  });
+
+  test('exports a quiz to JSON and imports it back as a new quiz', async ({ page }) => {
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Экспортировать в JSON' }).click();
+    const download = await downloadPromise;
+    const filePath = await download.path();
+
+    await page.locator('input[type="file"]').setInputFiles(filePath!);
+
+    await expect(page.locator('.quiz-card')).toHaveCount(2);
+    await expect(page.getByRole('link', { name: 'Опрос про кофе' })).toHaveCount(2);
+  });
+
+  test('shows an error when importing a file that is not a valid quiz', async ({ page }) => {
+    await page.locator('input[type="file"]').setInputFiles({
+      name: 'invalid.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from('not a quiz'),
+    });
+
+    await expect(page.getByText('Файл повреждён или не является корректным JSON.')).toBeVisible();
+    await expect(page.locator('.quiz-card')).toHaveCount(0);
+  });
+
   test('duplicates and deletes a quiz from the list', async ({ page }) => {
     await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
     await page.getByRole('button', { name: 'Создать' }).click();

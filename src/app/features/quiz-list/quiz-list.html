@@ -13,20 +13,39 @@
 
   @if (isAdmin()) {
     <form class="new-quiz-form" (submit)="createQuiz(); $event.preventDefault()">
-      <mat-form-field appearance="outline">
-        <mat-label>Название нового опросника</mat-label>
-        <input
-          matInput
-          [value]="newQuizTitle()"
-          (input)="newQuizTitle.set($any($event.target).value)"
-          placeholder="Например: Опрос о продукте"
-        />
-      </mat-form-field>
+      <div class="new-quiz-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Название нового опросника</mat-label>
+          <input
+            matInput
+            [value]="newQuizTitle()"
+            (input)="newQuizTitle.set($any($event.target).value)"
+            placeholder="Например: Опрос о продукте"
+          />
+        </mat-form-field>
+        @if (newQuizError()) {
+          <p class="field-error">{{ newQuizError() }}</p>
+        }
+      </div>
       <button mat-flat-button type="submit">
         <mat-icon>add</mat-icon>
         Создать
       </button>
+      <button mat-button type="button" (click)="importFileInput.click()">
+        <mat-icon>upload_file</mat-icon>
+        Импортировать
+      </button>
+      <input
+        #importFileInput
+        type="file"
+        accept="application/json,.json"
+        hidden
+        (change)="onImportFileSelected($event)"
+      />
     </form>
+    @if (importError()) {
+      <p class="import-error">{{ importError() }}</p>
+    }
   }
 
   @if (quizzes().length === 0) {
@@ -81,6 +100,14 @@
               >
                 <mat-icon>bar_chart</mat-icon>
               </a>
+              <button
+                mat-icon-button
+                (click)="exportQuiz(quiz)"
+                aria-label="Экспортировать в JSON"
+                title="Экспортировать в JSON"
+              >
+                <mat-icon>download</mat-icon>
+              </button>
               <button
                 mat-icon-button
                 (click)="startRename(quiz)"

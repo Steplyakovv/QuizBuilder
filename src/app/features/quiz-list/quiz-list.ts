@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { exportQuizToJson, parseImportedQuiz } from '../../core/models/quiz-io';
 import { Quiz } from '../../core/models/quiz.models';
 import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
@@ -30,8 +31,10 @@ export class QuizList {
   readonly isAdmin = this.auth.isAdmin;
 
   readonly newQuizTitle = signal('');
+  readonly newQuizError = signal<string | null>(null);
   readonly editingQuizId = signal<string | null>(null);
   readonly editingTitle = signal('');
+  readonly importError = signal<string | null>(null);
 
   constructor() {
     void this.store.load();
@@ -40,10 +43,42 @@ export class QuizList {
   async createQuiz(): Promise<void> {
     const title = this.newQuizTitle().trim();
     if (!title) {
+      this.newQuizError.set('Введите название опросника.');
       return;
     }
+    this.newQuizError.set(null);
     await this.store.create(title);
     this.newQuizTitle.set('');
+  }
+
+  exportQuiz(quiz: Quiz): void {
+    const json = exportQuizToJson(quiz);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${quiz.title || 'quiz'}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async onImportFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+    this.importError.set(null);
+    try {
+      const json = await file.text();
+      const quiz = parseImportedQuiz(json);
+      await this.store.import(quiz);
+    } catch (error) {
+      this.importError.set(
+        error instanceof Error ? error.message : 'Не удалось импортировать опросник.',
+      );
+    }
   }
 
   startRename(quiz: Quiz): void {

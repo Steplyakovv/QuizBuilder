@@ -7,6 +7,7 @@
 .editor-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1rem;
@@ -31,6 +32,15 @@
 .save-error {
   color: var(--mat-sys-error);
   font-size: 0.875rem;
+}
+
+.preview-panel {
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px dashed var(--mat-sys-outline);
+  border-radius: 4px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .title-field,
@@ -62,6 +72,7 @@
 .question-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -82,5 +93,6 @@
 .add-question {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }

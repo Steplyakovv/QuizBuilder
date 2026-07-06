@@ -2,7 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { createQuiz } from '../../core/models/quiz.factory';
+import { addQuestion } from '../../core/models/quiz-questions';
+import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
+import { FakeAttemptRepository } from '../../core/testing/fake-attempt-repository';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
 import { QuizEditor } from './quiz-editor';
 
@@ -12,7 +15,11 @@ describe('QuizEditor', () => {
   async function createComponent(quizId: string) {
     await TestBed.configureTestingModule({
       imports: [QuizEditor],
-      providers: [provideRouter([]), { provide: QUIZ_REPOSITORY, useValue: repository }],
+      providers: [
+        provideRouter([]),
+        { provide: QUIZ_REPOSITORY, useValue: repository },
+        { provide: ATTEMPT_REPOSITORY, useValue: new FakeAttemptRepository() },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(QuizEditor);
@@ -157,6 +164,31 @@ describe('QuizEditor', () => {
     const dirtyEvent = { preventDefault: vi.fn() } as unknown as BeforeUnloadEvent;
     fixture.componentInstance.onBeforeUnload(dirtyEvent);
     expect(dirtyEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('toggles an inline preview reflecting the current draft', async () => {
+    let quiz = createQuiz('Опрос про кофе');
+    quiz = addQuestion(quiz, 'text');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    expect(fixture.componentInstance.previewing()).toBe(false);
+    expect(fixture.nativeElement.querySelector('app-quiz-runner')).toBeNull();
+
+    fixture.componentInstance.updateTitle('Опрос про латте');
+    fixture.componentInstance.togglePreview();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.previewing()).toBe(true);
+    const runnerHost = fixture.nativeElement.querySelector('app-quiz-runner') as HTMLElement;
+    expect(runnerHost).not.toBeNull();
+    expect(runnerHost.textContent).toContain('Опрос про латте');
+
+    fixture.componentInstance.togglePreview();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.previewing()).toBe(false);
+    expect(fixture.nativeElement.querySelector('app-quiz-runner')).toBeNull();
   });
 
   it('reorders questions on drop', async () => {

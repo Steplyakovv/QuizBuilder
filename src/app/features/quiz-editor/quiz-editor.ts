@@ -16,6 +16,7 @@ import {
   replaceQuestion,
 } from '../../core/models/quiz-questions';
 import { QuizStore } from '../../core/state/quiz-store';
+import { QuizRunner } from '../quiz-runner/quiz-runner';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
 import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
 import { SingleChoiceEditor } from './question-editors/single-choice-editor';
@@ -36,6 +37,7 @@ import { TextEditor } from './question-editors/text-editor';
     MultipleChoiceEditor,
     SingleChoiceEditor,
     TextEditor,
+    QuizRunner,
   ],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
@@ -55,6 +57,7 @@ export class QuizEditor {
   readonly dirty = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
+  readonly previewing = signal(false);
 
   readonly questionTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
   readonly questionTypeLabels = QUESTION_TYPE_LABELS;
@@ -159,6 +162,10 @@ export class QuizEditor {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  togglePreview(): void {
+    this.previewing.update((value) => !value);
   }
 
   onBeforeUnload(event: BeforeUnloadEvent): void {

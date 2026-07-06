@@ -136,6 +136,32 @@ describe('QuizRunner', () => {
     expect(attemptRepository.attempts).toHaveLength(1);
   });
 
+  it('scores a preview quiz without persisting an attempt', async () => {
+    const quiz = singleChoiceQuiz();
+    await TestBed.configureTestingModule({
+      imports: [QuizRunner],
+      providers: [
+        provideRouter([]),
+        { provide: QUIZ_REPOSITORY, useValue: quizRepository },
+        { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(QuizRunner);
+    fixture.componentRef.setInput('previewQuiz', quiz);
+    await fixture.whenStable();
+    const questionId = quiz.questions[0].id;
+
+    expect(fixture.componentInstance.isPreview()).toBe(true);
+
+    fixture.componentInstance.setSelection(questionId, ['o1']);
+    await fixture.componentInstance.submit();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.submitted()).toBe(true);
+    expect(fixture.componentInstance.result()).toEqual({ correct: 1, total: 1 });
+    expect(attemptRepository.attempts).toHaveLength(0);
+  });
+
   it('surfaces a quota-exceeded error without marking the attempt as submitted', async () => {
     let quiz = createQuiz('Опрос про кофе');
     quiz = addQuestion(quiz, 'text');

@@ -15,6 +15,16 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+.preview-banner {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  font-size: 0.875rem;
+}
+
 .save-error {
   color: var(--mat-sys-error);
   font-size: 0.875rem;

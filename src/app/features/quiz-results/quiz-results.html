@@ -22,52 +22,54 @@
       }
 
       <h2>Попытки</h2>
-      <table class="attempts-table">
-        <thead>
-          <tr>
-            <th>Респондент</th>
-            <th>Завершено</th>
-            @if (quiz.settings.isGraded) {
-              <th>Баллы</th>
-            }
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (attempt of attempts(); track attempt.id) {
+      <div class="table-wrapper">
+        <table class="attempts-table">
+          <thead>
             <tr>
-              <td>{{ attempt.respondentName ?? 'Аноним' }}</td>
-              <td>{{ attempt.completedAt | date: 'short' }}</td>
+              <th>Респондент</th>
+              <th>Завершено</th>
               @if (quiz.settings.isGraded) {
-                <td>
-                  @if (scoreFor(attempt); as score) {
-                    {{ score.correct }} из {{ score.total }}
-                  } @else {
-                    —
-                  }
-                </td>
+                <th>Баллы</th>
               }
-              <td>
-                <button mat-button type="button" (click)="toggleExpand(attempt.id)">
-                  {{ expandedAttemptId() === attempt.id ? 'Скрыть' : 'Ответы' }}
-                </button>
-              </td>
+              <th></th>
             </tr>
-            @if (expandedAttemptId() === attempt.id) {
-              <tr class="attempt-detail-row">
-                <td [attr.colspan]="quiz.settings.isGraded ? 4 : 3">
-                  <dl class="attempt-detail">
-                    @for (question of quiz.questions; track question.id) {
-                      <dt>{{ question.prompt }}</dt>
-                      <dd>{{ answerFor(attempt, question) }}</dd>
+          </thead>
+          <tbody>
+            @for (attempt of attempts(); track attempt.id) {
+              <tr>
+                <td>{{ attempt.respondentName ?? 'Аноним' }}</td>
+                <td>{{ attempt.completedAt | date: 'short' }}</td>
+                @if (quiz.settings.isGraded) {
+                  <td>
+                    @if (scoreFor(attempt); as score) {
+                      {{ score.correct }} из {{ score.total }}
+                    } @else {
+                      —
                     }
-                  </dl>
+                  </td>
+                }
+                <td>
+                  <button mat-button type="button" (click)="toggleExpand(attempt.id)">
+                    {{ expandedAttemptId() === attempt.id ? 'Скрыть' : 'Ответы' }}
+                  </button>
                 </td>
               </tr>
+              @if (expandedAttemptId() === attempt.id) {
+                <tr class="attempt-detail-row">
+                  <td [attr.colspan]="quiz.settings.isGraded ? 4 : 3">
+                    <dl class="attempt-detail">
+                      @for (question of quiz.questions; track question.id) {
+                        <dt>{{ question.prompt }}</dt>
+                        <dd>{{ answerFor(attempt, question) }}</dd>
+                      }
+                    </dl>
+                  </td>
+                </tr>
+              }
             }
-          }
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     }
   </div>
 } @else {

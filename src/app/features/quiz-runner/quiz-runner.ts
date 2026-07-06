@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { createId } from '../../core/utils/id';
 import { isQuestionAnswered } from '../../core/models/quiz-attempt';
 import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
-import { QuestionResponse, QuizAttempt } from '../../core/models/quiz.models';
+import { QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
@@ -35,8 +35,17 @@ export class QuizRunner {
   private readonly attemptId = createId();
   private readonly startedAt = new Date().toISOString();
 
-  readonly id = input.required<string>();
-  readonly quiz = computed(() => this.store.quizzes().find((quiz) => quiz.id === this.id()));
+  readonly id = input<string>();
+  readonly previewQuiz = input<Quiz>();
+  readonly isPreview = computed(() => this.previewQuiz() !== undefined);
+  readonly quiz = computed(() => {
+    const preview = this.previewQuiz();
+    if (preview) {
+      return preview;
+    }
+    const id = this.id();
+    return id ? this.store.quizzes().find((quiz) => quiz.id === id) : undefined;
+  });
 
   readonly respondentName = signal('');
   private readonly responses = signal<Record<string, QuestionResponse>>({});
@@ -95,6 +104,12 @@ export class QuizRunner {
     );
     if (unanswered.length > 0) {
       this.validationErrors.set(new Set(unanswered.map((question) => question.id)));
+      return;
+    }
+
+    if (this.isPreview()) {
+      this.result.set(scoreAttempt(quiz, responses));
+      this.submitted.set(true);
       return;
     }
 
