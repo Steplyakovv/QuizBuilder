@@ -56,6 +56,7 @@ export interface ImageChoiceQuestion extends BaseQuestion {
 export interface QuizAttempt {
   id: string;
   quizId: string;
+  respondentName?: string;
   startedAt: string;
   completedAt?: string;
   responses: QuestionResponse[];

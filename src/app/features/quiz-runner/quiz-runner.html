@@ -13,6 +13,15 @@
       }
 
       <form (submit)="submit(); $event.preventDefault()">
+        <mat-form-field appearance="outline" class="respondent-name-field">
+          <mat-label>Ваше имя (необязательно)</mat-label>
+          <input
+            matInput
+            [value]="respondentName()"
+            (input)="respondentName.set($any($event.target).value)"
+          />
+        </mat-form-field>
+
         @for (question of quiz.questions; track question.id) {
           <div class="question-item" [class.invalid]="validationErrors().has(question.id)">
             <p class="question-prompt">

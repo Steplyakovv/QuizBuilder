@@ -5,7 +5,7 @@ export interface AttemptScore {
   total: number;
 }
 
-function hasCorrectAnswer(question: Question): boolean {
+export function hasCorrectAnswer(question: Question): boolean {
   switch (question.type) {
     case 'single-choice':
       return !!question.correctOptionId;
@@ -17,7 +17,7 @@ function hasCorrectAnswer(question: Question): boolean {
   }
 }
 
-function isCorrect(question: Question, response: QuestionResponse | undefined): boolean {
+export function isCorrect(question: Question, response: QuestionResponse | undefined): boolean {
   const selected = response?.selectedOptionIds ?? [];
   switch (question.type) {
     case 'single-choice':

@@ -6,18 +6,37 @@
     @if (attempts().length === 0) {
       <p class="empty-state">Пока никто не прошёл этот опросник.</p>
     } @else {
+      @if (stats().length > 0) {
+        <h2>Статистика по вопросам</h2>
+        <div class="stats-list">
+          @for (stat of stats(); track stat.questionId) {
+            <div class="stat-row">
+              <div class="stat-question">{{ questionById(stat.questionId)?.prompt }}</div>
+              <div class="stat-bar">
+                <div class="stat-bar-correct" [style.width.%]="percentCorrect(stat)"></div>
+              </div>
+              <div class="stat-numbers">{{ stat.correct }} из {{ stat.total }} верно</div>
+            </div>
+          }
+        </div>
+      }
+
+      <h2>Попытки</h2>
       <table class="attempts-table">
         <thead>
           <tr>
+            <th>Респондент</th>
             <th>Завершено</th>
             @if (quiz.settings.isGraded) {
               <th>Баллы</th>
             }
+            <th></th>
           </tr>
         </thead>
         <tbody>
           @for (attempt of attempts(); track attempt.id) {
             <tr>
+              <td>{{ attempt.respondentName ?? 'Аноним' }}</td>
               <td>{{ attempt.completedAt | date: 'short' }}</td>
               @if (quiz.settings.isGraded) {
                 <td>
@@ -28,7 +47,24 @@
                   }
                 </td>
               }
+              <td>
+                <button mat-button type="button" (click)="toggleExpand(attempt.id)">
+                  {{ expandedAttemptId() === attempt.id ? 'Скрыть' : 'Ответы' }}
+                </button>
+              </td>
             </tr>
+            @if (expandedAttemptId() === attempt.id) {
+              <tr class="attempt-detail-row">
+                <td [attr.colspan]="quiz.settings.isGraded ? 4 : 3">
+                  <dl class="attempt-detail">
+                    @for (question of quiz.questions; track question.id) {
+                      <dt>{{ question.prompt }}</dt>
+                      <dd>{{ answerFor(attempt, question) }}</dd>
+                    }
+                  </dl>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>

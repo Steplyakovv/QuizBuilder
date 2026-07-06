@@ -1,6 +1,8 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { createId } from '../../core/utils/id';
 import { isQuestionAnswered } from '../../core/models/quiz-attempt';
 import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
@@ -17,6 +19,8 @@ import { TextRunner } from './question-runners/text-runner';
   imports: [
     RouterLink,
     MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
     ImageChoiceRunner,
     MultipleChoiceRunner,
     SingleChoiceRunner,
@@ -34,6 +38,7 @@ export class QuizRunner {
   readonly id = input.required<string>();
   readonly quiz = computed(() => this.store.quizzes().find((quiz) => quiz.id === this.id()));
 
+  readonly respondentName = signal('');
   private readonly responses = signal<Record<string, QuestionResponse>>({});
   readonly validationErrors = signal<Set<string>>(new Set());
   readonly saving = signal(false);
@@ -100,6 +105,7 @@ export class QuizRunner {
       const attempt: QuizAttempt = {
         id: this.attemptId,
         quizId: quiz.id,
+        respondentName: this.respondentName().trim() || undefined,
         startedAt: this.startedAt,
         completedAt: new Date().toISOString(),
         responses,

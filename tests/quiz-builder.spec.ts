@@ -150,7 +150,9 @@ test.describe('as admin', () => {
     await expect(page.getByText('Результат: 1 из 1 правильных ответов')).toBeVisible();
   });
 
-  test('sees a graded attempt on the results page', async ({ page }) => {
+  test('sees a graded attempt with the respondent name and answers on the results page', async ({
+    page,
+  }) => {
     await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
     await page.getByRole('button', { name: 'Создать' }).click();
     await page.getByRole('link', { name: 'Опрос про кофе' }).click();
@@ -170,13 +172,19 @@ test.describe('as admin', () => {
     await page.getByRole('link', { name: '← К списку опросников' }).click();
 
     await page.getByRole('link', { name: 'Пройти опросник' }).click();
+    await page.getByLabel('Ваше имя (необязательно)').fill('Иван');
     await page.getByRole('radio', { name: 'Латте' }).click();
     await page.getByRole('button', { name: 'Отправить ответы' }).click();
     await page.getByRole('link', { name: '← К списку опросников' }).click();
 
     await page.getByRole('link', { name: 'Результаты' }).click();
     await expect(page.locator('.attempts-table tbody tr')).toHaveCount(1);
+    await expect(page.getByRole('cell', { name: 'Иван' })).toBeVisible();
     await expect(page.getByRole('cell', { name: '1 из 1' })).toBeVisible();
+    await expect(page.getByText('1 из 1 верно')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Ответы' }).click();
+    await expect(page.locator('.attempt-detail')).toContainText('Латте');
   });
 
   test('duplicates and deletes a quiz from the list', async ({ page }) => {

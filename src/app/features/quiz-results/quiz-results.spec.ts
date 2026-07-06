@@ -87,4 +87,86 @@ describe('QuizResults', () => {
       total: 1,
     });
   });
+
+  it('computes per-question statistics across all attempts', async () => {
+    let quiz = createQuiz('Опрос про кофе');
+    quiz = addQuestion(quiz, 'single-choice');
+    const question = {
+      ...quiz.questions[0],
+      options: [
+        { id: 'o1', label: 'Латте' },
+        { id: 'o2', label: 'Эспрессо' },
+      ],
+      correctOptionId: 'o1',
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, question);
+    quiz = { ...quiz, settings: { isGraded: true } };
+    await quizRepository.save(quiz);
+
+    await attemptRepository.save({
+      id: 'a1',
+      quizId: quiz.id,
+      startedAt: '',
+      responses: [{ questionId: question.id, selectedOptionIds: ['o1'] }],
+    });
+    await attemptRepository.save({
+      id: 'a2',
+      quizId: quiz.id,
+      startedAt: '',
+      responses: [{ questionId: question.id, selectedOptionIds: ['o2'] }],
+    });
+
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.stats()).toEqual([
+      { questionId: question.id, correct: 1, incorrect: 1, total: 2 },
+    ]);
+    expect(fixture.componentInstance.percentCorrect(fixture.componentInstance.stats()[0])).toBe(50);
+  });
+
+  it('formats an attempt answer using the respondent name and option labels', async () => {
+    let quiz = createQuiz('Опрос про кофе');
+    quiz = addQuestion(quiz, 'single-choice');
+    const question = {
+      ...quiz.questions[0],
+      options: [
+        { id: 'o1', label: 'Латте' },
+        { id: 'o2', label: 'Эспрессо' },
+      ],
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, question);
+    await quizRepository.save(quiz);
+
+    await attemptRepository.save({
+      id: 'a1',
+      quizId: quiz.id,
+      respondentName: 'Иван',
+      startedAt: '',
+      responses: [{ questionId: question.id, selectedOptionIds: ['o2'] }],
+    });
+
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+    const attempt = fixture.componentInstance.attempts()[0];
+
+    expect(attempt.respondentName).toBe('Иван');
+    expect(fixture.componentInstance.answerFor(attempt, question)).toBe('Эспрессо');
+  });
+
+  it('toggles which attempt is expanded', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    await attemptRepository.save({ id: 'a1', quizId: quiz.id, startedAt: '', responses: [] });
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.expandedAttemptId()).toBeNull();
+
+    fixture.componentInstance.toggleExpand('a1');
+    expect(fixture.componentInstance.expandedAttemptId()).toBe('a1');
+
+    fixture.componentInstance.toggleExpand('a1');
+    expect(fixture.componentInstance.expandedAttemptId()).toBeNull();
+  });
 });

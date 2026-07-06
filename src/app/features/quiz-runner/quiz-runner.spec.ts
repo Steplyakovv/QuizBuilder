@@ -107,6 +107,20 @@ describe('QuizRunner', () => {
     });
   });
 
+  it('saves the entered respondent name and omits it when left blank', async () => {
+    const quiz = singleChoiceQuiz();
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+    const questionId = quiz.questions[0].id;
+
+    fixture.componentInstance.respondentName.set('  Иван  ');
+    fixture.componentInstance.setSelection(questionId, ['o1']);
+    await fixture.componentInstance.submit();
+    await fixture.whenStable();
+
+    expect(attemptRepository.attempts[0].respondentName).toBe('Иван');
+  });
+
   it('does not require an optional question to be answered', async () => {
     let quiz = createQuiz('Опрос про кофе');
     quiz = addQuestion(quiz, 'text');
