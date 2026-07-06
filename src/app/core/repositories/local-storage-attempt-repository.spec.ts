@@ -41,4 +41,11 @@ describe('LocalStorageAttemptRepository', () => {
 
     expect(readStored().map((attempt) => attempt.id)).toEqual(['a1', 'a2']);
   });
+
+  it('returns only the attempts for the requested quiz', async () => {
+    await repository.save(createAttempt('a1'));
+    await repository.save({ ...createAttempt('a2'), quizId: 'quiz2' });
+
+    expect(await repository.getByQuizId('quiz1')).toEqual([createAttempt('a1')]);
+  });
 });

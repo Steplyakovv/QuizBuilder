@@ -1,0 +1,39 @@
+@if (quiz(); as quiz) {
+  <div class="quiz-results">
+    <a routerLink="/" class="back-link">← К списку опросников</a>
+    <h1>Результаты: {{ quiz.title }}</h1>
+
+    @if (attempts().length === 0) {
+      <p class="empty-state">Пока никто не прошёл этот опросник.</p>
+    } @else {
+      <table class="attempts-table">
+        <thead>
+          <tr>
+            <th>Завершено</th>
+            @if (quiz.settings.isGraded) {
+              <th>Баллы</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (attempt of attempts(); track attempt.id) {
+            <tr>
+              <td>{{ attempt.completedAt | date: 'short' }}</td>
+              @if (quiz.settings.isGraded) {
+                <td>
+                  @if (scoreFor(attempt); as score) {
+                    {{ score.correct }} из {{ score.total }}
+                  } @else {
+                    —
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+} @else {
+  <p class="empty-state">Опросник не найден.</p>
+}

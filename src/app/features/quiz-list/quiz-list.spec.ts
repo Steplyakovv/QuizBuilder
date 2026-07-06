@@ -1,6 +1,7 @@
 import { provideRouter } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
+import { AuthStore } from '../../core/state/auth-store';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
 import { QuizList } from './quiz-list';
 
@@ -18,6 +19,31 @@ describe('QuizList', () => {
     await fixture.whenStable();
     return fixture;
   }
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('hides quiz management controls from a non-admin', async () => {
+    const fixture = await createComponent();
+    fixture.componentInstance.newQuizTitle.set('Опрос про кофе');
+    await fixture.componentInstance.createQuiz();
+    await fixture.whenStable();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('Название нового опросника');
+    expect(fixture.nativeElement.querySelector('[aria-label="Удалить"]')).toBeNull();
+  });
+
+  it('shows quiz management controls to an admin', async () => {
+    const fixture = await createComponent();
+    TestBed.inject(AuthStore).login('admin', 'admin');
+    fixture.componentInstance.newQuizTitle.set('Опрос про кофе');
+    await fixture.componentInstance.createQuiz();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('[aria-label="Удалить"]')).not.toBeNull();
+  });
 
   it('shows an empty state when there are no quizzes', async () => {
     const fixture = await createComponent();

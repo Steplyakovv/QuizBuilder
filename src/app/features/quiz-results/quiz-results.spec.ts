@@ -1,0 +1,90 @@
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { createQuiz } from '../../core/models/quiz.factory';
+import { addQuestion, replaceQuestion } from '../../core/models/quiz-questions';
+import { SingleChoiceQuestion } from '../../core/models/quiz.models';
+import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
+import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
+import { FakeAttemptRepository } from '../../core/testing/fake-attempt-repository';
+import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
+import { QuizResults } from './quiz-results';
+
+describe('QuizResults', () => {
+  let quizRepository: FakeQuizRepository;
+  let attemptRepository: FakeAttemptRepository;
+
+  async function createComponent(quizId: string) {
+    await TestBed.configureTestingModule({
+      imports: [QuizResults],
+      providers: [
+        provideRouter([]),
+        { provide: QUIZ_REPOSITORY, useValue: quizRepository },
+        { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(QuizResults);
+    fixture.componentRef.setInput('id', quizId);
+    await fixture.whenStable();
+    return fixture;
+  }
+
+  beforeEach(() => {
+    quizRepository = new FakeQuizRepository();
+    attemptRepository = new FakeAttemptRepository();
+  });
+
+  it('shows a not-found message for an unknown quiz id', async () => {
+    const fixture = await createComponent('missing');
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Опросник не найден');
+  });
+
+  it('shows an empty state when no one has taken the quiz yet', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    expect(fixture.componentInstance.attempts()).toEqual([]);
+  });
+
+  it('loads and scores attempts for the requested quiz', async () => {
+    let quiz = createQuiz('Опрос про кофе');
+    quiz = addQuestion(quiz, 'single-choice');
+    const question = {
+      ...quiz.questions[0],
+      options: [
+        { id: 'o1', label: 'Латте' },
+        { id: 'o2', label: 'Эспрессо' },
+      ],
+      correctOptionId: 'o1',
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, question);
+    quiz = { ...quiz, settings: { isGraded: true } };
+    await quizRepository.save(quiz);
+
+    await attemptRepository.save({
+      id: 'a1',
+      quizId: quiz.id,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      completedAt: '2026-01-01T00:01:00.000Z',
+      responses: [{ questionId: question.id, selectedOptionIds: ['o1'] }],
+      score: 1,
+    });
+    await attemptRepository.save({
+      id: 'a2',
+      quizId: 'other-quiz',
+      startedAt: '2026-01-01T00:00:00.000Z',
+      responses: [],
+    });
+
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.attempts().map((attempt) => attempt.id)).toEqual(['a1']);
+    expect(fixture.componentInstance.scoreFor(fixture.componentInstance.attempts()[0])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+  });
+});

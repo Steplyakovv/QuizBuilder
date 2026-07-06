@@ -1,0 +1,29 @@
+<div class="login">
+  <a routerLink="/" class="back-link">← К списку опросников</a>
+
+  <h1>Вход для администратора</h1>
+  <p class="hint">Демо-доступ (без реального бэкенда): admin / admin</p>
+
+  <form class="login-form" (submit)="submit(); $event.preventDefault()">
+    <mat-form-field appearance="outline">
+      <mat-label>Логин</mat-label>
+      <input matInput [value]="username()" (input)="username.set($any($event.target).value)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Пароль</mat-label>
+      <input
+        matInput
+        type="password"
+        [value]="password()"
+        (input)="password.set($any($event.target).value)"
+      />
+    </mat-form-field>
+
+    @if (error()) {
+      <p class="login-error">{{ error() }}</p>
+    }
+
+    <button mat-flat-button color="primary" type="submit">Войти</button>
+  </form>
+</div>

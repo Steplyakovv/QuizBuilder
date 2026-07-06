@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Quiz } from '../../core/models/quiz.models';
+import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
 
 @Component({
@@ -23,8 +24,10 @@ import { QuizStore } from '../../core/state/quiz-store';
 })
 export class QuizList {
   private readonly store = inject(QuizStore);
+  private readonly auth = inject(AuthStore);
 
   readonly quizzes = this.store.quizzes;
+  readonly isAdmin = this.auth.isAdmin;
 
   readonly newQuizTitle = signal('');
   readonly editingQuizId = signal<string | null>(null);
@@ -73,5 +76,9 @@ export class QuizList {
       return;
     }
     await this.store.remove(quiz.id);
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 }

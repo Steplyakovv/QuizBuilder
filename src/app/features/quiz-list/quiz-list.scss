@@ -4,6 +4,24 @@
   padding: 2rem 1rem;
 }
 
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.role-indicator {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+}
+
 .new-quiz-form {
   display: flex;
   align-items: flex-start;

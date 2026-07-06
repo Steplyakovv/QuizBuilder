@@ -12,6 +12,10 @@ export class LocalStorageAttemptRepository implements AttemptRepository {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(attempts));
   }
 
+  async getByQuizId(quizId: string): Promise<QuizAttempt[]> {
+    return this.readAll().filter((attempt) => attempt.quizId === quizId);
+  }
+
   private readAll(): QuizAttempt[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as QuizAttempt[]) : [];

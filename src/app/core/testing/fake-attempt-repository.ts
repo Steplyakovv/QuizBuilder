@@ -7,4 +7,8 @@ export class FakeAttemptRepository implements AttemptRepository {
   async save(attempt: QuizAttempt): Promise<void> {
     this.attempts.push(attempt);
   }
+
+  async getByQuizId(quizId: string): Promise<QuizAttempt[]> {
+    return this.attempts.filter((attempt) => attempt.quizId === quizId);
+  }
 }
