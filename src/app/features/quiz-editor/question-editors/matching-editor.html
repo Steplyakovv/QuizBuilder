@@ -1,0 +1,29 @@
+<div class="matching-editor">
+  @for (pair of question().pairs; track pair.id) {
+    <div class="matching-pair-row">
+      <mat-form-field appearance="outline" class="matching-pair-field">
+        <input
+          matInput
+          [value]="pair.left"
+          (blur)="updateLeft(pair.id, $any($event.target).value)"
+          placeholder="Левый вариант"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="matching-pair-field">
+        <input
+          matInput
+          [value]="pair.right"
+          (blur)="updateRight(pair.id, $any($event.target).value)"
+          placeholder="Правый вариант"
+        />
+      </mat-form-field>
+      <button mat-icon-button type="button" (click)="removePair(pair.id)" aria-label="Удалить пару">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+  <button mat-stroked-button type="button" (click)="addPair()">
+    <mat-icon>add</mat-icon>
+    Добавить пару
+  </button>
+</div>

@@ -15,12 +15,21 @@ export function hasCorrectAnswer(question: Question): boolean {
       return !!question.correctOptionIds && question.correctOptionIds.length > 0;
     case 'true-false':
       return question.correctAnswer !== undefined;
+    case 'word-choice':
+      return question.words.length > 1;
+    case 'ranking':
+      return question.options.length > 1;
+    case 'fill-in-the-blank':
+      return !!question.correctAnswers && question.correctAnswers.some((answer) => answer.trim());
+    case 'matching':
+      return question.pairs.length > 1;
     case 'text':
     case 'number':
     case 'date':
     case 'rating':
     case 'slider':
     case 'constant-sum':
+    case 'matrix':
       return false;
   }
 }
@@ -38,12 +47,35 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     }
     case 'true-false':
       return response?.text === (question.correctAnswer ? 'true' : 'false');
+    case 'word-choice': {
+      const correctOrder = question.words.map((word) => word.id);
+      return (
+        selected.length === correctOrder.length && selected.every((id, i) => id === correctOrder[i])
+      );
+    }
+    case 'ranking': {
+      const correctOrder = question.options.map((option) => option.id);
+      return (
+        selected.length === correctOrder.length && selected.every((id, i) => id === correctOrder[i])
+      );
+    }
+    case 'fill-in-the-blank': {
+      const blanks = response?.blanks ?? [];
+      const correct = question.correctAnswers ?? [];
+      return correct.every((expected, index) => {
+        if (!expected.trim()) return true;
+        return (blanks[index] ?? '').trim().toLowerCase() === expected.trim().toLowerCase();
+      });
+    }
+    case 'matching':
+      return question.pairs.every((pair) => response?.matches?.[pair.id] === pair.id);
     case 'text':
     case 'number':
     case 'date':
     case 'rating':
     case 'slider':
     case 'constant-sum':
+    case 'matrix':
       return false;
   }
 }

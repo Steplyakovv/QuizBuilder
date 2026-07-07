@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +15,7 @@ import { Option } from '../../core/models/quiz.models';
 
 @Component({
   selector: 'app-option-list-editor',
-  imports: [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule],
+  imports: [DragDropModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule],
   templateUrl: './option-list-editor.html',
   styleUrl: './option-list-editor.scss',
 })
@@ -24,6 +25,7 @@ export class OptionListEditor {
   readonly selectionMode = input<'single' | 'multiple'>('single');
   readonly showCorrectMarking = input(false);
   readonly showImageUrl = input(false);
+  readonly reorderable = input(false);
 
   readonly optionsChange = output<Option[]>();
   readonly correctOptionIdsChange = output<string[]>();
@@ -61,6 +63,15 @@ export class OptionListEditor {
     const reader = new FileReader();
     reader.onload = () => this.updateImageUrl(optionId, reader.result as string);
     reader.readAsDataURL(file);
+  }
+
+  drop(event: CdkDragDrop<Option[]>): void {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    const next = [...this.options()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.optionsChange.emit(next);
   }
 
   toggleCorrect(optionId: string): void {

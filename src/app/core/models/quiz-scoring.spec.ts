@@ -213,4 +213,138 @@ describe('scoreAttempt', () => {
 
     expect(scoreAttempt(quiz, [{ questionId: 'q1', text: '4' }])).toBeUndefined();
   });
+
+  it('scores word-choice questions by exact word order', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'word-choice',
+      prompt: 'p',
+      required: true,
+      words: [
+        { id: 'w1', label: 'Небо' },
+        { id: 'w2', label: 'голубое' },
+      ],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['w1', 'w2'] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['w2', 'w1'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('ignores a word-choice question with fewer than two words', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'word-choice',
+      prompt: 'p',
+      required: true,
+      words: [{ id: 'w1', label: 'Небо' }],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['w1'] }])).toBeUndefined();
+  });
+
+  it('scores ranking questions by exact order', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'ranking',
+      prompt: 'p',
+      required: true,
+      options: [
+        { id: 'o1', label: 'Маленький' },
+        { id: 'o2', label: 'Большой' },
+      ],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['o1', 'o2'] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['o2', 'o1'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('scores fill-in-the-blank questions case-insensitively, trimmed', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'fill-in-the-blank',
+      prompt: 'p',
+      required: true,
+      template: 'Суп едят с {{}}.',
+      correctAnswers: ['хлебом'],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', blanks: ['  ХЛЕБОМ  '] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', blanks: ['молоком'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('ignores blanks with no configured correct answer', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'fill-in-the-blank',
+      prompt: 'p',
+      required: true,
+      template: 'Суп едят с {{}}, а кашу с {{}}.',
+      correctAnswers: ['хлебом', ''],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', blanks: ['хлебом', 'чем угодно'] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+  });
+
+  it('scores matching questions by exact pair matches', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'matching',
+      prompt: 'p',
+      required: true,
+      pairs: [
+        { id: 'p1', left: 'Франция', right: 'Париж' },
+        { id: 'p2', left: 'Италия', right: 'Рим' },
+      ],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', matches: { p1: 'p1', p2: 'p2' } }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', matches: { p1: 'p2', p2: 'p1' } }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('never scores matrix questions', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'matrix',
+      prompt: 'p',
+      required: true,
+      rows: [{ id: 'r1', label: 'Утверждение' }],
+      columns: [{ id: 'c1', label: 'Да' }],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', matches: { r1: 'c1' } }])).toBeUndefined();
+  });
 });

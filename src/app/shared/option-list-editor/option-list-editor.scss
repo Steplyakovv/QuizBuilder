@@ -10,6 +10,12 @@
   gap: 0.5rem;
 }
 
+.drag-handle {
+  cursor: grab;
+  display: flex;
+  color: var(--mat-sys-on-surface-variant);
+}
+
 .option-label {
   flex: 1;
 }

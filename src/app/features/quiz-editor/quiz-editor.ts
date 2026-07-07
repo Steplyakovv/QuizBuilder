@@ -19,14 +19,19 @@ import { QuizStore } from '../../core/state/quiz-store';
 import { QuizRunner } from '../quiz-runner/quiz-runner';
 import { ConstantSumEditor } from './question-editors/constant-sum-editor';
 import { DropdownEditor } from './question-editors/dropdown-editor';
+import { FillInTheBlankEditor } from './question-editors/fill-in-the-blank-editor';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
+import { MatchingEditor } from './question-editors/matching-editor';
+import { MatrixEditor } from './question-editors/matrix-editor';
 import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
 import { NumberEditor } from './question-editors/number-editor';
+import { RankingEditor } from './question-editors/ranking-editor';
 import { RatingEditor } from './question-editors/rating-editor';
 import { SingleChoiceEditor } from './question-editors/single-choice-editor';
 import { SliderEditor } from './question-editors/slider-editor';
 import { TextEditor } from './question-editors/text-editor';
 import { TrueFalseEditor } from './question-editors/true-false-editor';
+import { WordChoiceEditor } from './question-editors/word-choice-editor';
 
 @Component({
   selector: 'app-quiz-editor',
@@ -41,14 +46,19 @@ import { TrueFalseEditor } from './question-editors/true-false-editor';
     MatSelectModule,
     ConstantSumEditor,
     DropdownEditor,
+    FillInTheBlankEditor,
     ImageChoiceEditor,
+    MatchingEditor,
+    MatrixEditor,
     MultipleChoiceEditor,
     NumberEditor,
+    RankingEditor,
     RatingEditor,
     SingleChoiceEditor,
     SliderEditor,
     TextEditor,
     TrueFalseEditor,
+    WordChoiceEditor,
     QuizRunner,
   ],
   templateUrl: './quiz-editor.html',

@@ -101,6 +101,40 @@ describe('OptionListEditor', () => {
     expect(emitted).toBeUndefined();
   });
 
+  it('reorders options on drop', async () => {
+    const fixture = await createComponent([
+      { id: 'a', label: 'Первый' },
+      { id: 'b', label: 'Второй' },
+      { id: 'c', label: 'Третий' },
+    ]);
+    let emitted: Option[] | undefined;
+    fixture.componentInstance.optionsChange.subscribe((value) => (emitted = value));
+
+    fixture.componentInstance.drop({
+      previousIndex: 0,
+      currentIndex: 2,
+    } as unknown as Parameters<typeof fixture.componentInstance.drop>[0]);
+
+    expect(emitted?.map((option) => option.id)).toEqual(['b', 'c', 'a']);
+  });
+
+  it('does nothing when the drop index is unchanged', async () => {
+    const options = [
+      { id: 'a', label: 'Первый' },
+      { id: 'b', label: 'Второй' },
+    ];
+    const fixture = await createComponent(options);
+    let emitted: Option[] | undefined;
+    fixture.componentInstance.optionsChange.subscribe((value) => (emitted = value));
+
+    fixture.componentInstance.drop({
+      previousIndex: 1,
+      currentIndex: 1,
+    } as unknown as Parameters<typeof fixture.componentInstance.drop>[0]);
+
+    expect(emitted).toBeUndefined();
+  });
+
   describe('multiple selection mode', () => {
     it('adds to the correct ids without removing existing ones', async () => {
       const fixture = await createComponent(

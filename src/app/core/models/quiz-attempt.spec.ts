@@ -56,6 +56,70 @@ function constantSumQuestion(): Question {
   };
 }
 
+function wordChoiceQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'word-choice',
+    prompt: 'Составьте фразу',
+    required: true,
+    words: [
+      { id: 'w1', label: 'Небо' },
+      { id: 'w2', label: 'голубое' },
+    ],
+  };
+}
+
+function fillInTheBlankQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'fill-in-the-blank',
+    prompt: 'Заполните пропуски',
+    required: true,
+    template: 'Суп едят с {{}}, а кашу с {{}}.',
+    correctAnswers: ['хлебом', 'молоком'],
+  };
+}
+
+function rankingQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'ranking',
+    prompt: 'Отсортируйте по размеру',
+    required: true,
+    options: [
+      { id: 'o1', label: 'Маленький' },
+      { id: 'o2', label: 'Большой' },
+    ],
+  };
+}
+
+function matchingQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'matching',
+    prompt: 'Сопоставьте столицы',
+    required: true,
+    pairs: [
+      { id: 'p1', left: 'Франция', right: 'Париж' },
+      { id: 'p2', left: 'Италия', right: 'Рим' },
+    ],
+  };
+}
+
+function matrixQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'matrix',
+    prompt: 'Оцените утверждения',
+    required: true,
+    rows: [{ id: 'r1', label: 'Мне нравится этот опрос' }],
+    columns: [
+      { id: 'c1', label: 'Да' },
+      { id: 'c2', label: 'Нет' },
+    ],
+  };
+}
+
 describe('isQuestionAnswered', () => {
   it('treats a text question as unanswered when there is no response', () => {
     expect(isQuestionAnswered(textQuestion(), undefined)).toBe(false);
@@ -137,6 +201,58 @@ describe('isQuestionAnswered', () => {
       }),
     ).toBe(true);
   });
+
+  it('treats a word-choice question as unanswered until every word is placed', () => {
+    expect(
+      isQuestionAnswered(wordChoiceQuestion(), { questionId: 'q1', selectedOptionIds: ['w1'] }),
+    ).toBe(false);
+    expect(
+      isQuestionAnswered(wordChoiceQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: ['w2', 'w1'],
+      }),
+    ).toBe(true);
+  });
+
+  it('treats a ranking question as answered once every option has a position', () => {
+    expect(isQuestionAnswered(rankingQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(rankingQuestion(), { questionId: 'q1', selectedOptionIds: ['o2', 'o1'] }),
+    ).toBe(true);
+  });
+
+  it('treats a fill-in-the-blank question as unanswered until every blank is filled', () => {
+    expect(isQuestionAnswered(fillInTheBlankQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(fillInTheBlankQuestion(), { questionId: 'q1', blanks: ['хлебом', ''] }),
+    ).toBe(false);
+    expect(
+      isQuestionAnswered(fillInTheBlankQuestion(), {
+        questionId: 'q1',
+        blanks: ['хлебом', 'молоком'],
+      }),
+    ).toBe(true);
+  });
+
+  it('treats a matching question as answered once every pair has a match', () => {
+    expect(isQuestionAnswered(matchingQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(matchingQuestion(), { questionId: 'q1', matches: { p1: 'p2' } }),
+    ).toBe(false);
+    expect(
+      isQuestionAnswered(matchingQuestion(), {
+        questionId: 'q1',
+        matches: { p1: 'p2', p2: 'p1' },
+      }),
+    ).toBe(true);
+  });
+
+  it('treats a matrix question as answered once every row has a selection', () => {
+    expect(isQuestionAnswered(matrixQuestion(), undefined)).toBe(false);
+    expect(isQuestionAnswered(matrixQuestion(), { questionId: 'q1', matches: { r1: 'c1' } })).toBe(
+      true,
+    );
+  });
 });
 
 describe('formatResponse', () => {
@@ -199,5 +315,45 @@ describe('formatResponse', () => {
         distribution: { o1: 40, o2: 60 },
       }),
     ).toBe('Цена: 40, Качество: 60');
+  });
+
+  it('joins the chosen words for a word-choice response in the chosen order', () => {
+    expect(
+      formatResponse(wordChoiceQuestion(), { questionId: 'q1', selectedOptionIds: ['w2', 'w1'] }),
+    ).toBe('голубое Небо');
+    expect(formatResponse(wordChoiceQuestion(), undefined)).toBe('—');
+  });
+
+  it('joins the ranked option labels in the chosen order', () => {
+    expect(
+      formatResponse(rankingQuestion(), { questionId: 'q1', selectedOptionIds: ['o2', 'o1'] }),
+    ).toBe('Большой → Маленький');
+  });
+
+  it('fills the template with the entered blanks', () => {
+    expect(
+      formatResponse(fillInTheBlankQuestion(), {
+        questionId: 'q1',
+        blanks: ['хлебом', 'молоком'],
+      }),
+    ).toBe('Суп едят с хлебом, а кашу с молоком.');
+  });
+
+  it('shows a dash for a fill-in-the-blank response with an empty blank', () => {
+    expect(
+      formatResponse(fillInTheBlankQuestion(), { questionId: 'q1', blanks: ['хлебом', ''] }),
+    ).toBe('—');
+  });
+
+  it('shows the matched right-hand labels for a matching response', () => {
+    expect(
+      formatResponse(matchingQuestion(), { questionId: 'q1', matches: { p1: 'p2', p2: 'p1' } }),
+    ).toBe('Франция → Рим, Италия → Париж');
+  });
+
+  it('shows the selected column labels for a matrix response', () => {
+    expect(formatResponse(matrixQuestion(), { questionId: 'q1', matches: { r1: 'c1' } })).toBe(
+      'Мне нравится этот опрос: Да',
+    );
   });
 });

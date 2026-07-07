@@ -15,6 +15,11 @@ export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
   rating: 'Шкала оценки',
   slider: 'Ползунок',
   'constant-sum': 'Распределение баллов',
+  'word-choice': 'Выбор слов',
+  'fill-in-the-blank': 'Текст с пропусками',
+  ranking: 'Сортировка вариантов',
+  matching: 'Сопоставление пар',
+  matrix: 'Таблица (матрица)',
 };
 
 export function createQuestion(type: QuestionType): Question {
@@ -42,6 +47,16 @@ export function createQuestion(type: QuestionType): Question {
       return { id, type, prompt: '', required: true, min: 0, max: 100, step: 1 };
     case 'constant-sum':
       return { id, type, prompt: '', required: true, options: [], total: 100 };
+    case 'word-choice':
+      return { id, type, prompt: '', required: true, words: [] };
+    case 'fill-in-the-blank':
+      return { id, type, prompt: '', required: true, template: '' };
+    case 'ranking':
+      return { id, type, prompt: '', required: true, options: [] };
+    case 'matching':
+      return { id, type, prompt: '', required: true, pairs: [] };
+    case 'matrix':
+      return { id, type, prompt: '', required: true, rows: [], columns: [] };
   }
 }
 

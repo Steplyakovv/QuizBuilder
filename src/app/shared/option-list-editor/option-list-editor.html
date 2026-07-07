@@ -1,6 +1,16 @@
-<div class="option-list">
+<div
+  cdkDropList
+  class="option-list"
+  [cdkDropListDisabled]="!reorderable()"
+  (cdkDropListDropped)="drop($event)"
+>
   @for (option of options(); track option.id) {
-    <div class="option-row">
+    <div cdkDrag [cdkDragDisabled]="!reorderable()" class="option-row">
+      @if (reorderable()) {
+        <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+          <mat-icon>drag_indicator</mat-icon>
+        </span>
+      }
       @if (showCorrectMarking()) {
         <button
           mat-icon-button

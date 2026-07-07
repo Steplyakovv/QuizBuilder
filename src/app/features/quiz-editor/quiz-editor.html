@@ -125,6 +125,23 @@
                 [question]="question"
                 (questionChange)="saveQuestion($event)"
               />
+            } @else if (question.type === 'word-choice') {
+              <app-word-choice-editor
+                [question]="question"
+                (questionChange)="saveQuestion($event)"
+              />
+            } @else if (question.type === 'fill-in-the-blank') {
+              <app-fill-in-the-blank-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion($event)"
+              />
+            } @else if (question.type === 'ranking') {
+              <app-ranking-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'matching') {
+              <app-matching-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'matrix') {
+              <app-matrix-editor [question]="question" (questionChange)="saveQuestion($event)" />
             }
           </div>
         </div>

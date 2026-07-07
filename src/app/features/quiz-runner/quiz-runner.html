@@ -101,6 +101,36 @@
                 [distribution]="distribution(question.id)"
                 (distributionChange)="setDistribution(question.id, $event)"
               />
+            } @else if (question.type === 'word-choice') {
+              <app-word-choice-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            } @else if (question.type === 'fill-in-the-blank') {
+              <app-fill-in-the-blank-runner
+                [question]="question"
+                [blanks]="blanksResponse(question.id)"
+                (blanksChange)="setBlanks(question.id, $event)"
+              />
+            } @else if (question.type === 'ranking') {
+              <app-ranking-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            } @else if (question.type === 'matching') {
+              <app-matching-runner
+                [question]="question"
+                [matches]="matchesResponse(question.id)"
+                (matchesChange)="setMatches(question.id, $event)"
+              />
+            } @else if (question.type === 'matrix') {
+              <app-matrix-runner
+                [question]="question"
+                [matches]="matchesResponse(question.id)"
+                (matchesChange)="setMatches(question.id, $event)"
+              />
             }
 
             @if (validationErrors().has(question.id)) {

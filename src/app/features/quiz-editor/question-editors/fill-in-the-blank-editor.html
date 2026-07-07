@@ -1,0 +1,24 @@
+<div class="fill-in-the-blank-editor">
+  <mat-form-field appearance="outline" class="template-field">
+    <mat-label>Текст с пропусками ({{ '{{}}' }} — место пропуска)</mat-label>
+    <textarea
+      matInput
+      [value]="question().template"
+      (blur)="onTemplateChange($any($event.target).value)"
+    ></textarea>
+  </mat-form-field>
+
+  @if (graded() && blankCount() > 0) {
+    <p class="blank-answers-label">Правильные ответы для пропусков:</p>
+    @for (index of blankIndexes(); track index) {
+      <mat-form-field appearance="outline" class="blank-answer-field">
+        <mat-label>Пропуск {{ index + 1 }}</mat-label>
+        <input
+          matInput
+          [value]="correctAnswer(index)"
+          (blur)="onCorrectAnswerChange(index, $any($event.target).value)"
+        />
+      </mat-form-field>
+    }
+  }
+</div>

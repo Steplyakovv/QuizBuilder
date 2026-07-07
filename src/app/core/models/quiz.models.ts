@@ -24,7 +24,12 @@ export type Question =
   | DateQuestion
   | RatingQuestion
   | SliderQuestion
-  | ConstantSumQuestion;
+  | ConstantSumQuestion
+  | WordChoiceQuestion
+  | FillInTheBlankQuestion
+  | RankingQuestion
+  | MatchingQuestion
+  | MatrixQuestion;
 
 export interface BaseQuestion {
   id: string;
@@ -103,6 +108,49 @@ export interface ConstantSumQuestion extends BaseQuestion {
   total: number;
 }
 
+/**
+ * The word order in `words` is the correct sentence order — the respondent
+ * sees them shuffled and must place them back in this order.
+ */
+export interface WordChoiceQuestion extends BaseQuestion {
+  type: 'word-choice';
+  words: Option[];
+}
+
+export interface FillInTheBlankQuestion extends BaseQuestion {
+  type: 'fill-in-the-blank';
+  /** Blanks are marked with `{{}}`, e.g. "Небо {{}} цвета." */
+  template: string;
+  /** One entry per blank; a blank entry means that blank isn't graded. */
+  correctAnswers?: string[];
+}
+
+/**
+ * The option order in `options` is the correct ranking — the respondent
+ * sees them shuffled and must drag them back into this order.
+ */
+export interface RankingQuestion extends BaseQuestion {
+  type: 'ranking';
+  options: Option[];
+}
+
+export interface MatchingPair {
+  id: string;
+  left: string;
+  right: string;
+}
+
+export interface MatchingQuestion extends BaseQuestion {
+  type: 'matching';
+  pairs: MatchingPair[];
+}
+
+export interface MatrixQuestion extends BaseQuestion {
+  type: 'matrix';
+  rows: Option[];
+  columns: Option[];
+}
+
 export interface QuizAttempt {
   id: string;
   quizId: string;
@@ -118,4 +166,7 @@ export interface QuestionResponse {
   selectedOptionIds?: string[];
   text?: string;
   distribution?: Record<string, number>;
+  blanks?: string[];
+  /** Maps a left-pair id to a right-pair id (matching) or a row id to a column id (matrix). */
+  matches?: Record<string, string>;
 }

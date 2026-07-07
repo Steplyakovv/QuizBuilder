@@ -12,14 +12,19 @@ import { QuizStore } from '../../core/state/quiz-store';
 import { ConstantSumRunner } from './question-runners/constant-sum-runner';
 import { DateRunner } from './question-runners/date-runner';
 import { DropdownRunner } from './question-runners/dropdown-runner';
+import { FillInTheBlankRunner } from './question-runners/fill-in-the-blank-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
+import { MatchingRunner } from './question-runners/matching-runner';
+import { MatrixRunner } from './question-runners/matrix-runner';
 import { MultipleChoiceRunner } from './question-runners/multiple-choice-runner';
 import { NumberRunner } from './question-runners/number-runner';
+import { RankingRunner } from './question-runners/ranking-runner';
 import { RatingRunner } from './question-runners/rating-runner';
 import { SingleChoiceRunner } from './question-runners/single-choice-runner';
 import { SliderRunner } from './question-runners/slider-runner';
 import { TextRunner } from './question-runners/text-runner';
 import { TrueFalseRunner } from './question-runners/true-false-runner';
+import { WordChoiceRunner } from './question-runners/word-choice-runner';
 
 @Component({
   selector: 'app-quiz-runner',
@@ -31,14 +36,19 @@ import { TrueFalseRunner } from './question-runners/true-false-runner';
     ConstantSumRunner,
     DateRunner,
     DropdownRunner,
+    FillInTheBlankRunner,
     ImageChoiceRunner,
+    MatchingRunner,
+    MatrixRunner,
     MultipleChoiceRunner,
     NumberRunner,
+    RankingRunner,
     RatingRunner,
     SingleChoiceRunner,
     SliderRunner,
     TextRunner,
     TrueFalseRunner,
+    WordChoiceRunner,
   ],
   templateUrl: './quiz-runner.html',
   styleUrl: './quiz-runner.scss',
@@ -85,6 +95,14 @@ export class QuizRunner {
     return this.responses()[questionId]?.distribution ?? {};
   }
 
+  blanksResponse(questionId: string): string[] {
+    return this.responses()[questionId]?.blanks ?? [];
+  }
+
+  matchesResponse(questionId: string): Record<string, string> {
+    return this.responses()[questionId]?.matches ?? {};
+  }
+
   setSelection(questionId: string, selectedOptionIds: string[]): void {
     this.responses.update((responses) => ({
       ...responses,
@@ -102,6 +120,19 @@ export class QuizRunner {
     this.responses.update((responses) => ({
       ...responses,
       [questionId]: { questionId, distribution },
+    }));
+    this.clearValidationError(questionId);
+  }
+
+  setBlanks(questionId: string, blanks: string[]): void {
+    this.responses.update((responses) => ({ ...responses, [questionId]: { questionId, blanks } }));
+    this.clearValidationError(questionId);
+  }
+
+  setMatches(questionId: string, matches: Record<string, string>): void {
+    this.responses.update((responses) => ({
+      ...responses,
+      [questionId]: { questionId, matches },
     }));
     this.clearValidationError(questionId);
   }

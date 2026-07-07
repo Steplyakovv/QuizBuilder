@@ -62,6 +62,31 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'constant-sum', options: [], total: 100 });
   });
 
+  it('creates a word-choice question with an empty word list', () => {
+    const question = createQuestion('word-choice');
+    expect(question).toMatchObject({ type: 'word-choice', words: [] });
+  });
+
+  it('creates a fill-in-the-blank question with an empty template', () => {
+    const question = createQuestion('fill-in-the-blank');
+    expect(question).toMatchObject({ type: 'fill-in-the-blank', template: '' });
+  });
+
+  it('creates a ranking question with empty options', () => {
+    const question = createQuestion('ranking');
+    expect(question).toMatchObject({ type: 'ranking', options: [] });
+  });
+
+  it('creates a matching question with no pairs', () => {
+    const question = createQuestion('matching');
+    expect(question).toMatchObject({ type: 'matching', pairs: [] });
+  });
+
+  it('creates a matrix question with no rows or columns', () => {
+    const question = createQuestion('matrix');
+    expect(question).toMatchObject({ type: 'matrix', rows: [], columns: [] });
+  });
+
   it('generates a unique id for every question', () => {
     expect(createQuestion('text').id).not.toBe(createQuestion('text').id);
   });
