@@ -14,7 +14,14 @@ export interface QuizSettings {
 }
 
 export type Question =
-  SingleChoiceQuestion | MultipleChoiceQuestion | TextQuestion | ImageChoiceQuestion;
+  | SingleChoiceQuestion
+  | MultipleChoiceQuestion
+  | TextQuestion
+  | ImageChoiceQuestion
+  | TrueFalseQuestion
+  | DropdownQuestion
+  | NumberQuestion
+  | DateQuestion;
 
 export interface BaseQuestion {
   id: string;
@@ -51,6 +58,27 @@ export interface ImageChoiceQuestion extends BaseQuestion {
   multiple: boolean;
   options: Option[];
   correctOptionIds?: string[];
+}
+
+export interface TrueFalseQuestion extends BaseQuestion {
+  type: 'true-false';
+  correctAnswer?: boolean;
+}
+
+export interface DropdownQuestion extends BaseQuestion {
+  type: 'dropdown';
+  options: Option[];
+  correctOptionId?: string;
+}
+
+export interface NumberQuestion extends BaseQuestion {
+  type: 'number';
+  min?: number;
+  max?: number;
+}
+
+export interface DateQuestion extends BaseQuestion {
+  type: 'date';
 }
 
 export interface QuizAttempt {

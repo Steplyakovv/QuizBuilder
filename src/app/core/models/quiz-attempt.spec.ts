@@ -18,6 +18,14 @@ function singleChoiceQuestion(): Question {
   };
 }
 
+function trueFalseQuestion(): Question {
+  return { id: 'q1', type: 'true-false', prompt: 'Земля круглая?', required: true };
+}
+
+function numberQuestion(): Question {
+  return { id: 'q1', type: 'number', prompt: 'Сколько вам лет?', required: true };
+}
+
 describe('isQuestionAnswered', () => {
   it('treats a text question as unanswered when there is no response', () => {
     expect(isQuestionAnswered(textQuestion(), undefined)).toBe(false);
@@ -44,6 +52,22 @@ describe('isQuestionAnswered', () => {
         selectedOptionIds: ['o1'],
       }),
     ).toBe(true);
+  });
+
+  it('treats a true-false question as unanswered when there is no response', () => {
+    expect(isQuestionAnswered(trueFalseQuestion(), undefined)).toBe(false);
+  });
+
+  it('treats a true-false question as answered when a value is chosen', () => {
+    expect(isQuestionAnswered(trueFalseQuestion(), { questionId: 'q1', text: 'false' })).toBe(true);
+  });
+
+  it('treats a number question as unanswered when blank', () => {
+    expect(isQuestionAnswered(numberQuestion(), { questionId: 'q1', text: '' })).toBe(false);
+  });
+
+  it('treats a number question as answered when a value is entered', () => {
+    expect(isQuestionAnswered(numberQuestion(), { questionId: 'q1', text: '42' })).toBe(true);
   });
 });
 
@@ -75,5 +99,15 @@ describe('formatResponse', () => {
         selectedOptionIds: ['o1', 'o2'],
       }),
     ).toBe('Латте, Эспрессо');
+  });
+
+  it('shows Да/Нет for a true-false response', () => {
+    expect(formatResponse(trueFalseQuestion(), { questionId: 'q1', text: 'true' })).toBe('Да');
+    expect(formatResponse(trueFalseQuestion(), { questionId: 'q1', text: 'false' })).toBe('Нет');
+    expect(formatResponse(trueFalseQuestion(), undefined)).toBe('—');
+  });
+
+  it('shows the entered number as text', () => {
+    expect(formatResponse(numberQuestion(), { questionId: 'q1', text: '42' })).toBe('42');
   });
 });

@@ -20,6 +20,33 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'image-choice', multiple: false, options: [] });
   });
 
+  it('creates a true-false question with no correct answer set', () => {
+    const question = createQuestion('true-false');
+    expect(question).toMatchObject({ type: 'true-false', prompt: '', required: true });
+    if (question.type === 'true-false') {
+      expect(question.correctAnswer).toBeUndefined();
+    }
+  });
+
+  it('creates a dropdown question with empty options', () => {
+    const question = createQuestion('dropdown');
+    expect(question).toMatchObject({ type: 'dropdown', options: [] });
+  });
+
+  it('creates a number question with no range set', () => {
+    const question = createQuestion('number');
+    expect(question).toMatchObject({ type: 'number', prompt: '', required: true });
+    if (question.type === 'number') {
+      expect(question.min).toBeUndefined();
+      expect(question.max).toBeUndefined();
+    }
+  });
+
+  it('creates a date question', () => {
+    const question = createQuestion('date');
+    expect(question).toMatchObject({ type: 'date', prompt: '', required: true });
+  });
+
   it('generates a unique id for every question', () => {
     expect(createQuestion('text').id).not.toBe(createQuestion('text').id);
   });

@@ -134,4 +134,65 @@ describe('scoreAttempt', () => {
 
     expect(scoreAttempt(quiz, [])).toEqual({ correct: 0, total: 1 });
   });
+
+  it('scores true-false questions', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'true-false',
+      prompt: 'p',
+      required: true,
+      correctAnswer: true,
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', text: 'true' }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', text: 'false' }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('ignores a true-false question with no correct answer configured', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({ id: 'q1', type: 'true-false', prompt: 'p', required: true });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', text: 'true' }])).toBeUndefined();
+  });
+
+  it('scores dropdown questions', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'dropdown',
+      prompt: 'p',
+      required: true,
+      options: [
+        { id: 'o1', label: 'a' },
+        { id: 'o2', label: 'b' },
+      ],
+      correctOptionId: 'o1',
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['o1'] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['o2'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('ignores number and date questions when counting the total', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push(
+      { id: 'q1', type: 'number', prompt: 'p', required: false },
+      { id: 'q2', type: 'date', prompt: 'p2', required: false },
+    );
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', text: '42' }])).toBeUndefined();
+  });
 });

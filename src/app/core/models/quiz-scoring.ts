@@ -8,11 +8,16 @@ export interface AttemptScore {
 export function hasCorrectAnswer(question: Question): boolean {
   switch (question.type) {
     case 'single-choice':
+    case 'dropdown':
       return !!question.correctOptionId;
     case 'multiple-choice':
     case 'image-choice':
       return !!question.correctOptionIds && question.correctOptionIds.length > 0;
+    case 'true-false':
+      return question.correctAnswer !== undefined;
     case 'text':
+    case 'number':
+    case 'date':
       return false;
   }
 }
@@ -21,13 +26,18 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
   const selected = response?.selectedOptionIds ?? [];
   switch (question.type) {
     case 'single-choice':
+    case 'dropdown':
       return selected.length === 1 && selected[0] === question.correctOptionId;
     case 'multiple-choice':
     case 'image-choice': {
       const correct = question.correctOptionIds ?? [];
       return selected.length === correct.length && correct.every((id) => selected.includes(id));
     }
+    case 'true-false':
+      return response?.text === (question.correctAnswer ? 'true' : 'false');
     case 'text':
+    case 'number':
+    case 'date':
       return false;
   }
 }

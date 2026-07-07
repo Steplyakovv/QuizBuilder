@@ -17,10 +17,13 @@ import {
 } from '../../core/models/quiz-questions';
 import { QuizStore } from '../../core/state/quiz-store';
 import { QuizRunner } from '../quiz-runner/quiz-runner';
+import { DropdownEditor } from './question-editors/dropdown-editor';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
 import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
+import { NumberEditor } from './question-editors/number-editor';
 import { SingleChoiceEditor } from './question-editors/single-choice-editor';
 import { TextEditor } from './question-editors/text-editor';
+import { TrueFalseEditor } from './question-editors/true-false-editor';
 
 @Component({
   selector: 'app-quiz-editor',
@@ -33,10 +36,13 @@ import { TextEditor } from './question-editors/text-editor';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    DropdownEditor,
     ImageChoiceEditor,
     MultipleChoiceEditor,
+    NumberEditor,
     SingleChoiceEditor,
     TextEditor,
+    TrueFalseEditor,
     QuizRunner,
   ],
   templateUrl: './quiz-editor.html',

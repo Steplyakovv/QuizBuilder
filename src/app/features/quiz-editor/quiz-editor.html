@@ -102,6 +102,20 @@
                 [graded]="quiz.settings.isGraded"
                 (questionChange)="saveQuestion($event)"
               />
+            } @else if (question.type === 'true-false') {
+              <app-true-false-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion($event)"
+              />
+            } @else if (question.type === 'dropdown') {
+              <app-dropdown-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion($event)"
+              />
+            } @else if (question.type === 'number') {
+              <app-number-editor [question]="question" (questionChange)="saveQuestion($event)" />
             }
           </div>
         </div>
