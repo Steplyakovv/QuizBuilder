@@ -1,14 +1,21 @@
 import { Component, computed, input, output } from '@angular/core';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { shuffle } from '../../../core/utils/shuffle';
 import { WordChoiceQuestion } from '../../../core/models/quiz.models';
 
 @Component({
   selector: 'app-word-choice-runner',
+  imports: [DragDropModule],
   template: `
     <div class="word-choice-runner">
-      <div class="word-choice-answer">
+      <div
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        class="word-choice-answer"
+        (cdkDropListDropped)="drop($event)"
+      >
         @for (id of selectedOptionIds(); track id) {
-          <button type="button" class="word-chip word-chip--selected" (click)="remove(id)">
+          <button type="button" cdkDrag class="word-chip word-chip--selected" (click)="remove(id)">
             {{ labelFor(id) }}
           </button>
         }
@@ -64,6 +71,19 @@ import { WordChoiceQuestion } from '../../../core/models/quiz.models';
       background: var(--mat-sys-primary-container);
       color: var(--mat-sys-on-primary-container);
       border-color: transparent;
+      cursor: grab;
+    }
+
+    .cdk-drag-preview {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .cdk-drag-placeholder {
+      opacity: 0.4;
+    }
+
+    .word-choice-answer.cdk-drop-list-dragging .word-chip--selected:not(.cdk-drag-placeholder) {
+      transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
     }
   `,
 })
@@ -88,5 +108,14 @@ export class WordChoiceRunner {
 
   remove(id: string): void {
     this.selectionChange.emit(this.selectedOptionIds().filter((existing) => existing !== id));
+  }
+
+  drop(event: CdkDragDrop<string[]>): void {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    const next = [...this.selectedOptionIds()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.selectionChange.emit(next);
   }
 }
