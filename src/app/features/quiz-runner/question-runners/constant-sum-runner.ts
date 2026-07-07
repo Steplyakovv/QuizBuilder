@@ -24,6 +24,23 @@ import { ConstantSumQuestion } from '../../../core/models/quiz.models';
       </p>
     </div>
   `,
+  styles: `
+    .constant-sum-runner {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .constant-sum-runner-remaining {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    .constant-sum-runner-remaining.invalid {
+      color: var(--mat-sys-error);
+    }
+  `,
 })
 export class ConstantSumRunner {
   readonly question = input.required<ConstantSumQuestion>();
