@@ -83,6 +83,24 @@
                 [value]="textResponse(question.id)"
                 (valueChange)="setText(question.id, $event)"
               />
+            } @else if (question.type === 'rating') {
+              <app-rating-runner
+                [question]="question"
+                [value]="textResponse(question.id)"
+                (valueChange)="setText(question.id, $event)"
+              />
+            } @else if (question.type === 'slider') {
+              <app-slider-runner
+                [question]="question"
+                [value]="textResponse(question.id)"
+                (valueChange)="setText(question.id, $event)"
+              />
+            } @else if (question.type === 'constant-sum') {
+              <app-constant-sum-runner
+                [question]="question"
+                [distribution]="distribution(question.id)"
+                (distributionChange)="setDistribution(question.id, $event)"
+              />
             }
 
             @if (validationErrors().has(question.id)) {

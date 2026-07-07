@@ -12,6 +12,9 @@ export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
   dropdown: 'Выпадающий список',
   number: 'Числовой ответ',
   date: 'Дата',
+  rating: 'Шкала оценки',
+  slider: 'Ползунок',
+  'constant-sum': 'Распределение баллов',
 };
 
 export function createQuestion(type: QuestionType): Question {
@@ -33,6 +36,12 @@ export function createQuestion(type: QuestionType): Question {
       return { id, type, prompt: '', required: true };
     case 'date':
       return { id, type, prompt: '', required: true };
+    case 'rating':
+      return { id, type, prompt: '', required: true, min: 1, max: 5 };
+    case 'slider':
+      return { id, type, prompt: '', required: true, min: 0, max: 100, step: 1 };
+    case 'constant-sum':
+      return { id, type, prompt: '', required: true, options: [], total: 100 };
   }
 }
 

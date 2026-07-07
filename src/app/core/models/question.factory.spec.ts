@@ -47,6 +47,21 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'date', prompt: '', required: true });
   });
 
+  it('creates a rating question with a 1-5 scale by default', () => {
+    const question = createQuestion('rating');
+    expect(question).toMatchObject({ type: 'rating', min: 1, max: 5 });
+  });
+
+  it('creates a slider question with a 0-100 range and a step of 1', () => {
+    const question = createQuestion('slider');
+    expect(question).toMatchObject({ type: 'slider', min: 0, max: 100, step: 1 });
+  });
+
+  it('creates a constant-sum question with empty options and 100 points to distribute', () => {
+    const question = createQuestion('constant-sum');
+    expect(question).toMatchObject({ type: 'constant-sum', options: [], total: 100 });
+  });
+
   it('generates a unique id for every question', () => {
     expect(createQuestion('text').id).not.toBe(createQuestion('text').id);
   });

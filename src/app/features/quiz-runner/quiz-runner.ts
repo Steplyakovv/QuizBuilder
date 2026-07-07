@@ -9,12 +9,15 @@ import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
 import { QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
+import { ConstantSumRunner } from './question-runners/constant-sum-runner';
 import { DateRunner } from './question-runners/date-runner';
 import { DropdownRunner } from './question-runners/dropdown-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
 import { MultipleChoiceRunner } from './question-runners/multiple-choice-runner';
 import { NumberRunner } from './question-runners/number-runner';
+import { RatingRunner } from './question-runners/rating-runner';
 import { SingleChoiceRunner } from './question-runners/single-choice-runner';
+import { SliderRunner } from './question-runners/slider-runner';
 import { TextRunner } from './question-runners/text-runner';
 import { TrueFalseRunner } from './question-runners/true-false-runner';
 
@@ -25,12 +28,15 @@ import { TrueFalseRunner } from './question-runners/true-false-runner';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    ConstantSumRunner,
     DateRunner,
     DropdownRunner,
     ImageChoiceRunner,
     MultipleChoiceRunner,
     NumberRunner,
+    RatingRunner,
     SingleChoiceRunner,
+    SliderRunner,
     TextRunner,
     TrueFalseRunner,
   ],
@@ -75,6 +81,10 @@ export class QuizRunner {
     return this.responses()[questionId]?.text ?? '';
   }
 
+  distribution(questionId: string): Record<string, number> {
+    return this.responses()[questionId]?.distribution ?? {};
+  }
+
   setSelection(questionId: string, selectedOptionIds: string[]): void {
     this.responses.update((responses) => ({
       ...responses,
@@ -85,6 +95,14 @@ export class QuizRunner {
 
   setText(questionId: string, text: string): void {
     this.responses.update((responses) => ({ ...responses, [questionId]: { questionId, text } }));
+    this.clearValidationError(questionId);
+  }
+
+  setDistribution(questionId: string, distribution: Record<string, number>): void {
+    this.responses.update((responses) => ({
+      ...responses,
+      [questionId]: { questionId, distribution },
+    }));
     this.clearValidationError(questionId);
   }
 

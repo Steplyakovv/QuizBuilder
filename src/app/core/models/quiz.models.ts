@@ -21,7 +21,10 @@ export type Question =
   | TrueFalseQuestion
   | DropdownQuestion
   | NumberQuestion
-  | DateQuestion;
+  | DateQuestion
+  | RatingQuestion
+  | SliderQuestion
+  | ConstantSumQuestion;
 
 export interface BaseQuestion {
   id: string;
@@ -81,6 +84,25 @@ export interface DateQuestion extends BaseQuestion {
   type: 'date';
 }
 
+export interface RatingQuestion extends BaseQuestion {
+  type: 'rating';
+  min: number;
+  max: number;
+}
+
+export interface SliderQuestion extends BaseQuestion {
+  type: 'slider';
+  min: number;
+  max: number;
+  step: number;
+}
+
+export interface ConstantSumQuestion extends BaseQuestion {
+  type: 'constant-sum';
+  options: Option[];
+  total: number;
+}
+
 export interface QuizAttempt {
   id: string;
   quizId: string;
@@ -95,4 +117,5 @@ export interface QuestionResponse {
   questionId: string;
   selectedOptionIds?: string[];
   text?: string;
+  distribution?: Record<string, number>;
 }

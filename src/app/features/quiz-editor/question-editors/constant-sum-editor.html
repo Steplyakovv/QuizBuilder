@@ -1,0 +1,16 @@
+<div class="constant-sum-editor">
+  <mat-form-field appearance="outline" class="number-range-field">
+    <mat-label>Всего очков</mat-label>
+    <input
+      matInput
+      type="number"
+      [value]="question().total"
+      (blur)="onTotalChange($any($event.target).value)"
+    />
+  </mat-form-field>
+
+  <app-option-list-editor
+    [options]="question().options"
+    (optionsChange)="onOptionsChange($event)"
+  />
+</div>

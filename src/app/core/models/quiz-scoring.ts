@@ -18,6 +18,9 @@ export function hasCorrectAnswer(question: Question): boolean {
     case 'text':
     case 'number':
     case 'date':
+    case 'rating':
+    case 'slider':
+    case 'constant-sum':
       return false;
   }
 }
@@ -38,6 +41,9 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     case 'text':
     case 'number':
     case 'date':
+    case 'rating':
+    case 'slider':
+    case 'constant-sum':
       return false;
   }
 }

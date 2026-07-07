@@ -116,6 +116,15 @@
               />
             } @else if (question.type === 'number') {
               <app-number-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'rating') {
+              <app-rating-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'slider') {
+              <app-slider-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'constant-sum') {
+              <app-constant-sum-editor
+                [question]="question"
+                (questionChange)="saveQuestion($event)"
+              />
             }
           </div>
         </div>

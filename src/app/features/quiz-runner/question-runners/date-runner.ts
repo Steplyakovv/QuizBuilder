@@ -23,7 +23,12 @@ function formatIsoDate(date: Date): string {
   imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
   template: `
     <mat-form-field appearance="outline" class="date-runner-field">
-      <input matInput [matDatepicker]="picker" [value]="dateValue()" (dateChange)="onDateChange($event.value)" />
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [value]="dateValue()"
+        (dateChange)="onDateChange($event.value)"
+      />
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>

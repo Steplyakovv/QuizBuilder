@@ -195,4 +195,22 @@ describe('scoreAttempt', () => {
 
     expect(scoreAttempt(quiz, [{ questionId: 'q1', text: '42' }])).toBeUndefined();
   });
+
+  it('ignores rating, slider, and constant-sum questions when counting the total', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push(
+      { id: 'q1', type: 'rating', prompt: 'p', required: false, min: 1, max: 5 },
+      { id: 'q2', type: 'slider', prompt: 'p2', required: false, min: 0, max: 100, step: 1 },
+      {
+        id: 'q3',
+        type: 'constant-sum',
+        prompt: 'p3',
+        required: false,
+        options: [{ id: 'o1', label: 'a' }],
+        total: 100,
+      },
+    );
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', text: '4' }])).toBeUndefined();
+  });
 });

@@ -1,0 +1,31 @@
+<div class="slider-editor">
+  <mat-form-field appearance="outline" class="number-range-field">
+    <mat-label>Минимум</mat-label>
+    <input
+      matInput
+      type="number"
+      [value]="question().min"
+      (blur)="onMinChange($any($event.target).value)"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="number-range-field">
+    <mat-label>Максимум</mat-label>
+    <input
+      matInput
+      type="number"
+      [value]="question().max"
+      (blur)="onMaxChange($any($event.target).value)"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="number-range-field">
+    <mat-label>Шаг</mat-label>
+    <input
+      matInput
+      type="number"
+      [value]="question().step"
+      (blur)="onStepChange($any($event.target).value)"
+    />
+  </mat-form-field>
+</div>

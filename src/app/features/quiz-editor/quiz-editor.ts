@@ -17,11 +17,14 @@ import {
 } from '../../core/models/quiz-questions';
 import { QuizStore } from '../../core/state/quiz-store';
 import { QuizRunner } from '../quiz-runner/quiz-runner';
+import { ConstantSumEditor } from './question-editors/constant-sum-editor';
 import { DropdownEditor } from './question-editors/dropdown-editor';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
 import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
 import { NumberEditor } from './question-editors/number-editor';
+import { RatingEditor } from './question-editors/rating-editor';
 import { SingleChoiceEditor } from './question-editors/single-choice-editor';
+import { SliderEditor } from './question-editors/slider-editor';
 import { TextEditor } from './question-editors/text-editor';
 import { TrueFalseEditor } from './question-editors/true-false-editor';
 
@@ -36,11 +39,14 @@ import { TrueFalseEditor } from './question-editors/true-false-editor';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    ConstantSumEditor,
     DropdownEditor,
     ImageChoiceEditor,
     MultipleChoiceEditor,
     NumberEditor,
+    RatingEditor,
     SingleChoiceEditor,
+    SliderEditor,
     TextEditor,
     TrueFalseEditor,
     QuizRunner,
