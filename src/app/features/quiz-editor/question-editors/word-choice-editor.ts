@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { Option, WordChoiceQuestion } from '../../../core/models/quiz.models';
 import { OptionListEditor } from '../../../shared/option-list-editor/option-list-editor';
 
@@ -7,6 +7,9 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
   imports: [OptionListEditor],
   template: `
     <p class="reorder-hint">Порядок слов ниже — правильный порядок фразы.</p>
+    @if (correctPhrase()) {
+      <p class="correct-preview">Правильный ответ: «{{ correctPhrase() }}»</p>
+    }
     <app-option-list-editor
       [options]="question().words"
       [reorderable]="true"
@@ -19,11 +22,22 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
       font-size: 0.875rem;
       color: var(--mat-sys-on-surface-variant);
     }
+
+    .correct-preview {
+      margin: 0 0 0.75rem;
+      font-size: 0.875rem;
+    }
   `,
 })
 export class WordChoiceEditor {
   readonly question = input.required<WordChoiceQuestion>();
   readonly questionChange = output<WordChoiceQuestion>();
+
+  readonly correctPhrase = computed(() =>
+    this.question()
+      .words.map((word) => word.label)
+      .join(' '),
+  );
 
   onWordsChange(words: Option[]): void {
     this.questionChange.emit({ ...this.question(), words });

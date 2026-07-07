@@ -16,4 +16,19 @@ describe('WordChoiceEditor', () => {
 
     expect(emitted?.words).toEqual([{ id: 'w1', label: 'Небо' }]);
   });
+
+  it('shows the correct phrase as the joined word order', async () => {
+    await TestBed.configureTestingModule({ imports: [WordChoiceEditor] }).compileComponents();
+    const fixture = TestBed.createComponent(WordChoiceEditor);
+    fixture.componentRef.setInput('question', {
+      ...createQuestion('word-choice'),
+      words: [
+        { id: 'w1', label: 'Небо' },
+        { id: 'w2', label: 'голубое' },
+      ],
+    } as WordChoiceQuestion);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.correctPhrase()).toBe('Небо голубое');
+  });
 });

@@ -16,4 +16,19 @@ describe('RankingEditor', () => {
 
     expect(emitted?.options).toEqual([{ id: 'o1', label: 'Маленький' }]);
   });
+
+  it('shows the correct order as the joined option labels', async () => {
+    await TestBed.configureTestingModule({ imports: [RankingEditor] }).compileComponents();
+    const fixture = TestBed.createComponent(RankingEditor);
+    fixture.componentRef.setInput('question', {
+      ...createQuestion('ranking'),
+      options: [
+        { id: 'o1', label: 'Маленький' },
+        { id: 'o2', label: 'Большой' },
+      ],
+    } as RankingQuestion);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.correctOrder()).toBe('Маленький → Большой');
+  });
 });
