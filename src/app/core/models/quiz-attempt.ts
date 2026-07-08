@@ -39,6 +39,10 @@ export function isQuestionAnswered(
       return (
         question.rows.length > 0 && question.rows.every((row) => !!response?.matches?.[row.id])
       );
+    case 'hotspot':
+      return (response?.selectedOptionIds?.length ?? 0) === 1;
+    case 'file-upload':
+      return !!response?.file;
     default:
       return !!response?.selectedOptionIds && response.selectedOptionIds.length > 0;
   }
@@ -107,6 +111,13 @@ export function formatResponse(question: Question, response: QuestionResponse | 
         });
       return parts.length > 0 ? parts.join(', ') : '—';
     }
+    case 'hotspot': {
+      const selectedId = response?.selectedOptionIds?.[0];
+      const index = question.regions.findIndex((region) => region.id === selectedId);
+      return index === -1 ? '—' : `Область №${index + 1}`;
+    }
+    case 'file-upload':
+      return response?.file?.name ?? '—';
     default: {
       const selectedIds = response?.selectedOptionIds ?? [];
       const labels = question.options

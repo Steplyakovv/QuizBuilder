@@ -131,6 +131,18 @@
                 [matches]="matchesResponse(question.id)"
                 (matchesChange)="setMatches(question.id, $event)"
               />
+            } @else if (question.type === 'hotspot') {
+              <app-hotspot-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
+            } @else if (question.type === 'file-upload') {
+              <app-file-upload-runner
+                [question]="question"
+                [file]="fileResponse(question.id)"
+                (fileChange)="setFile(question.id, $event)"
+              />
             }
 
             @if (validationErrors().has(question.id)) {

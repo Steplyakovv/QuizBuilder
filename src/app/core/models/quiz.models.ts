@@ -29,7 +29,9 @@ export type Question =
   | FillInTheBlankQuestion
   | RankingQuestion
   | MatchingQuestion
-  | MatrixQuestion;
+  | MatrixQuestion
+  | HotspotQuestion
+  | FileUploadQuestion;
 
 export interface BaseQuestion {
   id: string;
@@ -151,6 +153,29 @@ export interface MatrixQuestion extends BaseQuestion {
   columns: Option[];
 }
 
+export interface HotspotRegion {
+  id: string;
+  /** Percent (0-100) from the left edge of the image. */
+  x: number;
+  /** Percent (0-100) from the top edge of the image. */
+  y: number;
+  /** Percent (0-100) of the image width. */
+  width: number;
+  /** Percent (0-100) of the image height. */
+  height: number;
+}
+
+export interface HotspotQuestion extends BaseQuestion {
+  type: 'hotspot';
+  imageUrl: string;
+  regions: HotspotRegion[];
+  correctRegionId?: string;
+}
+
+export interface FileUploadQuestion extends BaseQuestion {
+  type: 'file-upload';
+}
+
 export interface QuizAttempt {
   id: string;
   quizId: string;
@@ -169,4 +194,5 @@ export interface QuestionResponse {
   blanks?: string[];
   /** Maps a left-pair id to a right-pair id (matching) or a row id to a column id (matrix). */
   matches?: Record<string, string>;
+  file?: { name: string; dataUrl: string };
 }

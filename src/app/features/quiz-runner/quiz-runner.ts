@@ -12,7 +12,9 @@ import { QuizStore } from '../../core/state/quiz-store';
 import { ConstantSumRunner } from './question-runners/constant-sum-runner';
 import { DateRunner } from './question-runners/date-runner';
 import { DropdownRunner } from './question-runners/dropdown-runner';
+import { FileUploadRunner } from './question-runners/file-upload-runner';
 import { FillInTheBlankRunner } from './question-runners/fill-in-the-blank-runner';
+import { HotspotRunner } from './question-runners/hotspot-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
 import { MatchingRunner } from './question-runners/matching-runner';
 import { MatrixRunner } from './question-runners/matrix-runner';
@@ -36,7 +38,9 @@ import { WordChoiceRunner } from './question-runners/word-choice-runner';
     ConstantSumRunner,
     DateRunner,
     DropdownRunner,
+    FileUploadRunner,
     FillInTheBlankRunner,
+    HotspotRunner,
     ImageChoiceRunner,
     MatchingRunner,
     MatrixRunner,
@@ -103,6 +107,10 @@ export class QuizRunner {
     return this.responses()[questionId]?.matches ?? {};
   }
 
+  fileResponse(questionId: string): { name: string; dataUrl: string } | undefined {
+    return this.responses()[questionId]?.file;
+  }
+
   setSelection(questionId: string, selectedOptionIds: string[]): void {
     this.responses.update((responses) => ({
       ...responses,
@@ -134,6 +142,11 @@ export class QuizRunner {
       ...responses,
       [questionId]: { questionId, matches },
     }));
+    this.clearValidationError(questionId);
+  }
+
+  setFile(questionId: string, file: { name: string; dataUrl: string } | undefined): void {
+    this.responses.update((responses) => ({ ...responses, [questionId]: { questionId, file } }));
     this.clearValidationError(questionId);
   }
 

@@ -20,6 +20,7 @@ import { QuizRunner } from '../quiz-runner/quiz-runner';
 import { ConstantSumEditor } from './question-editors/constant-sum-editor';
 import { DropdownEditor } from './question-editors/dropdown-editor';
 import { FillInTheBlankEditor } from './question-editors/fill-in-the-blank-editor';
+import { HotspotEditor } from './question-editors/hotspot-editor';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
 import { MatchingEditor } from './question-editors/matching-editor';
 import { MatrixEditor } from './question-editors/matrix-editor';
@@ -47,6 +48,7 @@ import { WordChoiceEditor } from './question-editors/word-choice-editor';
     ConstantSumEditor,
     DropdownEditor,
     FillInTheBlankEditor,
+    HotspotEditor,
     ImageChoiceEditor,
     MatchingEditor,
     MatrixEditor,

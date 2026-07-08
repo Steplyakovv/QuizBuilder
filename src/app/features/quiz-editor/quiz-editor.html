@@ -142,6 +142,12 @@
               <app-matching-editor [question]="question" (questionChange)="saveQuestion($event)" />
             } @else if (question.type === 'matrix') {
               <app-matrix-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'hotspot') {
+              <app-hotspot-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion($event)"
+              />
             }
           </div>
         </div>

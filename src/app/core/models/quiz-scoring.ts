@@ -24,6 +24,8 @@ export function hasCorrectAnswer(question: Question): boolean {
       return !!question.correctAnswers && question.correctAnswers.some((answer) => answer.trim());
     case 'matching':
       return question.pairs.length > 1;
+    case 'hotspot':
+      return !!question.correctRegionId;
     case 'text':
     case 'number':
     case 'date':
@@ -31,6 +33,7 @@ export function hasCorrectAnswer(question: Question): boolean {
     case 'slider':
     case 'constant-sum':
     case 'matrix':
+    case 'file-upload':
       return false;
   }
 }
@@ -70,6 +73,8 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     }
     case 'matching':
       return question.pairs.every((pair) => response?.matches?.[pair.id] === pair.id);
+    case 'hotspot':
+      return selected.length === 1 && selected[0] === question.correctRegionId;
     case 'text':
     case 'number':
     case 'date':
@@ -77,6 +82,7 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     case 'slider':
     case 'constant-sum':
     case 'matrix':
+    case 'file-upload':
       return false;
   }
 }
@@ -116,6 +122,10 @@ export function formatCorrectAnswer(question: Question): string | undefined {
     }
     case 'matching':
       return question.pairs.map((pair) => `${pair.left} → ${pair.right}`).join(', ');
+    case 'hotspot': {
+      const index = question.regions.findIndex((region) => region.id === question.correctRegionId);
+      return index === -1 ? undefined : `Область №${index + 1}`;
+    }
     default:
       return undefined;
   }

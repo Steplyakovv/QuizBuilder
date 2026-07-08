@@ -87,6 +87,16 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'matrix', rows: [], columns: [] });
   });
 
+  it('creates a hotspot question with no image and no regions', () => {
+    const question = createQuestion('hotspot');
+    expect(question).toMatchObject({ type: 'hotspot', imageUrl: '', regions: [] });
+  });
+
+  it('creates a file-upload question', () => {
+    const question = createQuestion('file-upload');
+    expect(question).toMatchObject({ type: 'file-upload', prompt: '', required: true });
+  });
+
   it('generates a unique id for every question', () => {
     expect(createQuestion('text').id).not.toBe(createQuestion('text').id);
   });

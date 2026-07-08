@@ -347,6 +347,56 @@ describe('scoreAttempt', () => {
 
     expect(scoreAttempt(quiz, [{ questionId: 'q1', matches: { r1: 'c1' } }])).toBeUndefined();
   });
+
+  it('scores hotspot questions by the selected region', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'hotspot',
+      prompt: 'p',
+      required: true,
+      imageUrl: 'https://example.com/map.png',
+      regions: [
+        { id: 'r1', x: 0, y: 0, width: 20, height: 20 },
+        { id: 'r2', x: 50, y: 50, width: 20, height: 20 },
+      ],
+      correctRegionId: 'r2',
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['r2'] }])).toEqual({
+      correct: 1,
+      total: 1,
+    });
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['r1'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+  });
+
+  it('ignores a hotspot question with no correct region configured', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'hotspot',
+      prompt: 'p',
+      required: true,
+      imageUrl: 'https://example.com/map.png',
+      regions: [{ id: 'r1', x: 0, y: 0, width: 20, height: 20 }],
+    });
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['r1'] }])).toBeUndefined();
+  });
+
+  it('never scores file-upload questions', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({ id: 'q1', type: 'file-upload', prompt: 'p', required: true });
+
+    expect(
+      scoreAttempt(quiz, [
+        { questionId: 'q1', file: { name: 'a.png', dataUrl: 'data:image/png;base64,' } },
+      ]),
+    ).toBeUndefined();
+  });
 });
 
 describe('formatCorrectAnswer', () => {
@@ -463,5 +513,22 @@ describe('formatCorrectAnswer', () => {
         ],
       }),
     ).toBe('Франция → Париж, Италия → Рим');
+  });
+
+  it('shows the correct region number for hotspot questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'hotspot',
+        prompt: 'p',
+        required: true,
+        imageUrl: 'https://example.com/map.png',
+        regions: [
+          { id: 'r1', x: 0, y: 0, width: 20, height: 20 },
+          { id: 'r2', x: 50, y: 50, width: 20, height: 20 },
+        ],
+        correctRegionId: 'r2',
+      }),
+    ).toBe('Область №2');
   });
 });

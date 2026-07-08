@@ -20,6 +20,8 @@ export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
   ranking: 'Сортировка вариантов',
   matching: 'Сопоставление пар',
   matrix: 'Таблица (матрица)',
+  hotspot: 'Область на изображении',
+  'file-upload': 'Загрузка файла',
 };
 
 export function createQuestion(type: QuestionType): Question {
@@ -57,6 +59,10 @@ export function createQuestion(type: QuestionType): Question {
       return { id, type, prompt: '', required: true, pairs: [] };
     case 'matrix':
       return { id, type, prompt: '', required: true, rows: [], columns: [] };
+    case 'hotspot':
+      return { id, type, prompt: '', required: true, imageUrl: '', regions: [] };
+    case 'file-upload':
+      return { id, type, prompt: '', required: true };
   }
 }
 

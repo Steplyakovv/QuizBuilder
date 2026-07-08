@@ -120,6 +120,25 @@ function matrixQuestion(): Question {
   };
 }
 
+function hotspotQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'hotspot',
+    prompt: 'Кликните по столице',
+    required: true,
+    imageUrl: 'https://example.com/map.png',
+    regions: [
+      { id: 'r1', x: 10, y: 10, width: 20, height: 20 },
+      { id: 'r2', x: 50, y: 50, width: 20, height: 20 },
+    ],
+    correctRegionId: 'r2',
+  };
+}
+
+function fileUploadQuestion(): Question {
+  return { id: 'q1', type: 'file-upload', prompt: 'Прикрепите файл', required: true };
+}
+
 describe('isQuestionAnswered', () => {
   it('treats a text question as unanswered when there is no response', () => {
     expect(isQuestionAnswered(textQuestion(), undefined)).toBe(false);
@@ -253,6 +272,23 @@ describe('isQuestionAnswered', () => {
       true,
     );
   });
+
+  it('treats a hotspot question as answered once a region is selected', () => {
+    expect(isQuestionAnswered(hotspotQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(hotspotQuestion(), { questionId: 'q1', selectedOptionIds: ['r1'] }),
+    ).toBe(true);
+  });
+
+  it('treats a file-upload question as answered once a file is attached', () => {
+    expect(isQuestionAnswered(fileUploadQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(fileUploadQuestion(), {
+        questionId: 'q1',
+        file: { name: 'a.png', dataUrl: 'data:image/png;base64,' },
+      }),
+    ).toBe(true);
+  });
 });
 
 describe('formatResponse', () => {
@@ -355,5 +391,22 @@ describe('formatResponse', () => {
     expect(formatResponse(matrixQuestion(), { questionId: 'q1', matches: { r1: 'c1' } })).toBe(
       'Мне нравится этот опрос: Да',
     );
+  });
+
+  it('shows the selected region number for a hotspot response', () => {
+    expect(formatResponse(hotspotQuestion(), undefined)).toBe('—');
+    expect(formatResponse(hotspotQuestion(), { questionId: 'q1', selectedOptionIds: ['r2'] })).toBe(
+      'Область №2',
+    );
+  });
+
+  it('shows the attached file name for a file-upload response', () => {
+    expect(formatResponse(fileUploadQuestion(), undefined)).toBe('—');
+    expect(
+      formatResponse(fileUploadQuestion(), {
+        questionId: 'q1',
+        file: { name: 'photo.jpg', dataUrl: 'data:image/jpeg;base64,' },
+      }),
+    ).toBe('photo.jpg');
   });
 });
