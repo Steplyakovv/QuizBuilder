@@ -38,10 +38,8 @@ export type Question =
   | FileUploadQuestion;
 
 export interface QuestionCondition {
-  /** id of an earlier question whose answer gates whether this question is shown. */
+  /** id of an earlier question that must be answered before this question is shown. */
   questionId: string;
-  /** Option id the source question's answer must include (or 'true'/'false' for true-false). */
-  optionId: string;
 }
 
 export interface BaseQuestion {

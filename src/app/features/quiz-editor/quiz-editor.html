@@ -192,7 +192,7 @@
             @if (sources.length > 0) {
               <div class="question-condition">
                 <mat-form-field appearance="outline" class="condition-source-field">
-                  <mat-label>Показывать только если</mat-label>
+                  <mat-label>Показывать после выбранного вопроса</mat-label>
                   <mat-select
                     [value]="question.condition?.questionId ?? ''"
                     (valueChange)="updateConditionSource(question.id, $event)"
@@ -205,25 +205,6 @@
                     }
                   </mat-select>
                 </mat-form-field>
-
-                @if (question.condition; as condition) {
-                  <mat-form-field appearance="outline" class="condition-value-field">
-                    <mat-label>ответ — это</mat-label>
-                    <mat-select
-                      [value]="condition.optionId"
-                      (valueChange)="updateConditionValue(question.id, $event)"
-                    >
-                      @for (
-                        option of conditionValueOptions(condition.questionId);
-                        track option.id
-                      ) {
-                        <mat-option [value]="option.id">{{
-                          option.label || '(без текста)'
-                        }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                }
               </div>
             }
           }

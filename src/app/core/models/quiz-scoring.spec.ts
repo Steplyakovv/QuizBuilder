@@ -393,33 +393,27 @@ describe('scoreAttempt', () => {
       {
         id: 'q1',
         type: 'single-choice',
-        prompt: 'Показать доп. вопрос?',
-        required: true,
-        options: [
-          { id: 'yes', label: 'Да' },
-          { id: 'no', label: 'Нет' },
-        ],
-        correctOptionId: 'yes',
+        prompt: 'p1',
+        required: false,
+        options: [{ id: 'o1', label: 'a' }],
+        correctOptionId: 'o1',
       },
       {
         id: 'q2',
         type: 'single-choice',
         prompt: 'p2',
-        required: true,
-        options: [{ id: 'o1', label: 'a' }],
-        correctOptionId: 'o1',
-        condition: { questionId: 'q1', optionId: 'yes' },
+        required: false,
+        options: [{ id: 'o2', label: 'a' }],
+        correctOptionId: 'o2',
+        condition: { questionId: 'q1' },
       },
     );
 
-    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['no'] }])).toEqual({
-      correct: 0,
-      total: 1,
-    });
+    expect(scoreAttempt(quiz, [])).toEqual({ correct: 0, total: 1 });
     expect(
       scoreAttempt(quiz, [
-        { questionId: 'q1', selectedOptionIds: ['yes'] },
-        { questionId: 'q2', selectedOptionIds: ['o1'] },
+        { questionId: 'q1', selectedOptionIds: ['o1'] },
+        { questionId: 'q2', selectedOptionIds: ['o2'] },
       ]),
     ).toEqual({ correct: 2, total: 2 });
   });

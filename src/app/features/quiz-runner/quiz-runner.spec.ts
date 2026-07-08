@@ -198,13 +198,14 @@ describe('QuizRunner', () => {
     expect(visibleIds).toHaveLength(3);
   });
 
-  it('hides a question until its condition is met, and skips it from required validation', async () => {
+  it('hides a question until the source question is answered, and skips it from required validation', async () => {
     let quiz = createQuiz('Опрос с ветвлением');
     quiz = addQuestion(quiz, 'single-choice');
     quiz = addQuestion(quiz, 'text');
     const gate = {
       ...quiz.questions[0],
-      prompt: 'Показать доп. вопрос?',
+      prompt: 'Расскажите про кофе?',
+      required: false,
       options: [
         { id: 'yes', label: 'Да' },
         { id: 'no', label: 'Нет' },
@@ -213,7 +214,8 @@ describe('QuizRunner', () => {
     quiz = replaceQuestion(quiz, gate);
     const gated = {
       ...quiz.questions[1],
-      condition: { questionId: gate.id, optionId: 'yes' },
+      required: true,
+      condition: { questionId: gate.id },
     } as TextQuestion;
     quiz = replaceQuestion(quiz, gated);
     await quizRepository.save(quiz);
@@ -221,14 +223,35 @@ describe('QuizRunner', () => {
 
     expect(fixture.componentInstance.visibleQuestions().map((q) => q.id)).toEqual([gate.id]);
 
-    fixture.componentInstance.setSelection(gate.id, ['no']);
+    // gated is required but hidden, so submission succeeds without answering either question
     await fixture.componentInstance.submit();
     await fixture.whenStable();
     expect(fixture.componentInstance.submitted()).toBe(true);
     expect(attemptRepository.attempts).toHaveLength(1);
+  });
 
-    fixture.componentInstance.setSelection(gate.id, ['yes']);
+  it('reveals the gated question once the source question has any answer', async () => {
+    let quiz = createQuiz('Опрос с ветвлением');
+    quiz = addQuestion(quiz, 'single-choice');
+    quiz = addQuestion(quiz, 'text');
+    const gate = {
+      ...quiz.questions[0],
+      prompt: 'Расскажите про кофе?',
+      required: false,
+      options: [
+        { id: 'yes', label: 'Да' },
+        { id: 'no', label: 'Нет' },
+      ],
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, gate);
+    const gated = { ...quiz.questions[1], condition: { questionId: gate.id } } as TextQuestion;
+    quiz = replaceQuestion(quiz, gated);
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.setSelection(gate.id, ['no']);
     await fixture.whenStable();
+
     expect(fixture.componentInstance.visibleQuestions().map((q) => q.id)).toEqual([
       gate.id,
       gated.id,
