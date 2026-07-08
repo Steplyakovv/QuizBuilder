@@ -1,9 +1,21 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { createId } from '../../core/utils/id';
+import { getClientId } from '../../core/utils/client-id';
+import { shuffle } from '../../core/utils/shuffle';
+import { isQuestionVisible } from '../../core/models/question-condition';
 import { isQuestionAnswered } from '../../core/models/quiz-attempt';
 import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
 import { QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
@@ -62,6 +74,9 @@ export class QuizRunner {
   private readonly attemptRepository = inject(ATTEMPT_REPOSITORY);
   private readonly attemptId = createId();
   private readonly startedAt = new Date().toISOString();
+  private readonly startedAtMs = Date.now();
+  private readonly clientId = getClientId();
+  private timerHandle: ReturnType<typeof setInterval> | undefined;
 
   readonly id = input<string>();
   readonly previewQuiz = input<Quiz>();
@@ -75,6 +90,25 @@ export class QuizRunner {
     return id ? this.store.quizzes().find((quiz) => quiz.id === id) : undefined;
   });
 
+  private readonly displayQuestions = computed(() => {
+    const quiz = this.quiz();
+    if (!quiz) {
+      return [];
+    }
+    return quiz.settings.shuffleQuestions ? shuffle(quiz.questions) : quiz.questions;
+  });
+
+  readonly visibleQuestions = computed(() => {
+    const quiz = this.quiz();
+    if (!quiz) {
+      return [];
+    }
+    const responses = this.responses();
+    return this.displayQuestions().filter((question) =>
+      isQuestionVisible(question, quiz.questions, responses),
+    );
+  });
+
   readonly respondentName = signal('');
   private readonly responses = signal<Record<string, QuestionResponse>>({});
   readonly validationErrors = signal<Set<string>>(new Set());
@@ -83,8 +117,73 @@ export class QuizRunner {
   readonly submitted = signal(false);
   readonly result = signal<AttemptScore | undefined>(undefined);
 
+  readonly remainingSeconds = signal<number | undefined>(undefined);
+  readonly remainingTimeLabel = computed(() => {
+    const seconds = this.remainingSeconds();
+    if (seconds === undefined) {
+      return undefined;
+    }
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
+  });
+
+  readonly attemptsUsed = signal(0);
+  readonly attemptsBlocked = computed(() => {
+    const max = this.quiz()?.settings.maxAttempts;
+    return max !== undefined && this.attemptsUsed() >= max;
+  });
+
   constructor() {
     void this.store.load();
+
+    effect(() => {
+      const quiz = this.quiz();
+      const isPreview = this.isPreview();
+      untracked(() => {
+        if (!quiz || isPreview) {
+          return;
+        }
+        void this.loadAttemptsUsed(quiz.id);
+        this.startTimer(quiz.settings.timeLimitMinutes);
+      });
+    });
+
+    inject(DestroyRef).onDestroy(() => this.stopTimer());
+  }
+
+  private async loadAttemptsUsed(quizId: string): Promise<void> {
+    const attempts = await this.attemptRepository.getByQuizId(quizId);
+    this.attemptsUsed.set(
+      attempts.filter((attempt) => attempt.respondentClientId === this.clientId).length,
+    );
+  }
+
+  private startTimer(timeLimitMinutes: number | undefined): void {
+    this.stopTimer();
+    if (!timeLimitMinutes) {
+      this.remainingSeconds.set(undefined);
+      return;
+    }
+    const deadline = this.startedAtMs + timeLimitMinutes * 60_000;
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+      this.remainingSeconds.set(remaining);
+      if (remaining <= 0) {
+        this.stopTimer();
+        if (!this.submitted()) {
+          void this.submit(true);
+        }
+      }
+    };
+    tick();
+    this.timerHandle = setInterval(tick, 1000);
+  }
+
+  private stopTimer(): void {
+    if (this.timerHandle !== undefined) {
+      clearInterval(this.timerHandle);
+      this.timerHandle = undefined;
+    }
   }
 
   selectedOptionIds(questionId: string): string[] {
@@ -159,22 +258,28 @@ export class QuizRunner {
     this.validationErrors.set(next);
   }
 
-  async submit(): Promise<void> {
+  async submit(force = false): Promise<void> {
     const quiz = this.quiz();
     if (!quiz) {
       return;
     }
-    const responses = Object.values(this.responses());
-    const responseByQuestionId = new Map(
-      responses.map((response) => [response.questionId, response]),
-    );
-    const unanswered = quiz.questions.filter(
-      (question) =>
-        question.required && !isQuestionAnswered(question, responseByQuestionId.get(question.id)),
-    );
-    if (unanswered.length > 0) {
-      this.validationErrors.set(new Set(unanswered.map((question) => question.id)));
+    if (!this.isPreview() && this.attemptsBlocked()) {
       return;
+    }
+    this.stopTimer();
+    const responses = Object.values(this.responses());
+    if (!force) {
+      const responseByQuestionId = new Map(
+        responses.map((response) => [response.questionId, response]),
+      );
+      const unanswered = this.visibleQuestions().filter(
+        (question) =>
+          question.required && !isQuestionAnswered(question, responseByQuestionId.get(question.id)),
+      );
+      if (unanswered.length > 0) {
+        this.validationErrors.set(new Set(unanswered.map((question) => question.id)));
+        return;
+      }
     }
 
     if (this.isPreview()) {
@@ -191,6 +296,7 @@ export class QuizRunner {
         id: this.attemptId,
         quizId: quiz.id,
         respondentName: this.respondentName().trim() || undefined,
+        respondentClientId: this.clientId,
         startedAt: this.startedAt,
         completedAt: new Date().toISOString(),
         responses,

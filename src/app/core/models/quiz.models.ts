@@ -11,6 +11,10 @@ export interface Quiz {
 export interface QuizSettings {
   isGraded: boolean;
   shuffleQuestions?: boolean;
+  /** Auto-submits the attempt once this many minutes have passed since it started. */
+  timeLimitMinutes?: number;
+  /** Max attempts allowed per respondent (tracked by a per-browser client id). */
+  maxAttempts?: number;
 }
 
 export type Question =
@@ -33,10 +37,19 @@ export type Question =
   | HotspotQuestion
   | FileUploadQuestion;
 
+export interface QuestionCondition {
+  /** id of an earlier question whose answer gates whether this question is shown. */
+  questionId: string;
+  /** Option id the source question's answer must include (or 'true'/'false' for true-false). */
+  optionId: string;
+}
+
 export interface BaseQuestion {
   id: string;
   prompt: string;
   required: boolean;
+  /** When set, this question is only shown if the referenced answer matches. */
+  condition?: QuestionCondition;
 }
 
 export interface Option {
@@ -180,6 +193,8 @@ export interface QuizAttempt {
   id: string;
   quizId: string;
   respondentName?: string;
+  /** Per-browser id used to enforce settings.maxAttempts; not a real identity. */
+  respondentClientId?: string;
   startedAt: string;
   completedAt?: string;
   responses: QuestionResponse[];

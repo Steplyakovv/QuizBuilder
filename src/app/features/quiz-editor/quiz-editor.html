@@ -45,6 +45,37 @@
       Квиз с баллами (отмечать правильные ответы)
     </mat-checkbox>
 
+    <div class="quiz-run-settings">
+      <mat-checkbox
+        [checked]="quiz.settings.shuffleQuestions ?? false"
+        (change)="updateShuffleQuestions($event.checked)"
+      >
+        Перемешивать порядок вопросов
+      </mat-checkbox>
+
+      <mat-form-field appearance="outline" class="time-limit-field">
+        <mat-label>Лимит времени, мин (необязательно)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="1"
+          [value]="quiz.settings.timeLimitMinutes ?? ''"
+          (blur)="updateTimeLimit($any($event.target).value)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="max-attempts-field">
+        <mat-label>Лимит попыток (необязательно)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="1"
+          [value]="quiz.settings.maxAttempts ?? ''"
+          (blur)="updateMaxAttempts($any($event.target).value)"
+        />
+      </mat-form-field>
+    </div>
+
     <h2>Вопросы</h2>
 
     @if (quiz.questions.length === 0) {
@@ -150,6 +181,46 @@
               />
             }
           </div>
+
+          @if (conditionSources(question.id); as sources) {
+            @if (sources.length > 0) {
+              <div class="question-condition">
+                <mat-form-field appearance="outline" class="condition-source-field">
+                  <mat-label>Показывать только если</mat-label>
+                  <mat-select
+                    [value]="question.condition?.questionId ?? ''"
+                    (valueChange)="updateConditionSource(question.id, $event)"
+                  >
+                    <mat-option value="">— всегда показывать —</mat-option>
+                    @for (source of sources; track source.id) {
+                      <mat-option [value]="source.id">{{
+                        source.prompt || '(без текста)'
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                @if (question.condition; as condition) {
+                  <mat-form-field appearance="outline" class="condition-value-field">
+                    <mat-label>ответ — это</mat-label>
+                    <mat-select
+                      [value]="condition.optionId"
+                      (valueChange)="updateConditionValue(question.id, $event)"
+                    >
+                      @for (
+                        option of conditionValueOptions(condition.questionId);
+                        track option.id
+                      ) {
+                        <mat-option [value]="option.id">{{
+                          option.label || '(без текста)'
+                        }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+              </div>
+            }
+          }
         </div>
       }
     </div>

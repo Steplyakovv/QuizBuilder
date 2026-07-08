@@ -1,4 +1,5 @@
 import { splitTemplate } from './fill-in-the-blank';
+import { isQuestionVisible } from './question-condition';
 import { Question, QuestionResponse, Quiz } from './quiz.models';
 
 export interface AttemptScore {
@@ -135,13 +136,17 @@ export function scoreAttempt(quiz: Quiz, responses: QuestionResponse[]): Attempt
   if (!quiz.settings.isGraded) {
     return undefined;
   }
-  const gradableQuestions = quiz.questions.filter(hasCorrectAnswer);
-  if (gradableQuestions.length === 0) {
-    return undefined;
-  }
   const responseByQuestionId = new Map(
     responses.map((response) => [response.questionId, response]),
   );
+  const responseRecord = Object.fromEntries(responseByQuestionId);
+  const gradableQuestions = quiz.questions.filter(
+    (question) =>
+      hasCorrectAnswer(question) && isQuestionVisible(question, quiz.questions, responseRecord),
+  );
+  if (gradableQuestions.length === 0) {
+    return undefined;
+  }
   const correct = gradableQuestions.filter((question) =>
     isCorrect(question, responseByQuestionId.get(question.id)),
   ).length;

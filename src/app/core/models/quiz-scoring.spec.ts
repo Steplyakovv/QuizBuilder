@@ -387,6 +387,43 @@ describe('scoreAttempt', () => {
     expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['r1'] }])).toBeUndefined();
   });
 
+  it('excludes a conditionally hidden question from the gradable total', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push(
+      {
+        id: 'q1',
+        type: 'single-choice',
+        prompt: 'Показать доп. вопрос?',
+        required: true,
+        options: [
+          { id: 'yes', label: 'Да' },
+          { id: 'no', label: 'Нет' },
+        ],
+        correctOptionId: 'yes',
+      },
+      {
+        id: 'q2',
+        type: 'single-choice',
+        prompt: 'p2',
+        required: true,
+        options: [{ id: 'o1', label: 'a' }],
+        correctOptionId: 'o1',
+        condition: { questionId: 'q1', optionId: 'yes' },
+      },
+    );
+
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['no'] }])).toEqual({
+      correct: 0,
+      total: 1,
+    });
+    expect(
+      scoreAttempt(quiz, [
+        { questionId: 'q1', selectedOptionIds: ['yes'] },
+        { questionId: 'q2', selectedOptionIds: ['o1'] },
+      ]),
+    ).toEqual({ correct: 2, total: 2 });
+  });
+
   it('never scores file-upload questions', () => {
     const quiz = baseQuiz(true);
     quiz.questions.push({ id: 'q1', type: 'file-upload', prompt: 'p', required: true });

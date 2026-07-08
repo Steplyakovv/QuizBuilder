@@ -11,9 +11,19 @@
       <p class="quiz-description">{{ quiz.description }}</p>
     }
 
-    @if (!submitted()) {
+    @if (!submitted() && !isPreview() && attemptsBlocked()) {
+      <p class="empty-state">
+        Вы исчерпали лимит попыток прохождения этого опросника ({{ quiz.settings.maxAttempts }}).
+      </p>
+    } @else if (!submitted()) {
       @if (saveError()) {
         <p class="save-error">{{ saveError() }}</p>
+      }
+
+      @if (remainingTimeLabel(); as timeLabel) {
+        <p class="time-limit" [class.time-limit-warning]="(remainingSeconds() ?? 0) <= 30">
+          Осталось времени: {{ timeLabel }}
+        </p>
       }
 
       <form (submit)="submit(); $event.preventDefault()">
@@ -26,7 +36,7 @@
           />
         </mat-form-field>
 
-        @for (question of quiz.questions; track question.id) {
+        @for (question of visibleQuestions(); track question.id) {
           <div class="question-item" [class.invalid]="validationErrors().has(question.id)">
             <p class="question-prompt">
               {{ question.prompt }}

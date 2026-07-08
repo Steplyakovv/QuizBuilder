@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { getClientId } from '../../core/utils/client-id';
 import { createQuiz } from '../../core/models/quiz.factory';
 import { addQuestion, replaceQuestion } from '../../core/models/quiz-questions';
 import { Quiz, SingleChoiceQuestion, TextQuestion } from '../../core/models/quiz.models';
@@ -48,6 +49,7 @@ describe('QuizRunner', () => {
   }
 
   beforeEach(() => {
+    localStorage.clear();
     quizRepository = new FakeQuizRepository();
     attemptRepository = new FakeAttemptRepository();
   });
@@ -176,5 +178,113 @@ describe('QuizRunner', () => {
 
     expect(fixture.componentInstance.saveError()).toContain('лимит хранилища браузера');
     expect(fixture.componentInstance.submitted()).toBe(false);
+  });
+
+  it('shuffles question order without dropping or duplicating questions', async () => {
+    let quiz = createQuiz('Опрос');
+    quiz = addQuestion(quiz, 'text');
+    quiz = addQuestion(quiz, 'text');
+    quiz = addQuestion(quiz, 'text');
+    quiz = {
+      ...quiz,
+      questions: quiz.questions.map((question) => ({ ...question, required: false })),
+      settings: { isGraded: false, shuffleQuestions: true },
+    };
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    const visibleIds = fixture.componentInstance.visibleQuestions().map((question) => question.id);
+    expect(new Set(visibleIds)).toEqual(new Set(quiz.questions.map((question) => question.id)));
+    expect(visibleIds).toHaveLength(3);
+  });
+
+  it('hides a question until its condition is met, and skips it from required validation', async () => {
+    let quiz = createQuiz('Опрос с ветвлением');
+    quiz = addQuestion(quiz, 'single-choice');
+    quiz = addQuestion(quiz, 'text');
+    const gate = {
+      ...quiz.questions[0],
+      prompt: 'Показать доп. вопрос?',
+      options: [
+        { id: 'yes', label: 'Да' },
+        { id: 'no', label: 'Нет' },
+      ],
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, gate);
+    const gated = {
+      ...quiz.questions[1],
+      condition: { questionId: gate.id, optionId: 'yes' },
+    } as TextQuestion;
+    quiz = replaceQuestion(quiz, gated);
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    expect(fixture.componentInstance.visibleQuestions().map((q) => q.id)).toEqual([gate.id]);
+
+    fixture.componentInstance.setSelection(gate.id, ['no']);
+    await fixture.componentInstance.submit();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.submitted()).toBe(true);
+    expect(attemptRepository.attempts).toHaveLength(1);
+
+    fixture.componentInstance.setSelection(gate.id, ['yes']);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.visibleQuestions().map((q) => q.id)).toEqual([
+      gate.id,
+      gated.id,
+    ]);
+  });
+
+  it('blocks a new attempt once the per-browser attempt limit is reached', async () => {
+    const clientId = getClientId();
+    let quiz = createQuiz('Опрос с лимитом попыток');
+    quiz = addQuestion(quiz, 'text');
+    quiz = {
+      ...quiz,
+      questions: quiz.questions.map((question) => ({ ...question, required: false })),
+      settings: { isGraded: false, maxAttempts: 1 },
+    };
+    await quizRepository.save(quiz);
+    await attemptRepository.save({
+      id: 'previous',
+      quizId: quiz.id,
+      respondentClientId: clientId,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      completedAt: '2026-01-01T00:01:00.000Z',
+      responses: [],
+    });
+
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.attemptsBlocked()).toBe(true);
+
+    await fixture.componentInstance.submit();
+    await fixture.whenStable();
+    expect(attemptRepository.attempts).toHaveLength(1);
+  });
+
+  it('shows a countdown once a time limit is configured', async () => {
+    const quiz = singleChoiceQuiz();
+    const timedQuiz = { ...quiz, settings: { ...quiz.settings, timeLimitMinutes: 1 } };
+    await quizRepository.save(timedQuiz);
+    const fixture = await createComponent(timedQuiz.id);
+
+    expect(fixture.componentInstance.remainingSeconds()).toBeGreaterThan(0);
+    expect(fixture.componentInstance.remainingTimeLabel()).toMatch(/^\d+:\d{2}$/);
+  });
+
+  it('force-submits without validating required questions, as the expiry timer does', async () => {
+    const quiz = singleChoiceQuiz();
+    await quizRepository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    await fixture.componentInstance.submit(true);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.validationErrors().size).toBe(0);
+    expect(fixture.componentInstance.submitted()).toBe(true);
+    expect(attemptRepository.attempts).toHaveLength(1);
+    expect(attemptRepository.attempts[0].responses).toEqual([]);
   });
 });

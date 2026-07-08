@@ -8,7 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { QUESTION_TYPE_LABELS, QuestionType } from '../../core/models/question.factory';
-import { Question, Quiz } from '../../core/models/quiz.models';
+import { conditionOptions, isConditionSource } from '../../core/models/question-condition';
+import { Option, Question, QuestionCondition, Quiz } from '../../core/models/quiz.models';
 import {
   addQuestion,
   removeQuestion,
@@ -130,6 +131,65 @@ export class QuizEditor {
 
   updateGraded(isGraded: boolean): void {
     this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, isGraded } }));
+  }
+
+  updateShuffleQuestions(shuffleQuestions: boolean): void {
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, shuffleQuestions } }));
+  }
+
+  updateTimeLimit(rawValue: string): void {
+    const value = rawValue.trim();
+    const timeLimitMinutes = value ? Math.max(1, Math.round(Number(value))) : undefined;
+    if (value && Number.isNaN(timeLimitMinutes)) {
+      return;
+    }
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, timeLimitMinutes } }));
+  }
+
+  updateMaxAttempts(rawValue: string): void {
+    const value = rawValue.trim();
+    const maxAttempts = value ? Math.max(1, Math.round(Number(value))) : undefined;
+    if (value && Number.isNaN(maxAttempts)) {
+      return;
+    }
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, maxAttempts } }));
+  }
+
+  /** Earlier questions whose answer this question could be conditioned on. */
+  conditionSources(questionId: string): Question[] {
+    const questions = this.draft()?.questions ?? [];
+    const index = questions.findIndex((question) => question.id === questionId);
+    return questions.slice(0, index).filter(isConditionSource);
+  }
+
+  conditionValueOptions(sourceQuestionId: string | undefined): Option[] {
+    const source = this.draft()?.questions.find((question) => question.id === sourceQuestionId);
+    return source ? conditionOptions(source) : [];
+  }
+
+  updateConditionSource(questionId: string, sourceQuestionId: string): void {
+    const question = this.draft()?.questions.find((existing) => existing.id === questionId);
+    if (!question) {
+      return;
+    }
+    if (!sourceQuestionId) {
+      this.saveQuestion({ ...question, condition: undefined });
+      return;
+    }
+    const options = this.conditionValueOptions(sourceQuestionId);
+    const condition: QuestionCondition = {
+      questionId: sourceQuestionId,
+      optionId: options[0]?.id ?? '',
+    };
+    this.saveQuestion({ ...question, condition });
+  }
+
+  updateConditionValue(questionId: string, optionId: string): void {
+    const question = this.draft()?.questions.find((existing) => existing.id === questionId);
+    if (!question?.condition) {
+      return;
+    }
+    this.saveQuestion({ ...question, condition: { ...question.condition, optionId } });
   }
 
   addQuestion(): void {
