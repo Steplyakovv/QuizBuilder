@@ -8,6 +8,13 @@ import { FillInTheBlankQuestion } from '../../../core/models/quiz.models';
   selector: 'app-fill-in-the-blank-editor',
   imports: [MatFormFieldModule, MatInputModule],
   templateUrl: './fill-in-the-blank-editor.html',
+  styles: `
+    .blank-answer-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+  `,
 })
 export class FillInTheBlankEditor {
   readonly question = input.required<FillInTheBlankQuestion>();

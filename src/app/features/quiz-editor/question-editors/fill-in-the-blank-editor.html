@@ -10,15 +10,17 @@
 
   @if (graded() && blankCount() > 0) {
     <p class="blank-answers-label">Правильные ответы для пропусков:</p>
-    @for (index of blankIndexes(); track index) {
-      <mat-form-field appearance="outline" class="blank-answer-field">
-        <mat-label>Пропуск {{ index + 1 }}</mat-label>
-        <input
-          matInput
-          [value]="correctAnswer(index)"
-          (blur)="onCorrectAnswerChange(index, $any($event.target).value)"
-        />
-      </mat-form-field>
-    }
+    <div class="blank-answer-fields">
+      @for (index of blankIndexes(); track index) {
+        <mat-form-field appearance="outline" class="blank-answer-field">
+          <mat-label>Пропуск {{ index + 1 }}</mat-label>
+          <input
+            matInput
+            [value]="correctAnswer(index)"
+            (blur)="onCorrectAnswerChange(index, $any($event.target).value)"
+          />
+        </mat-form-field>
+      }
+    </div>
   }
 </div>
