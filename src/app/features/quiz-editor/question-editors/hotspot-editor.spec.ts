@@ -34,11 +34,13 @@ describe('HotspotEditor', () => {
     fixture.componentInstance.questionChange.subscribe((value) => (emitted = value));
 
     const rect = { left: 0, top: 0, width: 200, height: 100 } as DOMRect;
-    const target = { getBoundingClientRect: () => rect } as unknown as HTMLElement;
+    const wrap = { getBoundingClientRect: () => rect } as unknown as HTMLElement;
+    const eventTarget = { closest: () => null } as unknown as HTMLElement;
     fixture.componentInstance.onImageClick({
       clientX: 100,
       clientY: 50,
-      currentTarget: target,
+      currentTarget: wrap,
+      target: eventTarget,
     } as unknown as MouseEvent);
 
     expect(emitted?.regions).toHaveLength(1);
@@ -79,5 +81,65 @@ describe('HotspotEditor', () => {
     await fixture.whenStable();
     fixture.componentInstance.toggleCorrect('r1');
     expect(emitted?.correctRegionId).toBeUndefined();
+  });
+
+  function fakeDragStartEvent(clientX: number, clientY: number, rect: DOMRect): MouseEvent {
+    const wrap = { getBoundingClientRect: () => rect };
+    const target = { closest: () => wrap };
+    return {
+      clientX,
+      clientY,
+      currentTarget: target,
+      preventDefault: () => undefined,
+      stopPropagation: () => undefined,
+    } as unknown as MouseEvent;
+  }
+
+  it('moves a region by dragging it, then stops on mouseup', async () => {
+    const question = {
+      ...createQuestion('hotspot'),
+      imageUrl: 'https://example.com/a.png',
+      regions: [{ id: 'r1', x: 20, y: 20, width: 20, height: 20 }],
+    } as HotspotQuestion;
+    const fixture = await createComponent(question);
+    let emitted: HotspotQuestion | undefined;
+    fixture.componentInstance.questionChange.subscribe((value) => (emitted = value));
+
+    const rect = { left: 0, top: 0, width: 200, height: 100 } as DOMRect;
+    fixture.componentInstance.startMove(fakeDragStartEvent(40, 20, rect), question.regions[0]);
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 60, clientY: 20 }));
+
+    expect(emitted?.regions[0].x).toBe(30);
+    expect(emitted?.regions[0].y).toBe(20);
+
+    window.dispatchEvent(new MouseEvent('mouseup'));
+    emitted = undefined;
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 20 }));
+
+    expect(emitted).toBeUndefined();
+  });
+
+  it('resizes a region by dragging a handle', async () => {
+    const question = {
+      ...createQuestion('hotspot'),
+      imageUrl: 'https://example.com/a.png',
+      regions: [{ id: 'r1', x: 20, y: 20, width: 20, height: 20 }],
+    } as HotspotQuestion;
+    const fixture = await createComponent(question);
+    let emitted: HotspotQuestion | undefined;
+    fixture.componentInstance.questionChange.subscribe((value) => (emitted = value));
+
+    const rect = { left: 0, top: 0, width: 200, height: 100 } as DOMRect;
+    fixture.componentInstance.startResize(
+      fakeDragStartEvent(40, 20, rect),
+      question.regions[0],
+      'e',
+    );
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 60, clientY: 20 }));
+
+    expect(emitted?.regions[0].width).toBe(30);
+    expect(emitted?.regions[0].x).toBe(20);
+
+    window.dispatchEvent(new MouseEvent('mouseup'));
   });
 });

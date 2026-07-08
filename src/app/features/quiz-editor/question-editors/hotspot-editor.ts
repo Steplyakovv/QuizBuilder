@@ -1,10 +1,27 @@
-import { Component, input, output } from '@angular/core';
+import { Component, DestroyRef, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { addRegion, removeRegion, updateRegionSize } from '../../../core/models/hotspot-regions';
-import { HotspotQuestion } from '../../../core/models/quiz.models';
+import {
+  addRegion,
+  moveRegion,
+  removeRegion,
+  resizeRegion,
+  ResizeHandle,
+  updateRegionSize,
+} from '../../../core/models/hotspot-regions';
+import { HotspotQuestion, HotspotRegion } from '../../../core/models/quiz.models';
+
+interface DragState {
+  regionId: string;
+  handle?: ResizeHandle;
+  startClientX: number;
+  startClientY: number;
+  startRegion: HotspotRegion;
+  rectWidth: number;
+  rectHeight: number;
+}
 
 @Component({
   selector: 'app-hotspot-editor',
@@ -52,8 +69,15 @@ import { HotspotQuestion } from '../../../core/models/quiz.models';
               [style.top.%]="region.y"
               [style.width.%]="region.width"
               [style.height.%]="region.height"
+              (mousedown)="startMove($event, region)"
             >
               {{ i + 1 }}
+              @for (handle of handles; track handle) {
+                <span
+                  [class]="'hotspot-handle hotspot-handle-' + handle"
+                  (mousedown)="startResize($event, region, handle)"
+                ></span>
+              }
             </div>
           }
         </div>
@@ -171,12 +195,75 @@ import { HotspotQuestion } from '../../../core/models/quiz.models';
       color: var(--mat-sys-primary);
       font-weight: 600;
       box-sizing: border-box;
+      cursor: move;
     }
 
     .hotspot-region--correct {
       border-color: #2e7d32;
       background: color-mix(in srgb, #2e7d32 25%, transparent);
       color: #1b5e20;
+    }
+
+    .hotspot-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--mat-sys-surface);
+      border: 2px solid var(--mat-sys-primary);
+      border-radius: 50%;
+      box-sizing: border-box;
+    }
+
+    .hotspot-handle-n {
+      top: -6px;
+      left: 50%;
+      margin-left: -5px;
+      cursor: ns-resize;
+    }
+
+    .hotspot-handle-s {
+      bottom: -6px;
+      left: 50%;
+      margin-left: -5px;
+      cursor: ns-resize;
+    }
+
+    .hotspot-handle-e {
+      right: -6px;
+      top: 50%;
+      margin-top: -5px;
+      cursor: ew-resize;
+    }
+
+    .hotspot-handle-w {
+      left: -6px;
+      top: 50%;
+      margin-top: -5px;
+      cursor: ew-resize;
+    }
+
+    .hotspot-handle-ne {
+      top: -6px;
+      right: -6px;
+      cursor: nesw-resize;
+    }
+
+    .hotspot-handle-nw {
+      top: -6px;
+      left: -6px;
+      cursor: nwse-resize;
+    }
+
+    .hotspot-handle-se {
+      bottom: -6px;
+      right: -6px;
+      cursor: nwse-resize;
+    }
+
+    .hotspot-handle-sw {
+      bottom: -6px;
+      left: -6px;
+      cursor: nesw-resize;
     }
 
     .hotspot-region-list {
@@ -197,6 +284,67 @@ export class HotspotEditor {
   readonly question = input.required<HotspotQuestion>();
   readonly graded = input(false);
   readonly questionChange = output<HotspotQuestion>();
+
+  readonly handles: ResizeHandle[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+
+  private drag: DragState | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.endDrag());
+  }
+
+  startMove(event: MouseEvent, region: HotspotRegion): void {
+    this.beginDrag(event, region);
+  }
+
+  startResize(event: MouseEvent, region: HotspotRegion, handle: ResizeHandle): void {
+    this.beginDrag(event, region, handle);
+  }
+
+  private beginDrag(event: MouseEvent, region: HotspotRegion, handle?: ResizeHandle): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const wrap = (event.currentTarget as HTMLElement).closest('.hotspot-image-wrap');
+    if (!wrap) {
+      return;
+    }
+    const rect = wrap.getBoundingClientRect();
+    this.drag = {
+      regionId: region.id,
+      handle,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startRegion: region,
+      rectWidth: rect.width,
+      rectHeight: rect.height,
+    };
+    window.addEventListener('mousemove', this.onDragMove);
+    window.addEventListener('mouseup', this.endDrag);
+  }
+
+  private readonly onDragMove = (event: MouseEvent): void => {
+    const drag = this.drag;
+    if (!drag) {
+      return;
+    }
+    const dx = ((event.clientX - drag.startClientX) / drag.rectWidth) * 100;
+    const dy = ((event.clientY - drag.startClientY) / drag.rectHeight) * 100;
+    const updated = drag.handle
+      ? resizeRegion(drag.startRegion, drag.handle, dx, dy)
+      : moveRegion(drag.startRegion, dx, dy);
+    this.questionChange.emit({
+      ...this.question(),
+      regions: this.question().regions.map((region) =>
+        region.id === drag.regionId ? updated : region,
+      ),
+    });
+  };
+
+  private readonly endDrag = (): void => {
+    this.drag = null;
+    window.removeEventListener('mousemove', this.onDragMove);
+    window.removeEventListener('mouseup', this.endDrag);
+  };
 
   updateImageUrl(imageUrl: string): void {
     this.questionChange.emit({ ...this.question(), imageUrl });
@@ -220,6 +368,9 @@ export class HotspotEditor {
   }
 
   onImageClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).closest('.hotspot-region')) {
+      return;
+    }
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
