@@ -9,6 +9,10 @@ import { FillInTheBlankQuestion } from '../../../core/models/quiz.models';
   imports: [MatFormFieldModule, MatInputModule],
   templateUrl: './fill-in-the-blank-editor.html',
   styles: `
+    .template-field {
+      width: 100%;
+    }
+
     .blank-answer-fields {
       display: flex;
       flex-wrap: wrap;
