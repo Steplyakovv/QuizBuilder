@@ -3,15 +3,21 @@ import { HotspotRegion } from './quiz.models';
 
 const DEFAULT_SIZE = 20;
 const MIN_SIZE = 2;
+const DECIMALS = 2;
 
 export type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+function round(value: number): number {
+  const factor = 10 ** DECIMALS;
+  return Math.round(value * factor) / factor;
+}
 
 export function addRegion(regions: HotspotRegion[], x: number, y: number): HotspotRegion[] {
   const half = DEFAULT_SIZE / 2;
   const region: HotspotRegion = {
     id: createId(),
-    x: Math.min(Math.max(x - half, 0), 100 - DEFAULT_SIZE),
-    y: Math.min(Math.max(y - half, 0), 100 - DEFAULT_SIZE),
+    x: round(Math.min(Math.max(x - half, 0), 100 - DEFAULT_SIZE)),
+    y: round(Math.min(Math.max(y - half, 0), 100 - DEFAULT_SIZE)),
     width: DEFAULT_SIZE,
     height: DEFAULT_SIZE,
   };
@@ -28,7 +34,7 @@ export function updateRegionSize(
   field: 'width' | 'height',
   value: number,
 ): HotspotRegion[] {
-  const clamped = Math.min(Math.max(value, 1), 100);
+  const clamped = round(Math.min(Math.max(value, 1), 100));
   return regions.map((region) =>
     region.id === regionId ? { ...region, [field]: clamped } : region,
   );
@@ -37,8 +43,8 @@ export function updateRegionSize(
 export function moveRegion(region: HotspotRegion, dx: number, dy: number): HotspotRegion {
   return {
     ...region,
-    x: Math.min(Math.max(region.x + dx, 0), 100 - region.width),
-    y: Math.min(Math.max(region.y + dy, 0), 100 - region.height),
+    x: round(Math.min(Math.max(region.x + dx, 0), 100 - region.width)),
+    y: round(Math.min(Math.max(region.y + dy, 0), 100 - region.height)),
   };
 }
 
@@ -67,5 +73,5 @@ export function resizeRegion(
     height = bottom - y;
   }
 
-  return { ...region, x, y, width, height };
+  return { ...region, x: round(x), y: round(y), width: round(width), height: round(height) };
 }
