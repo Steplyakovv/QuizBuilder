@@ -10,6 +10,18 @@ interface MatchingLine {
   rightY: number;
 }
 
+const ROW_HEIGHT = 44;
+const ROW_GAP = 8;
+
+function rowCenterPercent(index: number, total: number): number {
+  const totalHeight = total * ROW_HEIGHT + (total - 1) * ROW_GAP;
+  if (totalHeight <= 0) {
+    return 50;
+  }
+  const center = index * (ROW_HEIGHT + ROW_GAP) + ROW_HEIGHT / 2;
+  return (center / totalHeight) * 100;
+}
+
 @Component({
   selector: 'app-matching-runner',
   template: `
@@ -32,16 +44,16 @@ interface MatchingLine {
         <svg class="matching-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
           @for (line of lines(); track line.leftId) {
             <line
-              [attr.x1]="100"
-              [attr.y1]="line.rightY"
-              [attr.x2]="0"
-              [attr.y2]="line.leftY"
+              [attr.x1]="0"
+              [attr.y1]="line.leftY"
+              [attr.x2]="100"
+              [attr.y2]="line.rightY"
               class="matching-line"
             />
           }
         </svg>
         @for (line of lines(); track line.leftId) {
-          <span class="matching-arrowhead" [style.top.%]="line.leftY"></span>
+          <span class="matching-arrowhead" [style.top.%]="line.rightY"></span>
         }
       </div>
 
@@ -86,12 +98,12 @@ interface MatchingLine {
 
     .matching-arrowhead {
       position: absolute;
-      left: 0;
+      right: 0;
       width: 0;
       height: 0;
       border-top: 5px solid transparent;
       border-bottom: 5px solid transparent;
-      border-right: 7px solid var(--mat-sys-primary);
+      border-left: 7px solid var(--mat-sys-primary);
       transform: translateY(-50%);
       pointer-events: none;
     }
@@ -99,12 +111,14 @@ interface MatchingLine {
     .matching-column {
       display: flex;
       flex-direction: column;
+      gap: 0.5rem;
     }
 
     .matching-node {
-      height: 2.75rem;
+      height: 44px;
       padding: 0 1rem;
       border: 1px solid var(--mat-sys-outline);
+      border-radius: 4px;
       background: var(--mat-sys-surface);
       color: inherit;
       font: inherit;
@@ -115,28 +129,8 @@ interface MatchingLine {
       cursor: pointer;
     }
 
-    .matching-node:not(:first-child) {
-      border-top: none;
-    }
-
     .matching-column--left .matching-node {
       text-align: right;
-    }
-
-    .matching-column--left .matching-node:first-child {
-      border-top-left-radius: 4px;
-    }
-
-    .matching-column--left .matching-node:last-child {
-      border-bottom-left-radius: 4px;
-    }
-
-    .matching-column--right .matching-node:first-child {
-      border-top-right-radius: 4px;
-    }
-
-    .matching-column--right .matching-node:last-child {
-      border-bottom-right-radius: 4px;
     }
 
     .matching-node--matched {
@@ -176,8 +170,8 @@ export class MatchingRunner {
       }
       result.push({
         leftId,
-        leftY: ((leftIndex + 0.5) / total) * 100,
-        rightY: ((rightIndex + 0.5) / total) * 100,
+        leftY: rowCenterPercent(leftIndex, total),
+        rightY: rowCenterPercent(rightIndex, total),
       });
     }
     return result;
