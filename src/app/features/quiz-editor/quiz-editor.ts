@@ -188,6 +188,23 @@ export class QuizEditor {
     this.saveQuestion({ ...question, prompt });
   }
 
+  updateQuestionOrder(questionId: string, rawValue: string): void {
+    const current = this.draft();
+    if (!current || !rawValue.trim()) {
+      return;
+    }
+    const requested = Math.round(Number(rawValue));
+    if (Number.isNaN(requested)) {
+      return;
+    }
+    const previousIndex = current.questions.findIndex((question) => question.id === questionId);
+    const targetIndex = Math.min(Math.max(requested - 1, 0), current.questions.length - 1);
+    if (previousIndex === -1 || previousIndex === targetIndex) {
+      return;
+    }
+    this.updateDraft((quiz) => reorderQuestions(quiz, previousIndex, targetIndex));
+  }
+
   updateQuestionRequired(questionId: string, required: boolean): void {
     const question = this.draft()?.questions.find((existing) => existing.id === questionId);
     if (!question) {

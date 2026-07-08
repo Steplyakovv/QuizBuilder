@@ -213,4 +213,50 @@ describe('QuizEditor', () => {
       ids[0],
     ]);
   });
+
+  it('moves a question to a manually entered position', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.addQuestion();
+    fixture.componentInstance.addQuestion();
+    fixture.componentInstance.addQuestion();
+    await fixture.whenStable();
+    const ids = fixture.componentInstance.draft()!.questions.map((question) => question.id);
+
+    fixture.componentInstance.updateQuestionOrder(ids[2], '1');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.draft()!.questions.map((question) => question.id)).toEqual([
+      ids[2],
+      ids[0],
+      ids[1],
+    ]);
+  });
+
+  it('clamps a manually entered position to the valid range and ignores invalid input', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.addQuestion();
+    fixture.componentInstance.addQuestion();
+    await fixture.whenStable();
+    const ids = fixture.componentInstance.draft()!.questions.map((question) => question.id);
+
+    fixture.componentInstance.updateQuestionOrder(ids[0], '99');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.questions.map((question) => question.id)).toEqual([
+      ids[1],
+      ids[0],
+    ]);
+
+    fixture.componentInstance.updateQuestionOrder(ids[0], 'abc');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.questions.map((question) => question.id)).toEqual([
+      ids[1],
+      ids[0],
+    ]);
+  });
 });
