@@ -8,10 +8,14 @@ interface MatchingLine {
   leftId: string;
   leftY: number;
   rightY: number;
+  /** Rotation (degrees) so the arrowhead points along the line instead of staying horizontal. */
+  angle: number;
 }
 
 const ROW_HEIGHT = 44;
 const ROW_GAP = 8;
+/** Matches the fixed 3rem width of `.matching-links` in the styles below. */
+const BRIDGE_WIDTH = 48;
 
 function rowCenterPercent(index: number, total: number): number {
   const totalHeight = total * ROW_HEIGHT + (total - 1) * ROW_GAP;
@@ -53,7 +57,11 @@ function rowCenterPercent(index: number, total: number): number {
           }
         </svg>
         @for (line of lines(); track line.leftId) {
-          <span class="matching-arrowhead" [style.top.%]="line.rightY"></span>
+          <span
+            class="matching-arrowhead"
+            [style.top.%]="line.rightY"
+            [style.transform]="'translateY(-50%) rotate(' + line.angle + 'deg)'"
+          ></span>
         }
       </div>
 
@@ -104,7 +112,7 @@ function rowCenterPercent(index: number, total: number): number {
       border-top: 5px solid transparent;
       border-bottom: 5px solid transparent;
       border-left: 7px solid var(--mat-sys-primary);
-      transform: translateY(-50%);
+      transform-origin: right center;
       pointer-events: none;
     }
 
@@ -168,10 +176,12 @@ export class MatchingRunner {
       if (leftIndex === -1 || rightIndex === -1) {
         continue;
       }
+      const verticalSpan = (rightIndex - leftIndex) * (ROW_HEIGHT + ROW_GAP);
       result.push({
         leftId,
         leftY: rowCenterPercent(leftIndex, total),
         rightY: rowCenterPercent(rightIndex, total),
+        angle: (Math.atan2(verticalSpan, BRIDGE_WIDTH) * 180) / Math.PI,
       });
     }
     return result;
