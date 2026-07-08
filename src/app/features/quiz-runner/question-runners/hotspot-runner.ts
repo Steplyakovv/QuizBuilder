@@ -26,6 +26,7 @@ import { HotspotQuestion } from '../../../core/models/quiz.models';
     .hotspot-runner-image-wrap {
       position: relative;
       display: inline-block;
+      align-self: flex-start;
       max-width: 100%;
     }
 
@@ -38,21 +39,22 @@ import { HotspotQuestion } from '../../../core/models/quiz.models';
     .hotspot-runner-region {
       position: absolute;
       box-sizing: border-box;
-      border: 2px solid transparent;
-      background: transparent;
+      border: 2px solid var(--mat-sys-outline);
+      background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
       border-radius: 4px;
       padding: 0;
       cursor: pointer;
     }
 
     .hotspot-runner-region:hover {
-      border-color: var(--mat-sys-outline);
-      background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+      border-color: var(--mat-sys-primary);
+      background: color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
     }
 
     .hotspot-runner-region--selected {
       border-color: var(--mat-sys-primary);
-      background: color-mix(in srgb, var(--mat-sys-primary) 25%, transparent);
+      border-width: 3px;
+      background: color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
     }
   `,
 })

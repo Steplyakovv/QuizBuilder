@@ -175,6 +175,7 @@ interface DragState {
     .hotspot-image-wrap {
       position: relative;
       display: inline-block;
+      align-self: flex-start;
       max-width: 100%;
       cursor: crosshair;
     }
