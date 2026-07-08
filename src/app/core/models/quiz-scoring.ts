@@ -1,3 +1,4 @@
+import { splitTemplate } from './fill-in-the-blank';
 import { Question, QuestionResponse, Quiz } from './quiz.models';
 
 export interface AttemptScore {
@@ -77,6 +78,46 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     case 'constant-sum':
     case 'matrix':
       return false;
+  }
+}
+
+export function formatCorrectAnswer(question: Question): string | undefined {
+  if (!hasCorrectAnswer(question)) {
+    return undefined;
+  }
+  switch (question.type) {
+    case 'single-choice':
+    case 'dropdown':
+      return question.options.find((option) => option.id === question.correctOptionId)?.label;
+    case 'multiple-choice':
+    case 'image-choice': {
+      const correctIds = question.correctOptionIds ?? [];
+      return question.options
+        .filter((option) => correctIds.includes(option.id))
+        .map((option) => option.label)
+        .join(', ');
+    }
+    case 'true-false':
+      return question.correctAnswer ? 'Да' : 'Нет';
+    case 'word-choice':
+      return question.words.map((word) => word.label).join(' ');
+    case 'ranking':
+      return question.options.map((option) => option.label).join(' → ');
+    case 'fill-in-the-blank': {
+      const segments = splitTemplate(question.template);
+      const answers = question.correctAnswers ?? [];
+      return segments.reduce(
+        (result, segment, index) =>
+          index === 0
+            ? segment
+            : `${result}${answers[index - 1]?.trim() || '[любой ответ]'}${segment}`,
+        '',
+      );
+    }
+    case 'matching':
+      return question.pairs.map((pair) => `${pair.left} → ${pair.right}`).join(', ');
+    default:
+      return undefined;
   }
 }
 

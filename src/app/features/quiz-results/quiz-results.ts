@@ -2,16 +2,23 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { formatResponse } from '../../core/models/quiz-attempt';
 import { QuestionStat, questionStatistics } from '../../core/models/question-statistics';
-import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
+import {
+  AttemptScore,
+  formatCorrectAnswer,
+  hasCorrectAnswer,
+  isCorrect,
+  scoreAttempt,
+} from '../../core/models/quiz-scoring';
 import { Question, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
 
 @Component({
   selector: 'app-quiz-results',
-  imports: [RouterLink, DatePipe, MatButtonModule],
+  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule],
   templateUrl: './quiz-results.html',
   styleUrl: './quiz-results.scss',
 })
@@ -58,6 +65,20 @@ export class QuizResults {
       question,
       attempt.responses.find((response) => response.questionId === question.id),
     );
+  }
+
+  questionCorrectness(attempt: QuizAttempt, question: Question): boolean | undefined {
+    if (!this.quiz()?.settings.isGraded || !hasCorrectAnswer(question)) {
+      return undefined;
+    }
+    return isCorrect(
+      question,
+      attempt.responses.find((response) => response.questionId === question.id),
+    );
+  }
+
+  correctAnswerFor(question: Question): string | undefined {
+    return formatCorrectAnswer(question);
   }
 
   toggleExpand(attemptId: string): void {

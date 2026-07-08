@@ -60,7 +60,30 @@
                     <dl class="attempt-detail">
                       @for (question of quiz.questions; track question.id) {
                         <dt>{{ question.prompt }}</dt>
-                        <dd>{{ answerFor(attempt, question) }}</dd>
+                        <dd>
+                          @let correctness = questionCorrectness(attempt, question);
+                          <span
+                            class="answer-text"
+                            [class.answer-correct]="correctness === true"
+                            [class.answer-incorrect]="correctness === false"
+                          >
+                            {{ answerFor(attempt, question) }}
+                            @if (correctness === true) {
+                              <mat-icon class="correctness-icon correct" aria-label="Правильно"
+                                >check_circle</mat-icon
+                              >
+                            } @else if (correctness === false) {
+                              <mat-icon class="correctness-icon incorrect" aria-label="Неправильно"
+                                >cancel</mat-icon
+                              >
+                            }
+                          </span>
+                          @if (correctness === false) {
+                            <div class="correct-answer-hint">
+                              Правильный ответ: {{ correctAnswerFor(question) }}
+                            </div>
+                          }
+                        </dd>
                       }
                     </dl>
                   </td>

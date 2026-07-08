@@ -1,5 +1,5 @@
 import { Quiz } from './quiz.models';
-import { scoreAttempt } from './quiz-scoring';
+import { formatCorrectAnswer, scoreAttempt } from './quiz-scoring';
 
 function baseQuiz(isGraded: boolean): Quiz {
   return {
@@ -346,5 +346,122 @@ describe('scoreAttempt', () => {
     });
 
     expect(scoreAttempt(quiz, [{ questionId: 'q1', matches: { r1: 'c1' } }])).toBeUndefined();
+  });
+});
+
+describe('formatCorrectAnswer', () => {
+  it('returns undefined for a question with no correct answer configured', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'single-choice',
+        prompt: 'p',
+        required: true,
+        options: [{ id: 'o1', label: 'a' }],
+      }),
+    ).toBeUndefined();
+  });
+
+  it('shows the correct option label for single-choice/dropdown questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'single-choice',
+        prompt: 'p',
+        required: true,
+        options: [
+          { id: 'o1', label: 'a' },
+          { id: 'o2', label: 'b' },
+        ],
+        correctOptionId: 'o2',
+      }),
+    ).toBe('b');
+  });
+
+  it('joins the correct option labels for multiple-choice questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'multiple-choice',
+        prompt: 'p',
+        required: true,
+        options: [
+          { id: 'o1', label: 'a' },
+          { id: 'o2', label: 'b' },
+          { id: 'o3', label: 'c' },
+        ],
+        correctOptionIds: ['o1', 'o3'],
+      }),
+    ).toBe('a, c');
+  });
+
+  it('shows Да/Нет for true-false questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'true-false',
+        prompt: 'p',
+        required: true,
+        correctAnswer: true,
+      }),
+    ).toBe('Да');
+  });
+
+  it('joins the words in correct order for word-choice questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'word-choice',
+        prompt: 'p',
+        required: true,
+        words: [
+          { id: 'w1', label: 'Небо' },
+          { id: 'w2', label: 'голубое' },
+        ],
+      }),
+    ).toBe('Небо голубое');
+  });
+
+  it('joins the options in correct order for ranking questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'ranking',
+        prompt: 'p',
+        required: true,
+        options: [
+          { id: 'o1', label: 'Маленький' },
+          { id: 'o2', label: 'Большой' },
+        ],
+      }),
+    ).toBe('Маленький → Большой');
+  });
+
+  it('fills the template with correct answers, marking ungraded blanks', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'fill-in-the-blank',
+        prompt: 'p',
+        required: true,
+        template: 'Суп едят с {{}}, а кашу с {{}}.',
+        correctAnswers: ['хлебом', ''],
+      }),
+    ).toBe('Суп едят с хлебом, а кашу с [любой ответ].');
+  });
+
+  it('shows the pair matches for matching questions', () => {
+    expect(
+      formatCorrectAnswer({
+        id: 'q1',
+        type: 'matching',
+        prompt: 'p',
+        required: true,
+        pairs: [
+          { id: 'p1', left: 'Франция', right: 'Париж' },
+          { id: 'p2', left: 'Италия', right: 'Рим' },
+        ],
+      }),
+    ).toBe('Франция → Париж, Италия → Рим');
   });
 });
