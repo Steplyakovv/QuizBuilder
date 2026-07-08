@@ -41,11 +41,13 @@
       ></textarea>
     </mat-form-field>
 
-    <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded($event.checked)">
-      Квиз с баллами (отмечать правильные ответы)
-    </mat-checkbox>
+    <h2>Настройки опросника</h2>
 
-    <div class="quiz-run-settings">
+    <div class="quiz-settings">
+      <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded($event.checked)">
+        Квиз с баллами (отмечать правильные ответы)
+      </mat-checkbox>
+
       <mat-checkbox
         [checked]="quiz.settings.shuffleQuestions ?? false"
         (change)="updateShuffleQuestions($event.checked)"
@@ -53,27 +55,31 @@
         Перемешивать порядок вопросов
       </mat-checkbox>
 
-      <mat-form-field appearance="outline" class="time-limit-field">
-        <mat-label>Лимит времени, мин (необязательно)</mat-label>
-        <input
-          matInput
-          type="number"
-          min="1"
-          [value]="quiz.settings.timeLimitMinutes ?? ''"
-          (blur)="updateTimeLimit($any($event.target).value)"
-        />
-      </mat-form-field>
+      <div class="quiz-settings-limits">
+        <mat-form-field appearance="outline" class="time-limit-field">
+          <mat-label>Лимит времени (мин)</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            [value]="quiz.settings.timeLimitMinutes ?? ''"
+            (blur)="updateTimeLimit($any($event.target).value)"
+          />
+          <mat-hint>Необязательно</mat-hint>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="max-attempts-field">
-        <mat-label>Лимит попыток (необязательно)</mat-label>
-        <input
-          matInput
-          type="number"
-          min="1"
-          [value]="quiz.settings.maxAttempts ?? ''"
-          (blur)="updateMaxAttempts($any($event.target).value)"
-        />
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="max-attempts-field">
+          <mat-label>Лимит попыток</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            [value]="quiz.settings.maxAttempts ?? ''"
+            (blur)="updateMaxAttempts($any($event.target).value)"
+          />
+          <mat-hint>Необязательно</mat-hint>
+        </mat-form-field>
+      </div>
     </div>
 
     <h2>Вопросы</h2>

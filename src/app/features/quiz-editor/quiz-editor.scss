@@ -52,17 +52,27 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.quiz-run-settings {
+.quiz-settings {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 4px;
+}
+
+.quiz-settings-limits {
+  display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
 }
 
 .time-limit-field,
 .max-attempts-field {
-  width: 220px;
+  width: 260px;
 }
 
 .question-list {
