@@ -177,6 +177,50 @@ describe('QuizList', () => {
     expect(fixture.componentInstance.quizzes()).toHaveLength(0);
   });
 
+  it('paginates the quiz list and lets the page size be changed', async () => {
+    const fixture = await createComponent();
+    for (let i = 0; i < 12; i++) {
+      fixture.componentInstance.newQuizTitle.set(`Опрос ${i}`);
+      await fixture.componentInstance.createQuiz();
+    }
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.pageSize()).toBe(10);
+    expect(fixture.componentInstance.pagedQuizzes()).toHaveLength(10);
+
+    fixture.componentInstance.onPageChange({ pageIndex: 1, pageSize: 10, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pagedQuizzes()).toHaveLength(2);
+
+    fixture.componentInstance.onPageChange({ pageIndex: 0, pageSize: 25, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pageSize()).toBe(25);
+    expect(fixture.componentInstance.pagedQuizzes()).toHaveLength(12);
+  });
+
+  it('clamps the current page back into range once quizzes are removed from it', async () => {
+    const fixture = await createComponent();
+    for (let i = 0; i < 12; i++) {
+      fixture.componentInstance.newQuizTitle.set(`Опрос ${i}`);
+      await fixture.componentInstance.createQuiz();
+    }
+    await fixture.whenStable();
+
+    fixture.componentInstance.onPageChange({ pageIndex: 1, pageSize: 10, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pageIndex()).toBe(1);
+
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    for (const quiz of fixture.componentInstance.quizzes().slice(2)) {
+      await fixture.componentInstance.deleteQuiz(quiz);
+    }
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.quizzes()).toHaveLength(2);
+    expect(fixture.componentInstance.pageIndex()).toBe(0);
+    expect(fixture.componentInstance.pagedQuizzes()).toHaveLength(2);
+  });
+
   it('keeps a quiz when deletion is not confirmed', async () => {
     const fixture = await createComponent();
     fixture.componentInstance.newQuizTitle.set('Опрос про кофе');

@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { exportQuizToJson, parseImportedQuiz } from '../../core/models/quiz-io';
 import { Quiz } from '../../core/models/quiz.models';
 import { AuthStore } from '../../core/state/auth-store';
@@ -19,6 +20,7 @@ import { QuizStore } from '../../core/state/quiz-store';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatPaginatorModule,
   ],
   templateUrl: './quiz-list.html',
   styleUrl: './quiz-list.scss',
@@ -30,6 +32,18 @@ export class QuizList {
   readonly quizzes = this.store.quizzes;
   readonly isAdmin = this.auth.isAdmin;
 
+  readonly pageSizeOptions = [5, 10, 25, 50];
+  readonly pageSize = signal(10);
+  private readonly requestedPageIndex = signal(0);
+  readonly pageIndex = computed(() => {
+    const pageCount = Math.max(1, Math.ceil(this.quizzes().length / this.pageSize()));
+    return Math.min(this.requestedPageIndex(), pageCount - 1);
+  });
+  readonly pagedQuizzes = computed(() => {
+    const start = this.pageIndex() * this.pageSize();
+    return this.quizzes().slice(start, start + this.pageSize());
+  });
+
   readonly newQuizTitle = signal('');
   readonly newQuizError = signal<string | null>(null);
   readonly editingQuizId = signal<string | null>(null);
@@ -38,6 +52,11 @@ export class QuizList {
 
   constructor() {
     void this.store.load();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageSize.set(event.pageSize);
+    this.requestedPageIndex.set(event.pageIndex);
   }
 
   async createQuiz(): Promise<void> {

@@ -58,7 +58,7 @@
     </p>
   } @else {
     <div class="quiz-cards">
-      @for (quiz of quizzes(); track quiz.id) {
+      @for (quiz of pagedQuizzes(); track quiz.id) {
         <mat-card class="quiz-card">
           @if (editingQuizId() === quiz.id) {
             <mat-form-field appearance="outline" class="rename-field">
@@ -127,5 +127,13 @@
         </mat-card>
       }
     </div>
+
+    <mat-paginator
+      [length]="quizzes().length"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+    />
   }
 </div>
