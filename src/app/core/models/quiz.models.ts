@@ -22,6 +22,12 @@ export interface QuizSettings {
   timeLimitMinutes?: number;
   /** Max attempts allowed per respondent (tracked by a per-browser client id). */
   maxAttempts?: number;
+  /** Defaults to true when unset, so quizzes created before this setting existed stay accessible. */
+  published?: boolean;
+  /** When set, a respondent must enter this exact code before taking the quiz. */
+  accessPassword?: string;
+  /** ISO timestamp; the quiz can no longer be taken once this passes. */
+  expiresAt?: string;
 }
 
 export type Question =

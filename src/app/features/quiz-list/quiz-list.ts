@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { isQuizPublished } from '../../core/models/quiz-access';
 import { exportQuizToJson, parseImportedQuiz } from '../../core/models/quiz-io';
 import { Quiz } from '../../core/models/quiz.models';
 import { AuthStore } from '../../core/state/auth-store';
@@ -34,16 +35,22 @@ export class QuizList {
   readonly quizzes = this.store.quizzes;
   readonly isAdmin = this.auth.isAdmin;
 
+  /** Non-admins only ever see published quizzes; admins see everything, including drafts. */
+  readonly visibleQuizzes = computed(() => {
+    const all = this.quizzes();
+    return this.isAdmin() ? all : all.filter((quiz) => isQuizPublished(quiz));
+  });
+
   readonly pageSizeOptions = [5, 10, 25, 50];
   readonly pageSize = signal(10);
   private readonly requestedPageIndex = signal(0);
   readonly pageIndex = computed(() => {
-    const pageCount = Math.max(1, Math.ceil(this.quizzes().length / this.pageSize()));
+    const pageCount = Math.max(1, Math.ceil(this.visibleQuizzes().length / this.pageSize()));
     return Math.min(this.requestedPageIndex(), pageCount - 1);
   });
   readonly pagedQuizzes = computed(() => {
     const start = this.pageIndex() * this.pageSize();
-    return this.quizzes().slice(start, start + this.pageSize());
+    return this.visibleQuizzes().slice(start, start + this.pageSize());
   });
 
   readonly newQuizTitle = signal('');
@@ -121,6 +128,10 @@ export class QuizList {
       return;
     }
     await this.store.update({ ...quiz, title });
+  }
+
+  isPublished(quiz: Quiz): boolean {
+    return isQuizPublished(quiz);
   }
 
   async duplicateQuiz(id: string): Promise<void> {

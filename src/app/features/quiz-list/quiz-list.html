@@ -48,7 +48,7 @@
     }
   }
 
-  @if (quizzes().length === 0) {
+  @if (visibleQuizzes().length === 0) {
     <p class="empty-state">
       @if (isAdmin()) {
         Опросников пока нет — создайте первый выше.
@@ -80,6 +80,9 @@
             >
           } @else {
             <span class="quiz-title">{{ quiz.title }}</span>
+          }
+          @if (isAdmin() && !isPublished(quiz)) {
+            <span class="draft-badge">Черновик</span>
           }
           <div class="quiz-meta">{{ quiz.questions.length }} вопрос(ов)</div>
           <div class="quiz-actions">
@@ -129,7 +132,7 @@
     </div>
 
     <mat-paginator
-      [length]="quizzes().length"
+      [length]="visibleQuizzes().length"
       [pageSize]="pageSize()"
       [pageIndex]="pageIndex()"
       [pageSizeOptions]="pageSizeOptions"

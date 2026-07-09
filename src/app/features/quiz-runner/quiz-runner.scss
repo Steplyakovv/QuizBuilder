@@ -103,6 +103,18 @@
   gap: 0.75rem;
 }
 
+.access-password-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 320px;
+}
+
+.access-password-field {
+  width: 100%;
+}
+
 .quiz-runner-result {
   display: flex;
   flex-direction: column;

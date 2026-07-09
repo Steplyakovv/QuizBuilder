@@ -55,6 +55,13 @@
         Перемешивать порядок вопросов
       </mat-checkbox>
 
+      <mat-checkbox
+        [checked]="quiz.settings.published ?? true"
+        (change)="updatePublished($event.checked)"
+      >
+        Опубликован (доступен для прохождения)
+      </mat-checkbox>
+
       <div class="quiz-settings-limits">
         <mat-form-field appearance="outline" class="time-limit-field">
           <mat-label>Лимит времени (мин)</mat-label>
@@ -76,6 +83,29 @@
             min="1"
             [value]="quiz.settings.maxAttempts ?? ''"
             (blur)="updateMaxAttempts($any($event.target).value)"
+          />
+          <mat-hint>Необязательно</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="quiz-settings-limits">
+        <mat-form-field appearance="outline" class="access-password-field">
+          <mat-label>Код доступа</mat-label>
+          <input
+            matInput
+            [value]="quiz.settings.accessPassword ?? ''"
+            (blur)="updateAccessPassword($any($event.target).value)"
+          />
+          <mat-hint>Необязательно</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="expires-at-field">
+          <mat-label>Доступен до</mat-label>
+          <input
+            matInput
+            type="datetime-local"
+            [value]="expiresAtInputValue(quiz)"
+            (blur)="updateExpiresAt($any($event.target).value)"
           />
           <mat-hint>Необязательно</mat-hint>
         </mat-form-field>

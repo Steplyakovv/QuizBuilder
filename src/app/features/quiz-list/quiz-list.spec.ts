@@ -4,6 +4,7 @@ import { exportQuizToJson } from '../../core/models/quiz-io';
 import { createQuiz } from '../../core/models/quiz.factory';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
 import { AuthStore } from '../../core/state/auth-store';
+import { QuizStore } from '../../core/state/quiz-store';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
 import { QuizList } from './quiz-list';
 
@@ -175,6 +176,28 @@ describe('QuizList', () => {
     await fixture.whenStable();
 
     expect(fixture.componentInstance.quizzes()).toHaveLength(0);
+  });
+
+  it('hides unpublished quizzes from a non-admin but shows them (with a badge) to an admin', async () => {
+    const fixture = await createComponent();
+    TestBed.inject(AuthStore).login('admin', 'admin');
+    fixture.componentInstance.newQuizTitle.set('Опрос про кофе');
+    await fixture.componentInstance.createQuiz();
+    await fixture.whenStable();
+    const quiz = fixture.componentInstance.quizzes()[0];
+    await TestBed.inject(QuizStore).update({
+      ...quiz,
+      settings: { ...quiz.settings, published: false },
+    });
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.visibleQuizzes()).toHaveLength(1);
+    expect((fixture.nativeElement as HTMLElement).textContent?.includes('Черновик')).toBe(true);
+
+    TestBed.inject(AuthStore).logout();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.visibleQuizzes()).toHaveLength(0);
   });
 
   it('paginates the quiz list and lets the page size be changed', async () => {

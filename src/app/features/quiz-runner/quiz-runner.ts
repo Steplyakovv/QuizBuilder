@@ -17,6 +17,12 @@ import { getClientId } from '../../core/utils/client-id';
 import { shuffle } from '../../core/utils/shuffle';
 import { isQuestionVisible } from '../../core/models/question-condition';
 import { isQuestionAnswered } from '../../core/models/quiz-attempt';
+import {
+  isAccessPasswordCorrect,
+  isQuizExpired,
+  isQuizPublished,
+  quizRequiresPassword,
+} from '../../core/models/quiz-access';
 import { paginateQuestions } from '../../core/models/quiz-pages';
 import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
 import { Question, QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
@@ -130,6 +136,10 @@ export class QuizRunner {
   readonly respondentName = signal('');
   private readonly responses = signal<Record<string, QuestionResponse>>({});
   readonly validationErrors = signal<Set<string>>(new Set());
+
+  readonly passwordInput = signal('');
+  readonly passwordError = signal<string | null>(null);
+  private readonly passwordUnlocked = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
   readonly submitted = signal(false);
@@ -151,14 +161,53 @@ export class QuizRunner {
     return max !== undefined && this.attemptsUsed() >= max;
   });
 
+  readonly isDraft = computed(() => {
+    const quiz = this.quiz();
+    return !!quiz && !isQuizPublished(quiz);
+  });
+  readonly isExpired = computed(() => {
+    const quiz = this.quiz();
+    return !!quiz && isQuizExpired(quiz);
+  });
+  readonly requiresPassword = computed(() => {
+    const quiz = this.quiz();
+    return !!quiz && quizRequiresPassword(quiz);
+  });
+  readonly isLocked = computed(() => this.requiresPassword() && !this.passwordUnlocked());
+
+  /** Whether the respondent is allowed past the draft/expiry/password gates. Always true in preview. */
+  private readonly accessGranted = computed(
+    () => this.isPreview() || (!this.isDraft() && !this.isExpired() && !this.isLocked()),
+  );
+
+  readonly blockReason = computed<'draft' | 'expired' | 'locked' | 'attempts' | null>(() => {
+    if (this.isPreview()) {
+      return null;
+    }
+    if (this.isDraft()) {
+      return 'draft';
+    }
+    if (this.isExpired()) {
+      return 'expired';
+    }
+    if (this.isLocked()) {
+      return 'locked';
+    }
+    if (this.attemptsBlocked()) {
+      return 'attempts';
+    }
+    return null;
+  });
+
   constructor() {
     void this.store.load();
 
     effect(() => {
       const quiz = this.quiz();
       const isPreview = this.isPreview();
+      const accessGranted = this.accessGranted();
       untracked(() => {
-        if (!quiz || isPreview) {
+        if (!quiz || isPreview || !accessGranted) {
           return;
         }
         void this.loadAttemptsUsed(quiz.id);
@@ -167,6 +216,19 @@ export class QuizRunner {
     });
 
     inject(DestroyRef).onDestroy(() => this.stopTimer());
+  }
+
+  unlock(): void {
+    const quiz = this.quiz();
+    if (!quiz) {
+      return;
+    }
+    if (isAccessPasswordCorrect(quiz, this.passwordInput())) {
+      this.passwordUnlocked.set(true);
+      this.passwordError.set(null);
+    } else {
+      this.passwordError.set('Неверный код доступа.');
+    }
   }
 
   private async loadAttemptsUsed(quizId: string): Promise<void> {
@@ -314,7 +376,7 @@ export class QuizRunner {
     if (!quiz) {
       return;
     }
-    if (!this.isPreview() && this.attemptsBlocked()) {
+    if (!this.isPreview() && this.blockReason() !== null) {
       return;
     }
     this.stopTimer();

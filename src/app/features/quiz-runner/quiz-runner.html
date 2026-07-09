@@ -11,11 +11,44 @@
       <p class="quiz-description">{{ quiz.description }}</p>
     }
 
-    @if (!submitted() && !isPreview() && attemptsBlocked()) {
+    @if (submitted()) {
+      <div class="quiz-runner-result">
+        @if (isPreview()) {
+          <p>Это предпросмотр — ответы не сохранены.</p>
+        } @else {
+          <p>Спасибо! Ваши ответы сохранены.</p>
+        }
+        @if (result(); as result) {
+          <p class="score">
+            Результат: {{ result.correct }} из {{ result.total }} правильных ответов
+          </p>
+        }
+      </div>
+    } @else if (blockReason() === 'draft') {
+      <p class="empty-state">Этот опросник ещё не опубликован.</p>
+    } @else if (blockReason() === 'expired') {
+      <p class="empty-state">Срок прохождения этого опросника истёк.</p>
+    } @else if (blockReason() === 'locked') {
+      <form class="access-password-form" (submit)="unlock(); $event.preventDefault()">
+        <mat-form-field appearance="outline" class="access-password-field">
+          <mat-label>Код доступа</mat-label>
+          <input
+            matInput
+            type="password"
+            [value]="passwordInput()"
+            (input)="passwordInput.set($any($event.target).value)"
+          />
+        </mat-form-field>
+        @if (passwordError()) {
+          <p class="field-error">{{ passwordError() }}</p>
+        }
+        <button mat-flat-button color="primary" type="submit">Продолжить</button>
+      </form>
+    } @else if (blockReason() === 'attempts') {
       <p class="empty-state">
         Вы исчерпали лимит попыток прохождения этого опросника ({{ quiz.settings.maxAttempts }}).
       </p>
-    } @else if (!submitted()) {
+    } @else {
       @if (saveError()) {
         <p class="save-error">{{ saveError() }}</p>
       }
@@ -185,19 +218,6 @@
           }
         </div>
       </form>
-    } @else {
-      <div class="quiz-runner-result">
-        @if (isPreview()) {
-          <p>Это предпросмотр — ответы не сохранены.</p>
-        } @else {
-          <p>Спасибо! Ваши ответы сохранены.</p>
-        }
-        @if (result(); as result) {
-          <p class="score">
-            Результат: {{ result.correct }} из {{ result.total }} правильных ответов
-          </p>
-        }
-      </div>
     }
   </div>
 } @else {

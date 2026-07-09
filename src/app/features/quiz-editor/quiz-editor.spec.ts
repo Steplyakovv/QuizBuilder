@@ -288,4 +288,32 @@ describe('QuizEditor', () => {
     expect(fixture.componentInstance.draft()!.pages).toHaveLength(0);
     expect(fixture.componentInstance.draft()!.questions[0].pageId).toBeUndefined();
   });
+
+  it('toggles the published flag, access password and expiry date', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.updatePublished(false);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.published).toBe(false);
+
+    fixture.componentInstance.updateAccessPassword('  secret  ');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.accessPassword).toBe('secret');
+
+    fixture.componentInstance.updateAccessPassword('  ');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.accessPassword).toBeUndefined();
+
+    fixture.componentInstance.updateExpiresAt('2026-08-01T10:30');
+    await fixture.whenStable();
+    const draft = fixture.componentInstance.draft()!;
+    expect(draft.settings.expiresAt).toBe(new Date('2026-08-01T10:30').toISOString());
+    expect(fixture.componentInstance.expiresAtInputValue(draft)).toBe('2026-08-01T10:30');
+
+    fixture.componentInstance.updateExpiresAt('');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.expiresAt).toBeUndefined();
+  });
 });

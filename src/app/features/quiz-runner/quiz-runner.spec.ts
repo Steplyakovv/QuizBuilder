@@ -411,4 +411,87 @@ describe('QuizRunner', () => {
       expect(fixture.componentInstance.validationErrors().has(q1)).toBe(true);
     });
   });
+
+  describe('access control', () => {
+    function unpublishedQuiz(): Quiz {
+      let quiz = createQuiz('Черновик');
+      quiz = addQuestion(quiz, 'text');
+      quiz = {
+        ...quiz,
+        questions: quiz.questions.map((question) => ({ ...question, required: false })),
+        settings: { isGraded: false, published: false },
+      };
+      return quiz;
+    }
+
+    it('blocks an unpublished quiz for a real attempt', async () => {
+      const quiz = unpublishedQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      expect(fixture.componentInstance.blockReason()).toBe('draft');
+
+      await fixture.componentInstance.submit();
+      await fixture.whenStable();
+      expect(fixture.componentInstance.submitted()).toBe(false);
+      expect(attemptRepository.attempts).toHaveLength(0);
+    });
+
+    it('lets a preview bypass the unpublished/expired/password gates', async () => {
+      const quiz: Quiz = {
+        ...unpublishedQuiz(),
+        settings: {
+          isGraded: false,
+          published: false,
+          expiresAt: '2020-01-01T00:00:00.000Z',
+          accessPassword: 'secret',
+        },
+      };
+      await TestBed.configureTestingModule({
+        imports: [QuizRunner],
+        providers: [
+          provideRouter([]),
+          { provide: QUIZ_REPOSITORY, useValue: quizRepository },
+          { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
+        ],
+      }).compileComponents();
+      const fixture = TestBed.createComponent(QuizRunner);
+      fixture.componentRef.setInput('previewQuiz', quiz);
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.blockReason()).toBeNull();
+    });
+
+    it('blocks a quiz once its deadline has passed', async () => {
+      let quiz = unpublishedQuiz();
+      quiz = {
+        ...quiz,
+        settings: { isGraded: false, expiresAt: '2020-01-01T00:00:00.000Z' },
+      };
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      expect(fixture.componentInstance.blockReason()).toBe('expired');
+    });
+
+    it('requires the correct access password before the quiz is shown, and accepts it once entered', async () => {
+      let quiz = unpublishedQuiz();
+      quiz = { ...quiz, settings: { isGraded: false, accessPassword: 'secret' } };
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      expect(fixture.componentInstance.blockReason()).toBe('locked');
+
+      fixture.componentInstance.passwordInput.set('wrong');
+      fixture.componentInstance.unlock();
+      await fixture.whenStable();
+      expect(fixture.componentInstance.blockReason()).toBe('locked');
+      expect(fixture.componentInstance.passwordError()).toBeTruthy();
+
+      fixture.componentInstance.passwordInput.set('secret');
+      fixture.componentInstance.unlock();
+      await fixture.whenStable();
+      expect(fixture.componentInstance.blockReason()).toBeNull();
+    });
+  });
 });

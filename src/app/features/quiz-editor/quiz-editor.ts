@@ -160,6 +160,31 @@ export class QuizEditor {
     this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, maxAttempts } }));
   }
 
+  updatePublished(published: boolean): void {
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, published } }));
+  }
+
+  updateAccessPassword(rawValue: string): void {
+    const accessPassword = rawValue.trim() || undefined;
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, accessPassword } }));
+  }
+
+  /** Formats settings.expiresAt (ISO, UTC) as a `datetime-local` input value in local time. */
+  expiresAtInputValue(quiz: Quiz): string {
+    const iso = quiz.settings.expiresAt;
+    if (!iso) {
+      return '';
+    }
+    const date = new Date(iso);
+    const pad = (value: number) => value.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  updateExpiresAt(rawValue: string): void {
+    const expiresAt = rawValue ? new Date(rawValue).toISOString() : undefined;
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, expiresAt } }));
+  }
+
   addPage(): void {
     const title = this.newPageTitle().trim();
     if (!title) {

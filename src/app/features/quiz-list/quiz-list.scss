@@ -73,6 +73,15 @@
   flex: 1;
 }
 
+.draft-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
 .quiz-meta {
   color: var(--mat-sys-on-surface-variant);
   font-size: 0.875rem;
