@@ -3,9 +3,16 @@ export interface Quiz {
   title: string;
   description?: string;
   questions: Question[];
+  /** Named groups of questions, shown one page at a time in the runner. */
+  pages?: QuizPage[];
   settings: QuizSettings;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface QuizPage {
+  id: string;
+  title: string;
 }
 
 export interface QuizSettings {
@@ -48,6 +55,8 @@ export interface BaseQuestion {
   required: boolean;
   /** When set, this question is only shown if the referenced answer matches. */
   condition?: QuestionCondition;
+  /** id of a QuizPage this question belongs to; questions without one get their own page. */
+  pageId?: string;
 }
 
 export interface Option {

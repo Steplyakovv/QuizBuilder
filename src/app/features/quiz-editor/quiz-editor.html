@@ -82,6 +82,47 @@
       </div>
     </div>
 
+    <h2>Страницы</h2>
+
+    <div class="quiz-pages">
+      @if (!quiz.pages || quiz.pages.length === 0) {
+        <p class="empty-state">
+          Страниц пока нет — вопросы показываются одним списком. Добавьте страницу, чтобы
+          группировать вопросы по темам: в прохождении они будут показаны по очереди, со своим
+          названием.
+        </p>
+      }
+      @for (page of quiz.pages; track page.id) {
+        <div class="quiz-page-item">
+          <mat-form-field appearance="outline" class="page-title-field">
+            <mat-label>Название страницы</mat-label>
+            <input
+              matInput
+              [value]="page.title"
+              (blur)="renamePage(page.id, $any($event.target).value)"
+            />
+          </mat-form-field>
+          <button mat-icon-button (click)="removePage(page.id)" aria-label="Удалить страницу">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+      <div class="add-page">
+        <mat-form-field appearance="outline" class="page-title-field">
+          <mat-label>Новая страница</mat-label>
+          <input
+            matInput
+            [value]="newPageTitle()"
+            (input)="newPageTitle.set($any($event.target).value)"
+          />
+        </mat-form-field>
+        <button mat-flat-button (click)="addPage()">
+          <mat-icon>add</mat-icon>
+          Добавить страницу
+        </button>
+      </div>
+    </div>
+
     <h2>Вопросы</h2>
 
     @if (quiz.questions.length === 0) {
@@ -198,6 +239,23 @@
               />
             }
           </div>
+
+          @if (quiz.pages && quiz.pages.length > 0) {
+            <div class="question-meta">
+              <mat-form-field appearance="outline" class="page-select-field">
+                <mat-label>Страница</mat-label>
+                <mat-select
+                  [value]="question.pageId ?? ''"
+                  (valueChange)="updateQuestionPage(question.id, $event)"
+                >
+                  <mat-option value="">— без страницы —</mat-option>
+                  @for (page of quiz.pages; track page.id) {
+                    <mat-option [value]="page.id">{{ page.title }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          }
 
           @if (conditionSources(question.id); as sources) {
             @if (sources.length > 0) {

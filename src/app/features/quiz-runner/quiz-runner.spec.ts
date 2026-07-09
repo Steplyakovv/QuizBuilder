@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { getClientId } from '../../core/utils/client-id';
 import { createQuiz } from '../../core/models/quiz.factory';
 import { addQuestion, replaceQuestion } from '../../core/models/quiz-questions';
+import { addPage } from '../../core/models/quiz-pages';
 import { Quiz, SingleChoiceQuestion, TextQuestion } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
@@ -309,5 +310,105 @@ describe('QuizRunner', () => {
     expect(fixture.componentInstance.submitted()).toBe(true);
     expect(attemptRepository.attempts).toHaveLength(1);
     expect(attemptRepository.attempts[0].responses).toEqual([]);
+  });
+
+  describe('pagination', () => {
+    function pagedQuiz(): { quiz: Quiz; page1: string; page2: string; q1: string; q2: string } {
+      let quiz = createQuiz('Опрос со страницами');
+      quiz = addQuestion(quiz, 'text');
+      quiz = addQuestion(quiz, 'text');
+      quiz = addPage(quiz, 'Первая тема');
+      quiz = addPage(quiz, 'Вторая тема');
+      const [page1, page2] = quiz.pages!;
+      const q1 = { ...quiz.questions[0], required: true, pageId: page1.id } as TextQuestion;
+      const q2 = { ...quiz.questions[1], required: true, pageId: page2.id } as TextQuestion;
+      quiz = replaceQuestion(quiz, q1);
+      quiz = replaceQuestion(quiz, q2);
+      return { quiz, page1: page1.id, page2: page2.id, q1: q1.id, q2: q2.id };
+    }
+
+    it('treats a quiz with no pages configured as a single page', async () => {
+      const quiz = singleChoiceQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      expect(fixture.componentInstance.isPaginated()).toBe(false);
+      expect(fixture.componentInstance.pages()).toHaveLength(1);
+      expect(fixture.componentInstance.currentPage()?.questions).toHaveLength(1);
+    });
+
+    it('shows each page in order with its title, one at a time', async () => {
+      const { quiz, q1, q2 } = pagedQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      expect(fixture.componentInstance.isPaginated()).toBe(true);
+      expect(fixture.componentInstance.currentPage()?.title).toBe('Первая тема');
+      expect(fixture.componentInstance.currentPage()?.questions.map((q) => q.id)).toEqual([q1]);
+      expect(fixture.componentInstance.isFirstPage()).toBe(true);
+      expect(fixture.componentInstance.isLastPage()).toBe(false);
+
+      fixture.componentInstance.setText(q1, 'ответ');
+      fixture.componentInstance.goToNextPage();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.currentPage()?.title).toBe('Вторая тема');
+      expect(fixture.componentInstance.currentPage()?.questions.map((q) => q.id)).toEqual([q2]);
+      expect(fixture.componentInstance.isLastPage()).toBe(true);
+    });
+
+    it('blocks advancing to the next page until required questions on it are answered', async () => {
+      const { quiz, q1 } = pagedQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      fixture.componentInstance.goToNextPage();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.currentPage()?.title).toBe('Первая тема');
+      expect(fixture.componentInstance.validationErrors().has(q1)).toBe(true);
+
+      fixture.componentInstance.setText(q1, 'ответ');
+      fixture.componentInstance.goToNextPage();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.currentPage()?.title).toBe('Вторая тема');
+    });
+
+    it('goes back to the previous page without validation', async () => {
+      const { quiz, q1 } = pagedQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      fixture.componentInstance.setText(q1, 'ответ');
+      fixture.componentInstance.goToNextPage();
+      await fixture.whenStable();
+      expect(fixture.componentInstance.isFirstPage()).toBe(false);
+
+      fixture.componentInstance.goToPreviousPage();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.isFirstPage()).toBe(true);
+    });
+
+    it('jumps back to the page containing the first unanswered required question on submit', async () => {
+      const { quiz, q1 } = pagedQuiz();
+      await quizRepository.save(quiz);
+      const fixture = await createComponent(quiz.id);
+
+      fixture.componentInstance.setText(q1, 'ответ');
+      fixture.componentInstance.goToNextPage();
+      await fixture.whenStable();
+      expect(fixture.componentInstance.isLastPage()).toBe(true);
+
+      // clear the first page's answer, then try to submit from the last page
+      fixture.componentInstance.setText(q1, '');
+      await fixture.componentInstance.submit();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.submitted()).toBe(false);
+      expect(fixture.componentInstance.currentPage()?.title).toBe('Первая тема');
+      expect(fixture.componentInstance.validationErrors().has(q1)).toBe(true);
+    });
   });
 });

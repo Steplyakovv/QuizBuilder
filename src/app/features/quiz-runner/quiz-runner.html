@@ -27,16 +27,25 @@
       }
 
       <form (submit)="submit(); $event.preventDefault()">
-        <mat-form-field appearance="outline" class="respondent-name-field">
-          <mat-label>Ваше имя (необязательно)</mat-label>
-          <input
-            matInput
-            [value]="respondentName()"
-            (input)="respondentName.set($any($event.target).value)"
-          />
-        </mat-form-field>
+        @if (isFirstPage()) {
+          <mat-form-field appearance="outline" class="respondent-name-field">
+            <mat-label>Ваше имя (необязательно)</mat-label>
+            <input
+              matInput
+              [value]="respondentName()"
+              (input)="respondentName.set($any($event.target).value)"
+            />
+          </mat-form-field>
+        }
 
-        @for (question of visibleQuestions(); track question.id) {
+        @if (isPaginated()) {
+          <p class="page-progress">Страница {{ clampedPageIndex() + 1 }} из {{ pages().length }}</p>
+        }
+        @if (currentPage()?.title; as pageTitle) {
+          <h2 class="page-title">{{ pageTitle }}</h2>
+        }
+
+        @for (question of currentPage()?.questions ?? []; track question.id) {
           <div class="question-item" [class.invalid]="validationErrors().has(question.id)">
             <p class="question-prompt">
               {{ question.prompt }}
@@ -161,9 +170,20 @@
           </div>
         }
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-          Отправить ответы
-        </button>
+        <div class="page-nav">
+          @if (!isFirstPage()) {
+            <button mat-button type="button" (click)="goToPreviousPage()">Назад</button>
+          }
+          @if (!isLastPage()) {
+            <button mat-flat-button color="primary" type="button" (click)="goToNextPage()">
+              Далее
+            </button>
+          } @else {
+            <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+              Отправить ответы
+            </button>
+          }
+        </div>
       </form>
     } @else {
       <div class="quiz-runner-result">

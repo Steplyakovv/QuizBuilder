@@ -17,8 +17,9 @@ import { getClientId } from '../../core/utils/client-id';
 import { shuffle } from '../../core/utils/shuffle';
 import { isQuestionVisible } from '../../core/models/question-condition';
 import { isQuestionAnswered } from '../../core/models/quiz-attempt';
+import { paginateQuestions } from '../../core/models/quiz-pages';
 import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
-import { QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
+import { Question, QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
 import { ConstantSumRunner } from './question-runners/constant-sum-runner';
@@ -108,6 +109,23 @@ export class QuizRunner {
       isQuestionVisible(question, quiz.questions, responses),
     );
   });
+
+  readonly pages = computed(() => {
+    const quiz = this.quiz();
+    if (!quiz) {
+      return [];
+    }
+    return paginateQuestions(quiz, this.visibleQuestions());
+  });
+
+  readonly currentPageIndex = signal(0);
+  readonly clampedPageIndex = computed(() =>
+    Math.min(this.currentPageIndex(), Math.max(this.pages().length - 1, 0)),
+  );
+  readonly currentPage = computed(() => this.pages()[this.clampedPageIndex()]);
+  readonly isFirstPage = computed(() => this.clampedPageIndex() === 0);
+  readonly isLastPage = computed(() => this.clampedPageIndex() === this.pages().length - 1);
+  readonly isPaginated = computed(() => this.pages().length > 1);
 
   readonly respondentName = signal('');
   private readonly responses = signal<Record<string, QuestionResponse>>({});
@@ -258,6 +276,39 @@ export class QuizRunner {
     this.validationErrors.set(next);
   }
 
+  private findUnanswered(questions: Question[]): Question[] {
+    const responseByQuestionId = new Map(
+      Object.values(this.responses()).map((response) => [response.questionId, response]),
+    );
+    return questions.filter(
+      (question) =>
+        question.required && !isQuestionAnswered(question, responseByQuestionId.get(question.id)),
+    );
+  }
+
+  private jumpToQuestionPage(questionId: string): void {
+    const index = this.pages().findIndex((page) =>
+      page.questions.some((question) => question.id === questionId),
+    );
+    if (index !== -1) {
+      this.currentPageIndex.set(index);
+    }
+  }
+
+  goToNextPage(): void {
+    const unanswered = this.findUnanswered(this.currentPage()?.questions ?? []);
+    if (unanswered.length > 0) {
+      this.validationErrors.set(new Set(unanswered.map((question) => question.id)));
+      return;
+    }
+    this.validationErrors.set(new Set());
+    this.currentPageIndex.update((index) => Math.min(index + 1, this.pages().length - 1));
+  }
+
+  goToPreviousPage(): void {
+    this.currentPageIndex.update((index) => Math.max(index - 1, 0));
+  }
+
   async submit(force = false): Promise<void> {
     const quiz = this.quiz();
     if (!quiz) {
@@ -269,15 +320,10 @@ export class QuizRunner {
     this.stopTimer();
     const responses = Object.values(this.responses());
     if (!force) {
-      const responseByQuestionId = new Map(
-        responses.map((response) => [response.questionId, response]),
-      );
-      const unanswered = this.visibleQuestions().filter(
-        (question) =>
-          question.required && !isQuestionAnswered(question, responseByQuestionId.get(question.id)),
-      );
+      const unanswered = this.findUnanswered(this.visibleQuestions());
       if (unanswered.length > 0) {
         this.validationErrors.set(new Set(unanswered.map((question) => question.id)));
+        this.jumpToQuestionPage(unanswered[0].id);
         return;
       }
     }

@@ -15,6 +15,11 @@ import {
   reorderQuestions,
   replaceQuestion,
 } from '../../core/models/quiz-questions';
+import {
+  addPage as addQuizPage,
+  removePage as removeQuizPage,
+  renamePage as renameQuizPage,
+} from '../../core/models/quiz-pages';
 import { QuizStore } from '../../core/state/quiz-store';
 import { QuizRunner } from '../quiz-runner/quiz-runner';
 import { ConstantSumEditor } from './question-editors/constant-sum-editor';
@@ -86,6 +91,7 @@ export class QuizEditor {
   readonly questionTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
   readonly questionTypeLabels = QUESTION_TYPE_LABELS;
   readonly newQuestionType = signal<QuestionType>(this.questionTypes[0]);
+  readonly newPageTitle = signal('');
 
   constructor() {
     void this.store.load();
@@ -152,6 +158,31 @@ export class QuizEditor {
       return;
     }
     this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, maxAttempts } }));
+  }
+
+  addPage(): void {
+    const title = this.newPageTitle().trim();
+    if (!title) {
+      return;
+    }
+    this.updateDraft((quiz) => addQuizPage(quiz, title));
+    this.newPageTitle.set('');
+  }
+
+  renamePage(pageId: string, title: string): void {
+    this.updateDraft((quiz) => renameQuizPage(quiz, pageId, title));
+  }
+
+  removePage(pageId: string): void {
+    this.updateDraft((quiz) => removeQuizPage(quiz, pageId));
+  }
+
+  updateQuestionPage(questionId: string, pageId: string): void {
+    const question = this.draft()?.questions.find((existing) => existing.id === questionId);
+    if (!question) {
+      return;
+    }
+    this.saveQuestion({ ...question, pageId: pageId || undefined });
   }
 
   /** Earlier questions this question could be shown after. */

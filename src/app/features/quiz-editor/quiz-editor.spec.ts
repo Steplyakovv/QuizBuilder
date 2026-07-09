@@ -259,4 +259,33 @@ describe('QuizEditor', () => {
       ids[0],
     ]);
   });
+
+  it('adds, renames and removes a page, unassigning its questions', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await repository.save(quiz);
+    const fixture = await createComponent(quiz.id);
+
+    fixture.componentInstance.addQuestion();
+    await fixture.whenStable();
+    const questionId = fixture.componentInstance.draft()!.questions[0].id;
+
+    fixture.componentInstance.newPageTitle.set('Вступление');
+    fixture.componentInstance.addPage();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.pages).toHaveLength(1);
+    const pageId = fixture.componentInstance.draft()!.pages![0].id;
+
+    fixture.componentInstance.updateQuestionPage(questionId, pageId);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.questions[0].pageId).toBe(pageId);
+
+    fixture.componentInstance.renamePage(pageId, 'Введение');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.pages![0].title).toBe('Введение');
+
+    fixture.componentInstance.removePage(pageId);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.pages).toHaveLength(0);
+    expect(fixture.componentInstance.draft()!.questions[0].pageId).toBeUndefined();
+  });
 });
