@@ -28,7 +28,9 @@ export function exportAttemptsToCsv(quiz: Quiz, attempts: QuizAttempt[]): string
       }),
     ];
   });
-  return [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\r\n');
+  // Excel on a ru-RU locale treats "," as the decimal separator and defaults
+  // to ";" as the CSV delimiter, so "," here would silently merge columns.
+  return [headers, ...rows].map((row) => row.map(csvEscape).join(';')).join('\r\n');
 }
 
 function formatDate(iso: string): string {
@@ -36,5 +38,5 @@ function formatDate(iso: string): string {
 }
 
 function csvEscape(value: string): string {
-  return /["\n\r,]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  return /["\n\r;]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }

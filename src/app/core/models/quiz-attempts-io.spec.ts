@@ -32,16 +32,16 @@ describe('exportAttemptsToCsv', () => {
     ]);
 
     const [header, row] = csv.split('\r\n');
-    expect(header).toBe('Респондент,Начато,Завершено,Баллы,Любимый напиток?');
+    expect(header).toBe('Респондент;Начато;Завершено;Баллы;Любимый напиток?');
     expect(row).toContain('Иван');
     expect(row).toContain('1/1');
     expect(row).toContain('Латте');
   });
 
-  it('escapes commas, quotes and newlines in field values', () => {
+  it('escapes semicolons, quotes and newlines in field values, but leaves plain commas alone', () => {
     let quiz = createQuiz('Опрос про кофе');
     quiz = addQuestion(quiz, 'text');
-    const question = { ...quiz.questions[0], prompt: 'Комментарий, если есть' };
+    const question = { ...quiz.questions[0], prompt: 'Комментарий; если есть' };
     quiz = replaceQuestion(quiz, question);
 
     const csv = exportAttemptsToCsv(quiz, [
@@ -50,13 +50,13 @@ describe('exportAttemptsToCsv', () => {
         quizId: quiz.id,
         respondentName: 'Кто-то "особенный"',
         startedAt: '2026-01-01T00:00:00.000Z',
-        responses: [{ questionId: question.id, text: 'строка с, запятой' }],
+        responses: [{ questionId: question.id, text: 'строка с, запятой; и точкой с запятой' }],
       },
     ]);
 
-    expect(csv).toContain('"Комментарий, если есть"');
+    expect(csv).toContain('"Комментарий; если есть"');
     expect(csv).toContain('"Кто-то ""особенный"""');
-    expect(csv).toContain('"строка с, запятой"');
+    expect(csv).toContain('"строка с, запятой; и точкой с запятой"');
   });
 
   it('scores each attempt against its own quiz snapshot, not the quiz passed in', () => {
