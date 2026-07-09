@@ -147,7 +147,10 @@ export class QuizResults {
     const quiz = this.quiz();
     if (!quiz) return;
     const csv = exportAttemptsToCsv(quiz, this.filteredAttempts());
-    const blob = new Blob([csvBom + csv], { type: 'text/csv;charset=utf-8;' });
+    // "sep=," forces Excel to split on commas even when the OS locale's list
+    // separator is ";" (e.g. Russian Windows) — without it, opening the file
+    // by double-click dumps every row into a single column.
+    const blob = new Blob([csvBom + 'sep=,\r\n' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
