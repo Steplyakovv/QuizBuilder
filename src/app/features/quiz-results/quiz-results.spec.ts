@@ -254,6 +254,60 @@ describe('QuizResults', () => {
     expect(fixture.componentInstance.questionCorrectness(attempt, snapshotQuestion)).toBe(true);
   });
 
+  it('paginates the attempts list and lets the page size be changed', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    for (let i = 0; i < 12; i++) {
+      await attemptRepository.save({
+        id: `a${i}`,
+        quizId: quiz.id,
+        startedAt: '2026-01-01T00:00:00.000Z',
+        responses: [],
+      });
+    }
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.pageSize()).toBe(10);
+    expect(fixture.componentInstance.pagedAttempts()).toHaveLength(10);
+
+    fixture.componentInstance.onPageChange({ pageIndex: 1, pageSize: 10, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pagedAttempts()).toHaveLength(2);
+
+    fixture.componentInstance.onPageChange({ pageIndex: 0, pageSize: 25, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pageSize()).toBe(25);
+    expect(fixture.componentInstance.pagedAttempts()).toHaveLength(12);
+  });
+
+  it('clamps the current page back into range once a filter narrows the results', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    for (let i = 0; i < 12; i++) {
+      await attemptRepository.save({
+        id: `a${i}`,
+        quizId: quiz.id,
+        respondentName: i === 0 ? 'Уникальный' : 'Обычный',
+        startedAt: '2026-01-01T00:00:00.000Z',
+        responses: [],
+      });
+    }
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    fixture.componentInstance.onPageChange({ pageIndex: 1, pageSize: 10, length: 12 });
+    await fixture.whenStable();
+    expect(fixture.componentInstance.pageIndex()).toBe(1);
+
+    fixture.componentInstance.respondentFilter.set('уникал');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.filteredAttempts()).toHaveLength(1);
+    expect(fixture.componentInstance.pageIndex()).toBe(0);
+    expect(fixture.componentInstance.pagedAttempts()).toHaveLength(1);
+  });
+
   it('toggles which attempt is expanded', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await quizRepository.save(quiz);

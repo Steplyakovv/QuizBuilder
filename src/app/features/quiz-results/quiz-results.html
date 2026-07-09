@@ -69,7 +69,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (attempt of filteredAttempts(); track attempt.id) {
+              @for (attempt of pagedAttempts(); track attempt.id) {
                 <tr>
                   <td>{{ attempt.respondentName ?? 'Аноним' }}</td>
                   <td>{{ attempt.completedAt | date: 'short' }}</td>
@@ -129,6 +129,13 @@
             </tbody>
           </table>
         </div>
+        <mat-paginator
+          [length]="filteredAttempts().length"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPageChange($event)"
+        />
       }
     }
   </div>

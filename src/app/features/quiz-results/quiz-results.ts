@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { formatResponse } from '../../core/models/quiz-attempt';
 import { exportAttemptsToCsv } from '../../core/models/quiz-attempts-io';
 import { QuestionStat, questionStatistics } from '../../core/models/question-statistics';
@@ -18,6 +19,7 @@ import {
 import { Question, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
+import { ruPaginatorIntl } from '../../core/utils/ru-paginator-intl';
 
 type SortField = 'date' | 'score';
 
@@ -33,7 +35,9 @@ const csvBom = '﻿';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
+    MatPaginatorModule,
   ],
+  providers: [{ provide: MatPaginatorIntl, useFactory: ruPaginatorIntl }],
   templateUrl: './quiz-results.html',
   styleUrl: './quiz-results.scss',
 })
@@ -74,6 +78,18 @@ export class QuizResults {
       const dateB = new Date(b.completedAt ?? b.startedAt).getTime();
       return (dateA - dateB) * dir;
     });
+  });
+
+  readonly pageSizeOptions = [5, 10, 25, 50];
+  readonly pageSize = signal(10);
+  private readonly requestedPageIndex = signal(0);
+  readonly pageIndex = computed(() => {
+    const pageCount = Math.max(1, Math.ceil(this.filteredAttempts().length / this.pageSize()));
+    return Math.min(this.requestedPageIndex(), pageCount - 1);
+  });
+  readonly pagedAttempts = computed(() => {
+    const start = this.pageIndex() * this.pageSize();
+    return this.filteredAttempts().slice(start, start + this.pageSize());
   });
 
   readonly expandedAttemptId = signal<string | null>(null);
@@ -132,6 +148,11 @@ export class QuizResults {
 
   toggleExpand(attemptId: string): void {
     this.expandedAttemptId.update((current) => (current === attemptId ? null : attemptId));
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageSize.set(event.pageSize);
+    this.requestedPageIndex.set(event.pageIndex);
   }
 
   toggleSort(field: SortField): void {
