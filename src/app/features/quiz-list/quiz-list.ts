@@ -5,11 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { exportQuizToJson, parseImportedQuiz } from '../../core/models/quiz-io';
 import { Quiz } from '../../core/models/quiz.models';
 import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
+import { ruPaginatorIntl } from '../../core/utils/ru-paginator-intl';
 
 @Component({
   selector: 'app-quiz-list',
@@ -22,6 +23,7 @@ import { QuizStore } from '../../core/state/quiz-store';
     MatInputModule,
     MatPaginatorModule,
   ],
+  providers: [{ provide: MatPaginatorIntl, useFactory: ruPaginatorIntl }],
   templateUrl: './quiz-list.html',
   styleUrl: './quiz-list.scss',
 })
