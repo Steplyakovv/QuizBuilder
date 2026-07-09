@@ -212,6 +212,8 @@ export interface QuizAttempt {
   completedAt?: string;
   responses: QuestionResponse[];
   score?: number;
+  /** Quiz as it was when this attempt was submitted, so later edits don't rewrite old results. */
+  quizSnapshot?: Quiz;
 }
 
 export interface QuestionResponse {

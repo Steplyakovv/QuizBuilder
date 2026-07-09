@@ -13,12 +13,16 @@ export function questionStatistics(quiz: Quiz, attempts: QuizAttempt[]): Questio
     return [];
   }
   return quiz.questions.filter(hasCorrectAnswer).map((question) => {
-    const correct = attempts.filter((attempt) =>
-      isCorrect(
-        question,
+    const correct = attempts.filter((attempt) => {
+      // Use the question as the respondent actually saw it, not later edits to the live quiz.
+      const effectiveQuestion =
+        attempt.quizSnapshot?.questions.find((candidate) => candidate.id === question.id) ??
+        question;
+      return isCorrect(
+        effectiveQuestion,
         attempt.responses.find((response) => response.questionId === question.id),
-      ),
-    ).length;
+      );
+    }).length;
     return {
       questionId: question.id,
       correct,

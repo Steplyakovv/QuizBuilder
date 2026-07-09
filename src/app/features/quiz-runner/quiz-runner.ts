@@ -409,6 +409,7 @@ export class QuizRunner {
         completedAt: new Date().toISOString(),
         responses,
         score: score?.correct,
+        quizSnapshot: quiz,
       };
       await this.attemptRepository.save(attempt);
       this.result.set(score);

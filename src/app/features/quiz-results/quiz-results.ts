@@ -3,7 +3,10 @@ import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { formatResponse } from '../../core/models/quiz-attempt';
+import { exportAttemptsToCsv } from '../../core/models/quiz-attempts-io';
 import { QuestionStat, questionStatistics } from '../../core/models/question-statistics';
 import {
   AttemptScore,
@@ -12,13 +15,25 @@ import {
   isCorrect,
   scoreAttempt,
 } from '../../core/models/quiz-scoring';
-import { Question, QuizAttempt } from '../../core/models/quiz.models';
+import { Question, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
 
+type SortField = 'date' | 'score';
+
+/** Excel only auto-detects UTF-8 CSVs when a byte-order mark leads the file. */
+const csvBom = '﻿';
+
 @Component({
   selector: 'app-quiz-results',
-  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule],
+  imports: [
+    RouterLink,
+    DatePipe,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
   templateUrl: './quiz-results.html',
   styleUrl: './quiz-results.scss',
 })
@@ -35,6 +50,32 @@ export class QuizResults {
     return quiz ? questionStatistics(quiz, this.attempts()) : [];
   });
 
+  readonly respondentFilter = signal('');
+  readonly sortField = signal<SortField>('date');
+  readonly sortDirection = signal<'asc' | 'desc'>('desc');
+
+  readonly filteredAttempts = computed(() => {
+    const filter = this.respondentFilter().trim().toLowerCase();
+    const matching = filter
+      ? this.attempts().filter((attempt) =>
+          (attempt.respondentName ?? 'Аноним').toLowerCase().includes(filter),
+        )
+      : this.attempts();
+
+    const field = this.sortField();
+    const dir = this.sortDirection() === 'asc' ? 1 : -1;
+    return [...matching].sort((a, b) => {
+      if (field === 'score') {
+        const scoreA = this.scoreFor(a)?.correct ?? -1;
+        const scoreB = this.scoreFor(b)?.correct ?? -1;
+        return (scoreA - scoreB) * dir;
+      }
+      const dateA = new Date(a.completedAt ?? a.startedAt).getTime();
+      const dateB = new Date(b.completedAt ?? b.startedAt).getTime();
+      return (dateA - dateB) * dir;
+    });
+  });
+
   readonly expandedAttemptId = signal<string | null>(null);
 
   constructor() {
@@ -47,9 +88,17 @@ export class QuizResults {
     });
   }
 
+  private effectiveQuiz(attempt: QuizAttempt): Quiz | undefined {
+    return attempt.quizSnapshot ?? this.quiz();
+  }
+
   scoreFor(attempt: QuizAttempt): AttemptScore | undefined {
-    const quiz = this.quiz();
+    const quiz = this.effectiveQuiz(attempt);
     return quiz ? scoreAttempt(quiz, attempt.responses) : undefined;
+  }
+
+  questionsFor(attempt: QuizAttempt): Question[] {
+    return this.effectiveQuiz(attempt)?.questions ?? [];
   }
 
   questionById(questionId: string): Question | undefined {
@@ -68,7 +117,7 @@ export class QuizResults {
   }
 
   questionCorrectness(attempt: QuizAttempt, question: Question): boolean | undefined {
-    if (!this.quiz()?.settings.isGraded || !hasCorrectAnswer(question)) {
+    if (!this.effectiveQuiz(attempt)?.settings.isGraded || !hasCorrectAnswer(question)) {
       return undefined;
     }
     return isCorrect(
@@ -83,5 +132,27 @@ export class QuizResults {
 
   toggleExpand(attemptId: string): void {
     this.expandedAttemptId.update((current) => (current === attemptId ? null : attemptId));
+  }
+
+  toggleSort(field: SortField): void {
+    if (this.sortField() === field) {
+      this.sortDirection.update((direction) => (direction === 'asc' ? 'desc' : 'asc'));
+    } else {
+      this.sortField.set(field);
+      this.sortDirection.set('desc');
+    }
+  }
+
+  exportCsv(): void {
+    const quiz = this.quiz();
+    if (!quiz) return;
+    const csv = exportAttemptsToCsv(quiz, this.filteredAttempts());
+    const blob = new Blob([csvBom + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${quiz.title || 'quiz'}-results.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 }

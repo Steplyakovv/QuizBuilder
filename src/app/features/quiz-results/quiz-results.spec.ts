@@ -154,6 +154,106 @@ describe('QuizResults', () => {
     expect(fixture.componentInstance.answerFor(attempt, question)).toBe('Эспрессо');
   });
 
+  it('filters attempts by respondent name', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    await attemptRepository.save({
+      id: 'a1',
+      quizId: quiz.id,
+      respondentName: 'Иван',
+      startedAt: '2026-01-01T00:00:00.000Z',
+      responses: [],
+    });
+    await attemptRepository.save({
+      id: 'a2',
+      quizId: quiz.id,
+      respondentName: 'Мария',
+      startedAt: '2026-01-01T00:00:00.000Z',
+      responses: [],
+    });
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.filteredAttempts()).toHaveLength(2);
+
+    fixture.componentInstance.respondentFilter.set('мари');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.filteredAttempts().map((attempt) => attempt.id)).toEqual([
+      'a2',
+    ]);
+  });
+
+  it('sorts attempts by completion date, newest first by default, and toggles direction', async () => {
+    const quiz = createQuiz('Опрос про кофе');
+    await quizRepository.save(quiz);
+    await attemptRepository.save({
+      id: 'earlier',
+      quizId: quiz.id,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      completedAt: '2026-01-01T00:00:00.000Z',
+      responses: [],
+    });
+    await attemptRepository.save({
+      id: 'later',
+      quizId: quiz.id,
+      startedAt: '2026-01-02T00:00:00.000Z',
+      completedAt: '2026-01-02T00:00:00.000Z',
+      responses: [],
+    });
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.filteredAttempts().map((attempt) => attempt.id)).toEqual([
+      'later',
+      'earlier',
+    ]);
+
+    fixture.componentInstance.toggleSort('date');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.filteredAttempts().map((attempt) => attempt.id)).toEqual([
+      'earlier',
+      'later',
+    ]);
+  });
+
+  it('scores and displays an attempt against the quiz snapshot taken at attempt time, not the live quiz', async () => {
+    let quiz = createQuiz('Опрос про кофе');
+    quiz = addQuestion(quiz, 'single-choice');
+    const originalQuestion = {
+      ...quiz.questions[0],
+      options: [
+        { id: 'o1', label: 'Латте' },
+        { id: 'o2', label: 'Эспрессо' },
+      ],
+      correctOptionId: 'o1',
+    } as SingleChoiceQuestion;
+    quiz = replaceQuestion(quiz, originalQuestion);
+    quiz = { ...quiz, settings: { isGraded: true } };
+    await quizRepository.save(quiz);
+
+    // The respondent saw "o2" as correct; the admin later flipped it to "o1".
+    const snapshotQuestion = { ...originalQuestion, correctOptionId: 'o2' } as SingleChoiceQuestion;
+    const snapshotQuiz = replaceQuestion(quiz, snapshotQuestion);
+
+    await attemptRepository.save({
+      id: 'a1',
+      quizId: quiz.id,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      completedAt: '2026-01-01T00:01:00.000Z',
+      responses: [{ questionId: originalQuestion.id, selectedOptionIds: ['o2'] }],
+      quizSnapshot: snapshotQuiz,
+    });
+
+    const fixture = await createComponent(quiz.id);
+    await fixture.whenStable();
+    const attempt = fixture.componentInstance.attempts()[0];
+
+    expect(fixture.componentInstance.scoreFor(attempt)).toEqual({ correct: 1, total: 1 });
+    expect(fixture.componentInstance.questionCorrectness(attempt, snapshotQuestion)).toBe(true);
+  });
+
   it('toggles which attempt is expanded', async () => {
     const quiz = createQuiz('Опрос про кофе');
     await quizRepository.save(quiz);
