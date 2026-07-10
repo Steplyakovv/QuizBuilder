@@ -15,6 +15,7 @@ builder.Services.AddDbContext<QuizBuilderDbContext>(options =>
         .UseSnakeCaseNamingConvention());
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
+builder.Services.AddScoped<IQuestionMapper, QuestionMapper>();
 builder.Services.AddScoped<IQuizMapper, QuizMapper>();
 builder.Services.AddScoped<IAttemptMapper, AttemptMapper>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());

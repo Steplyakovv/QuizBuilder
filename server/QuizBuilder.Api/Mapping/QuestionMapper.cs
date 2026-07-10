@@ -3,11 +3,26 @@ using QuizBuilder.Api.Models;
 
 namespace QuizBuilder.Api.Mapping;
 
-public static class QuestionMapper
+/// <summary>
+/// Polymorphic Question ↔ QuestionDto mapping (18 concrete types via QuestionFieldValues) -
+/// hand-written rather than AutoMapper-based, since it's a discriminated-union fan-out with
+/// per-type field shapes that don't line up 1:1 (see AutoMapperProfiles.cs for the rationale).
+/// </summary>
+public interface IQuestionMapper
+{
+    QuestionFieldValues FromEntity(Question q);
+    QuestionFieldValues FromSnapshot(AttemptQuestionSnapshot s);
+    QuestionFieldValues FromDto(QuestionDto dto, int position);
+    QuestionDto ToDto(QuestionFieldValues v);
+    Question ToEntity(QuestionFieldValues v, Guid quizId);
+    AttemptQuestionSnapshot ToSnapshotEntity(QuestionFieldValues v, Guid attemptId);
+}
+
+public class QuestionMapper : IQuestionMapper
 {
     // ---- entity/snapshot -> field values -------------------------------------------------
 
-    public static QuestionFieldValues FromEntity(Question q) => new()
+    public QuestionFieldValues FromEntity(Question q) => new()
     {
         Id = q.Id,
         Type = QuestionTypeOf(q),
@@ -51,7 +66,7 @@ public static class QuestionMapper
         CorrectRegionId = (q as HotspotQuestion)?.CorrectRegionId,
     };
 
-    public static QuestionFieldValues FromSnapshot(AttemptQuestionSnapshot s) => new()
+    public QuestionFieldValues FromSnapshot(AttemptQuestionSnapshot s) => new()
     {
         Id = s.OriginalQuestionId,
         Type = s.Type,
@@ -103,7 +118,7 @@ public static class QuestionMapper
 
     // ---- dto -> field values ---------------------------------------------------------------
 
-    public static QuestionFieldValues FromDto(QuestionDto dto, int position)
+    public QuestionFieldValues FromDto(QuestionDto dto, int position)
     {
         var options = OptionsOf(dto);
         return new QuestionFieldValues
@@ -207,7 +222,7 @@ public static class QuestionMapper
 
     // ---- field values -> dto ---------------------------------------------------------------
 
-    public static QuestionDto ToDto(QuestionFieldValues v)
+    public QuestionDto ToDto(QuestionFieldValues v)
     {
         string id = v.Id.ToString();
         QuestionConditionDto? condition = v.ConditionQuestionId is { } cq ? new QuestionConditionDto { QuestionId = cq.ToString() } : null;
@@ -325,7 +340,7 @@ public static class QuestionMapper
 
     // ---- field values -> entity / snapshot entity ------------------------------------------
 
-    public static Question ToEntity(QuestionFieldValues v, Guid quizId)
+    public Question ToEntity(QuestionFieldValues v, Guid quizId)
     {
         Question question = v.Type switch
         {
@@ -379,7 +394,7 @@ public static class QuestionMapper
         return question;
     }
 
-    public static AttemptQuestionSnapshot ToSnapshotEntity(QuestionFieldValues v, Guid attemptId) => new()
+    public AttemptQuestionSnapshot ToSnapshotEntity(QuestionFieldValues v, Guid attemptId) => new()
     {
         Id = Guid.NewGuid(),
         AttemptId = attemptId,

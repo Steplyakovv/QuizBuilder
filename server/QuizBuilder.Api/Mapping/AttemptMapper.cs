@@ -10,7 +10,7 @@ public interface IAttemptMapper
     QuizAttempt ToEntity(QuizAttemptDto dto);
 }
 
-public class AttemptMapper(IMapper mapper) : IAttemptMapper
+public class AttemptMapper(IMapper mapper, IQuestionMapper questionMapper) : IAttemptMapper
 {
     public QuizAttemptDto ToDto(QuizAttempt attempt)
     {
@@ -23,7 +23,7 @@ public class AttemptMapper(IMapper mapper) : IAttemptMapper
                 Title = attempt.Quiz?.Title ?? "",
                 Description = null,
                 Questions = attempt.QuestionSnapshots.OrderBy(s => s.Position)
-                    .Select(s => QuestionMapper.ToDto(QuestionMapper.FromSnapshot(s)))
+                    .Select(s => questionMapper.ToDto(questionMapper.FromSnapshot(s)))
                     .ToList(),
                 Pages = null,
                 Settings = new QuizSettingsDto { IsGraded = attempt.SnapshotIsGraded ?? true },
@@ -47,7 +47,7 @@ public class AttemptMapper(IMapper mapper) : IAttemptMapper
         attempt.SnapshotIsGraded = dto.QuizSnapshot?.Settings.IsGraded;
         attempt.Responses = dto.Responses.Select(r => ToResponseEntity(r, attemptId)).ToList();
         attempt.QuestionSnapshots = dto.QuizSnapshot?.Questions
-            .Select((q, i) => QuestionMapper.ToSnapshotEntity(QuestionMapper.FromDto(q, i), attemptId))
+            .Select((q, i) => questionMapper.ToSnapshotEntity(questionMapper.FromDto(q, i), attemptId))
             .ToList() ?? [];
         return attempt;
     }

@@ -26,7 +26,7 @@ public interface IQuizMapper
     (List<QuizPage> Pages, List<Question> Questions) BuildChildren(QuizDto dto, Guid quizId);
 }
 
-public class QuizMapper(IMapper mapper) : IQuizMapper
+public class QuizMapper(IMapper mapper, IQuestionMapper questionMapper) : IQuizMapper
 {
     public QuizDto ToDto(Quiz quiz)
     {
@@ -34,7 +34,7 @@ public class QuizMapper(IMapper mapper) : IQuizMapper
         return dto with
         {
             Questions = quiz.Questions.OrderBy(q => q.Position)
-                .Select(q => QuestionMapper.ToDto(QuestionMapper.FromEntity(q)))
+                .Select(q => questionMapper.ToDto(questionMapper.FromEntity(q)))
                 .ToList(),
             Pages = quiz.Pages.Count == 0
                 ? null
@@ -52,7 +52,7 @@ public class QuizMapper(IMapper mapper) : IQuizMapper
         }).ToList();
 
         var questions = dto.Questions
-            .Select((q, i) => QuestionMapper.ToEntity(QuestionMapper.FromDto(q, i), quizId))
+            .Select((q, i) => questionMapper.ToEntity(questionMapper.FromDto(q, i), quizId))
             .ToList();
 
         return (pages, questions);
