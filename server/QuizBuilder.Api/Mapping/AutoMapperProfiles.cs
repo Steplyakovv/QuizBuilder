@@ -67,7 +67,8 @@ public class AttemptMappingProfile : Profile
         CreateMap<QuizAttemptDto, QuizAttempt>()
             .ForMember(d => d.SnapshotIsGraded, opt => opt.Ignore())
             .ForMember(d => d.Responses, opt => opt.Ignore())
-            .ForMember(d => d.QuestionSnapshots, opt => opt.Ignore());
+            .ForMember(d => d.QuestionSnapshots, opt => opt.Ignore())
+            .ForMember(d => d.Quiz, opt => opt.Ignore());
 
         CreateMap<QuestionResponse, QuestionResponseDto>()
             .ForMember(d => d.SelectedOptionIds, opt => opt.MapFrom(s =>
@@ -82,6 +83,7 @@ public class AttemptMappingProfile : Profile
         CreateMap<QuestionResponseDto, QuestionResponse>()
             .ForMember(d => d.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(d => d.AttemptId, opt => opt.Ignore())
+            .ForMember(d => d.Attempt, opt => opt.Ignore())
             .ForMember(d => d.SelectedOptions, opt => opt.MapFrom(s =>
                 (s.SelectedOptionIds ?? new List<string>()).Select(id => new ResponseSelectedOption { Id = Guid.NewGuid(), OptionId = Guid.Parse(id) })))
             .ForMember(d => d.Distributions, opt => opt.MapFrom(s =>
