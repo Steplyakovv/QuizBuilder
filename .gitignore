@@ -55,3 +55,4 @@ node_modules/
 server/**/bin/
 server/**/obj/
 .vs/
+server/backups/

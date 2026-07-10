@@ -4,13 +4,17 @@ description: Manually verify a QuizBuilder UI change or bug repro by driving a r
 
 # Browser check
 
-QuizBuilder has no backend and no auth, so the fastest way to confirm a UI
-change actually works — not just that unit tests pass — is to drive a real
-browser against the running dev server and read back what a user would see.
+The fastest way to confirm a UI change actually works — not just that unit
+tests pass — is to drive a real browser against the running dev server and
+read back what a user would see.
 
 ## Prerequisites
 
 The dev server must already be running: `npm start` (http://localhost:4200).
+Since Phase 15, the app also needs the real backend running against Postgres:
+`dotnet run --launch-profile http` from `server/QuizBuilder.Api`
+(http://localhost:5131). If the user has manual dev data worth keeping, see
+the `db-snapshot` skill before/after scenarios that create quizzes/attempts.
 
 ## Usage
 
