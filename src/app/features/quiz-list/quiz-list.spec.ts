@@ -2,9 +2,11 @@ import { provideRouter } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { exportQuizToJson } from '../../core/models/quiz-io';
 import { createQuiz } from '../../core/models/quiz.factory';
+import { AUTH_REPOSITORY } from '../../core/repositories/auth-repository';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
 import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
+import { FakeAuthRepository } from '../../core/testing/fake-auth-repository';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
 import { QuizList } from './quiz-list';
 
@@ -15,17 +17,17 @@ describe('QuizList', () => {
     repository = new FakeQuizRepository();
     await TestBed.configureTestingModule({
       imports: [QuizList],
-      providers: [provideRouter([]), { provide: QUIZ_REPOSITORY, useValue: repository }],
+      providers: [
+        provideRouter([]),
+        { provide: QUIZ_REPOSITORY, useValue: repository },
+        { provide: AUTH_REPOSITORY, useValue: new FakeAuthRepository() },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(QuizList);
     await fixture.whenStable();
     return fixture;
   }
-
-  beforeEach(() => {
-    localStorage.clear();
-  });
 
   it('hides quiz management controls from a non-admin', async () => {
     const fixture = await createComponent();
@@ -40,7 +42,7 @@ describe('QuizList', () => {
 
   it('shows quiz management controls to an admin', async () => {
     const fixture = await createComponent();
-    TestBed.inject(AuthStore).login('admin', 'admin');
+    await TestBed.inject(AuthStore).login('admin', 'admin');
     fixture.componentInstance.newQuizTitle.set('Опрос про кофе');
     await fixture.componentInstance.createQuiz();
     await fixture.whenStable();
@@ -109,7 +111,7 @@ describe('QuizList', () => {
 
   it('imports a quiz from a selected JSON file', async () => {
     const fixture = await createComponent();
-    TestBed.inject(AuthStore).login('admin', 'admin');
+    await TestBed.inject(AuthStore).login('admin', 'admin');
     const imported = createQuiz('Импортированный опрос');
     const file = new File([exportQuizToJson(imported)], 'quiz.json', {
       type: 'application/json',
@@ -180,7 +182,7 @@ describe('QuizList', () => {
 
   it('hides unpublished quizzes from a non-admin but shows them (with a badge) to an admin', async () => {
     const fixture = await createComponent();
-    TestBed.inject(AuthStore).login('admin', 'admin');
+    await TestBed.inject(AuthStore).login('admin', 'admin');
     fixture.componentInstance.newQuizTitle.set('Опрос про кофе');
     await fixture.componentInstance.createQuiz();
     await fixture.whenStable();
@@ -194,7 +196,7 @@ describe('QuizList', () => {
     expect(fixture.componentInstance.visibleQuizzes()).toHaveLength(1);
     expect((fixture.nativeElement as HTMLElement).textContent?.includes('Черновик')).toBe(true);
 
-    TestBed.inject(AuthStore).logout();
+    await TestBed.inject(AuthStore).logout();
     await fixture.whenStable();
 
     expect(fixture.componentInstance.visibleQuizzes()).toHaveLength(0);

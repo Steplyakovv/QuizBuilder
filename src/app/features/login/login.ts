@@ -19,8 +19,9 @@ export class Login {
   readonly password = signal('');
   readonly error = signal<string | null>(null);
 
-  submit(): void {
-    if (this.auth.login(this.username(), this.password())) {
+  async submit(): Promise<void> {
+    const success = await this.auth.login(this.username(), this.password());
+    if (success) {
       void this.router.navigateByUrl('/');
       return;
     }

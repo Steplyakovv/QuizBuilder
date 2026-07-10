@@ -1,4 +1,11 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type APIRequestContext } from '@playwright/test';
+
+const API_BASE_URL = 'http://localhost:5131/api';
+
+/** Tests share one real backend database, so each test starts from a clean slate. */
+async function resetBackend(request: APIRequestContext): Promise<void> {
+  await request.post(`${API_BASE_URL}/test/reset`);
+}
 
 async function loginAsAdmin(page: Page): Promise<void> {
   await page.getByRole('link', { name: 'Войти как администратор' }).click();
@@ -8,10 +15,9 @@ async function loginAsAdmin(page: Page): Promise<void> {
 }
 
 test.describe('as admin', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    await resetBackend(request);
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
     await loginAsAdmin(page);
   });
 
@@ -257,10 +263,9 @@ test.describe('as admin', () => {
 });
 
 test.describe('authentication', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    await resetBackend(request);
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
   });
 
   test('logs in as admin and back out to the respondent view', async ({ page }) => {

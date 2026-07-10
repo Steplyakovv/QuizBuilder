@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: quizbuilder
+      POSTGRES_USER: quizbuilder
+      POSTGRES_PASSWORD: quizbuilder
+    ports:
+      - "5432:5432"
+    volumes:
+      - quizbuilder-postgres:/var/lib/postgresql/data
+
+volumes:
+  quizbuilder-postgres:

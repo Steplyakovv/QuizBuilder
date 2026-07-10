@@ -1,23 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { AUTH_REPOSITORY } from '../../core/repositories/auth-repository';
 import { AuthStore } from '../../core/state/auth-store';
+import { FakeAuthRepository } from '../../core/testing/fake-auth-repository';
 import { Login } from './login';
 
 describe('Login', () => {
   async function createComponent() {
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: AUTH_REPOSITORY, useValue: new FakeAuthRepository() },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(Login);
     await fixture.whenStable();
     return fixture;
   }
-
-  beforeEach(() => {
-    localStorage.clear();
-  });
 
   it('logs in and navigates to the quiz list on correct credentials', async () => {
     const fixture = await createComponent();
@@ -26,7 +27,7 @@ describe('Login', () => {
 
     fixture.componentInstance.username.set('admin');
     fixture.componentInstance.password.set('admin');
-    fixture.componentInstance.submit();
+    await fixture.componentInstance.submit();
 
     expect(TestBed.inject(AuthStore).isAdmin()).toBe(true);
     expect(navigateSpy).toHaveBeenCalledWith('/');
@@ -37,7 +38,7 @@ describe('Login', () => {
 
     fixture.componentInstance.username.set('admin');
     fixture.componentInstance.password.set('wrong');
-    fixture.componentInstance.submit();
+    await fixture.componentInstance.submit();
 
     expect(fixture.componentInstance.error()).toBe('Неверный логин или пароль.');
     expect(TestBed.inject(AuthStore).isAdmin()).toBe(false);
