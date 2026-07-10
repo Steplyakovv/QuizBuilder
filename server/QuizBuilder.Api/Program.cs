@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QuizBuilder.Api.Data;
 using QuizBuilder.Api.Endpoints;
+using QuizBuilder.Api.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<QuizBuilderDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
         .UseSnakeCaseNamingConvention());
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
+builder.Services.AddScoped<IQuizMapper, QuizMapper>();
+builder.Services.AddScoped<IAttemptMapper, AttemptMapper>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {

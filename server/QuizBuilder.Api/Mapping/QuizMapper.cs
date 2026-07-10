@@ -1,54 +1,18 @@
+using AutoMapper;
 using QuizBuilder.Api.Dto;
 using QuizBuilder.Api.Models;
 
 namespace QuizBuilder.Api.Mapping;
 
-public static class QuizMapper
+public interface IQuizMapper
 {
-    public static QuizDto ToDto(Quiz quiz) => new()
-    {
-        Id = quiz.Id.ToString(),
-        Title = quiz.Title,
-        Description = quiz.Description,
-        Questions = quiz.Questions.OrderBy(q => q.Position)
-            .Select(q => QuestionMapper.ToDto(QuestionMapper.FromEntity(q)))
-            .ToList(),
-        Pages = quiz.Pages.Count == 0
-            ? null
-            : quiz.Pages.OrderBy(p => p.Position).Select(p => new QuizPageDto { Id = p.Id.ToString(), Title = p.Title }).ToList(),
-        Settings = new QuizSettingsDto
-        {
-            IsGraded = quiz.IsGraded,
-            ShuffleQuestions = quiz.ShuffleQuestions,
-            TimeLimitMinutes = quiz.TimeLimitMinutes,
-            MaxAttempts = quiz.MaxAttempts,
-            Published = quiz.Published,
-            AccessPassword = quiz.AccessPassword,
-            ExpiresAt = quiz.ExpiresAt?.ToString("o"),
-        },
-        CreatedAt = quiz.CreatedAt.ToString("o"),
-        UpdatedAt = quiz.UpdatedAt.ToString("o"),
-    };
+    QuizDto ToDto(Quiz quiz);
 
     /// <summary>
     /// Applies a QuizDto's scalar fields onto an existing (or brand-new) Quiz entity.
-    /// Pages/Questions are deliberately NOT touched here - see BuildPages/BuildQuestions.
+    /// Pages/Questions are deliberately NOT touched here - see BuildChildren.
     /// </summary>
-    public static void ApplyScalarsTo(Quiz target, QuizDto dto)
-    {
-        target.Id = Guid.Parse(dto.Id);
-        target.Title = dto.Title;
-        target.Description = dto.Description;
-        target.IsGraded = dto.Settings.IsGraded;
-        target.ShuffleQuestions = dto.Settings.ShuffleQuestions;
-        target.TimeLimitMinutes = dto.Settings.TimeLimitMinutes;
-        target.MaxAttempts = dto.Settings.MaxAttempts;
-        target.Published = dto.Settings.Published;
-        target.AccessPassword = dto.Settings.AccessPassword;
-        target.ExpiresAt = dto.Settings.ExpiresAt is null ? null : DateTimeOffset.Parse(dto.Settings.ExpiresAt);
-        target.CreatedAt = DateTimeOffset.Parse(dto.CreatedAt);
-        target.UpdatedAt = DateTimeOffset.Parse(dto.UpdatedAt);
-    }
+    void ApplyScalarsTo(Quiz target, QuizDto dto);
 
     /// <summary>
     /// Builds the quiz's pages/questions as brand-new entities to be explicitly
@@ -59,7 +23,28 @@ public static class QuizMapper
     /// treated as pre-existing and get UPDATE statements issued against rows that don't
     /// exist yet, which fails with DbUpdateConcurrencyException (0 rows affected).
     /// </summary>
-    public static (List<QuizPage> Pages, List<Question> Questions) BuildChildren(QuizDto dto, Guid quizId)
+    (List<QuizPage> Pages, List<Question> Questions) BuildChildren(QuizDto dto, Guid quizId);
+}
+
+public class QuizMapper(IMapper mapper) : IQuizMapper
+{
+    public QuizDto ToDto(Quiz quiz)
+    {
+        var dto = mapper.Map<QuizDto>(quiz);
+        return dto with
+        {
+            Questions = quiz.Questions.OrderBy(q => q.Position)
+                .Select(q => QuestionMapper.ToDto(QuestionMapper.FromEntity(q)))
+                .ToList(),
+            Pages = quiz.Pages.Count == 0
+                ? null
+                : quiz.Pages.OrderBy(p => p.Position).Select(p => new QuizPageDto { Id = p.Id.ToString(), Title = p.Title }).ToList(),
+        };
+    }
+
+    public void ApplyScalarsTo(Quiz target, QuizDto dto) => mapper.Map(dto, target);
+
+    public (List<QuizPage> Pages, List<Question> Questions) BuildChildren(QuizDto dto, Guid quizId)
     {
         var pages = (dto.Pages ?? []).Select((p, i) => new QuizPage
         {

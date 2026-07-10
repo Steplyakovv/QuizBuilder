@@ -1,9 +1,8 @@
 using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using QuizBuilder.Api.Auth;
-using QuizBuilder.Api.Data;
+using QuizBuilder.Api.Features.Auth;
 
 namespace QuizBuilder.Api.Endpoints;
 
@@ -16,15 +15,15 @@ public static class AuthEndpoints
     {
         var group = app.MapGroup("/api/auth");
 
-        group.MapPost("/login", async (LoginRequest request, QuizBuilderDbContext db, HttpContext http) =>
+        group.MapPost("/login", async (LoginRequest request, ISender sender, HttpContext http) =>
         {
-            var user = await db.AdminUsers.SingleOrDefaultAsync(u => u.Username == request.Username);
-            if (user is null || !PasswordHasher.Verify(request.Password, user.PasswordHash))
+            var success = await sender.Send(new LoginCommand(request.Username, request.Password));
+            if (!success)
             {
                 return Results.Unauthorized();
             }
 
-            var claims = new List<Claim> { new(ClaimTypes.Name, user.Username), new(ClaimTypes.Role, "admin") };
+            var claims = new List<Claim> { new(ClaimTypes.Name, request.Username), new(ClaimTypes.Role, "admin") };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
