@@ -18,6 +18,7 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 builder.Services.AddScoped<IQuizMapper, QuizMapper>();
 builder.Services.AddScoped<IAttemptMapper, AttemptMapper>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {

@@ -1,7 +1,4 @@
-using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using QuizBuilder.Api.Features.Auth;
 
 namespace QuizBuilder.Api.Endpoints;
@@ -15,28 +12,19 @@ public static class AuthEndpoints
     {
         var group = app.MapGroup("/api/auth");
 
-        group.MapPost("/login", async (LoginRequest request, ISender sender, HttpContext http) =>
+        group.MapPost("/login", async (LoginRequest request, ISender sender) =>
         {
             var success = await sender.Send(new LoginCommand(request.Username, request.Password));
-            if (!success)
-            {
-                return Results.Unauthorized();
-            }
-
-            var claims = new List<Claim> { new(ClaimTypes.Name, request.Username), new(ClaimTypes.Role, "admin") };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
-
-            return Results.Ok(new AuthStatusResponse(true));
+            return success ? Results.Ok(new AuthStatusResponse(true)) : Results.Unauthorized();
         });
 
-        group.MapPost("/logout", async (HttpContext http) =>
+        group.MapPost("/logout", async (ISender sender) =>
         {
-            await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await sender.Send(new LogoutCommand());
             return Results.Ok();
         });
 
-        group.MapGet("/me", (HttpContext http) =>
-            Results.Ok(new AuthStatusResponse(http.User.IsInRole("admin"))));
+        group.MapGet("/me", async (ISender sender) =>
+            Results.Ok(new AuthStatusResponse(await sender.Send(new GetAuthStatusQuery()))));
     }
 }
