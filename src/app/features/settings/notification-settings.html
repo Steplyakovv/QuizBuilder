@@ -1,0 +1,89 @@
+@if (settings(); as settings) {
+  <div class="notification-settings">
+    <a routerLink="/" class="back-link">← К списку опросников</a>
+
+    <h1>Настройки уведомлений</h1>
+    <p class="hint">
+      Email, на который придёт отчёт с ответами при каждом прохождении опросника.
+    </p>
+
+    <div class="settings-form">
+      <mat-form-field appearance="outline">
+        <mat-label>SMTP-хост</mat-label>
+        <input matInput [value]="settings.host ?? ''" (blur)="updateHost($any($event.target).value)" />
+        <mat-hint>Например, smtp.gmail.com</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="port-field">
+        <mat-label>Порт</mat-label>
+        <input
+          matInput
+          type="number"
+          [value]="settings.port"
+          (blur)="updatePort($any($event.target).value)"
+        />
+      </mat-form-field>
+
+      <mat-checkbox
+        [checked]="settings.useStartTls"
+        (change)="updateUseStartTls($event.checked)"
+      >
+        Использовать STARTTLS (выключите для портов с неявным SSL, например 465)
+      </mat-checkbox>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Имя пользователя</mat-label>
+        <input
+          matInput
+          [value]="settings.username ?? ''"
+          (blur)="updateUsername($any($event.target).value)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Пароль</mat-label>
+        <input
+          matInput
+          type="password"
+          (blur)="updatePassword($any($event.target).value)"
+        />
+        <mat-hint>{{
+          settings.hasPassword
+            ? 'Уже задан — оставьте пустым, чтобы не менять'
+            : 'Не задан'
+        }}</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>От кого (From)</mat-label>
+        <input matInput [value]="settings.from ?? ''" (blur)="updateFrom($any($event.target).value)" />
+        <mat-hint>Необязательно — по умолчанию используется имя пользователя</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Получатель отчётов</mat-label>
+        <input
+          matInput
+          [value]="settings.reportRecipientEmail ?? ''"
+          (blur)="updateReportRecipientEmail($any($event.target).value)"
+        />
+      </mat-form-field>
+    </div>
+
+    <div class="settings-actions">
+      <button mat-flat-button color="primary" [disabled]="saving()" (click)="save()">
+        Сохранить
+      </button>
+      <button mat-button [disabled]="sendingTestEmail()" (click)="sendTestEmail()">
+        Отправить тестовое письмо
+      </button>
+    </div>
+
+    @if (saveMessage()) {
+      <p class="save-message">{{ saveMessage() }}</p>
+    }
+    @if (testEmailResult(); as result) {
+      <p class="test-email-result" [class.error]="!result.success">{{ result.message }}</p>
+    }
+  </div>
+}

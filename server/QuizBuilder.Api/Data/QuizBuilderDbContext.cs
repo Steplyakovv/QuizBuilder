@@ -6,6 +6,7 @@ namespace QuizBuilder.Api.Data;
 public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options) : DbContext(options)
 {
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<NotificationSettings> NotificationSettings => Set<NotificationSettings>();
 
     public DbSet<Quiz> Quizzes => Set<Quiz>();
     public DbSet<QuizPage> QuizPages => Set<QuizPage>();

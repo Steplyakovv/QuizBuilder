@@ -10,6 +10,8 @@ import { ATTEMPT_REPOSITORY } from './core/repositories/attempt-repository';
 import { HttpAttemptRepository } from './core/repositories/http-attempt-repository';
 import { AUTH_REPOSITORY } from './core/repositories/auth-repository';
 import { HttpAuthRepository } from './core/repositories/http-auth-repository';
+import { SETTINGS_REPOSITORY } from './core/repositories/settings-repository';
+import { HttpSettingsRepository } from './core/repositories/http-settings-repository';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,5 +22,6 @@ export const appConfig: ApplicationConfig = {
     { provide: QUIZ_REPOSITORY, useClass: HttpQuizRepository },
     { provide: ATTEMPT_REPOSITORY, useClass: HttpAttemptRepository },
     { provide: AUTH_REPOSITORY, useClass: HttpAuthRepository },
+    { provide: SETTINGS_REPOSITORY, useClass: HttpSettingsRepository },
   ],
 };

@@ -1,12 +1,13 @@
 using MailKit;
 using MailKit.Security;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using MimeKit;
 using NSubstitute;
+using QuizBuilder.Api.Data;
 using QuizBuilder.Api.Dto;
 using QuizBuilder.Api.Features.Attempts;
 using QuizBuilder.Api.Models;
+using QuizBuilder.Api.Tests.Support;
 
 namespace QuizBuilder.Api.Tests.Features.Attempts;
 
@@ -23,41 +24,56 @@ public class AttemptReportEmailSenderTests
         QuestionReport = [],
     };
 
-    private static AttemptReportEmailSender CreateSender(
-        IMailTransport transport, SmtpOptions smtp, NotificationOptions notifications) =>
-        new(transport, Options.Create(smtp), Options.Create(notifications), NullLogger<AttemptReportEmailSender>.Instance);
+    private static async Task SeedSettingsAsync(QuizBuilderDbContext db, NotificationSettings settings)
+    {
+        db.NotificationSettings.Add(settings);
+        await db.SaveChangesAsync();
+    }
+
+    private static AttemptReportEmailSender CreateSender(IMailTransport transport, QuizBuilderDbContext db) =>
+        new(transport, db, NullLogger<AttemptReportEmailSender>.Instance);
 
     [Fact]
-    public async Task Does_not_connect_or_send_when_the_recipient_is_not_configured()
+    public async Task SendAsync_does_not_connect_or_send_when_the_recipient_is_not_configured()
     {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid(), SmtpHost = "smtp.example.com", ReportRecipientEmail = "" });
         var transport = Substitute.For<IMailTransport>();
-        var sender = CreateSender(transport, new SmtpOptions { Host = "smtp.example.com" }, new NotificationOptions { ReportRecipientEmail = "" });
 
-        await sender.SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
+        await CreateSender(transport, db).SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
 
         Assert.Empty(transport.ReceivedCalls());
     }
 
     [Fact]
-    public async Task Does_not_connect_or_send_when_the_smtp_host_is_not_configured()
+    public async Task SendAsync_does_not_connect_or_send_when_the_smtp_host_is_not_configured()
     {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid(), SmtpHost = "", ReportRecipientEmail = "admin@example.com" });
         var transport = Substitute.For<IMailTransport>();
-        var sender = CreateSender(transport, new SmtpOptions { Host = "" }, new NotificationOptions { ReportRecipientEmail = "admin@example.com" });
 
-        await sender.SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
+        await CreateSender(transport, db).SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
 
         Assert.Empty(transport.ReceivedCalls());
     }
 
     [Fact]
-    public async Task Connects_authenticates_and_sends_when_fully_configured()
+    public async Task SendAsync_connects_authenticates_and_sends_when_fully_configured()
     {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings
+        {
+            Id = Guid.NewGuid(),
+            SmtpHost = "smtp.example.com",
+            SmtpPort = 587,
+            SmtpUsername = "user",
+            SmtpPassword = "pass",
+            SmtpFrom = "quiz@example.com",
+            ReportRecipientEmail = "admin@example.com",
+        });
         var transport = Substitute.For<IMailTransport>();
-        var smtp = new SmtpOptions { Host = "smtp.example.com", Port = 587, Username = "user", Password = "pass", From = "quiz@example.com" };
-        var notifications = new NotificationOptions { ReportRecipientEmail = "admin@example.com" };
-        var sender = CreateSender(transport, smtp, notifications);
 
-        await sender.SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
+        await CreateSender(transport, db).SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
 
         await transport.Received(1).ConnectAsync("smtp.example.com", 587, SecureSocketOptions.StartTls, Arg.Any<CancellationToken>());
         await transport.Received(1).AuthenticateAsync("user", "pass", Arg.Any<CancellationToken>());
@@ -66,15 +82,56 @@ public class AttemptReportEmailSenderTests
     }
 
     [Fact]
-    public async Task Does_not_throw_when_the_transport_fails()
+    public async Task SendAsync_does_not_throw_when_the_transport_fails()
     {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid(), SmtpHost = "smtp.example.com", ReportRecipientEmail = "admin@example.com" });
         var transport = Substitute.For<IMailTransport>();
         transport.When(t => t.ConnectAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<SecureSocketOptions>(), Arg.Any<CancellationToken>()))
             .Throw(new InvalidOperationException("connection refused"));
-        var smtp = new SmtpOptions { Host = "smtp.example.com" };
-        var notifications = new NotificationOptions { ReportRecipientEmail = "admin@example.com" };
-        var sender = CreateSender(transport, smtp, notifications);
 
-        await sender.SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
+        await CreateSender(transport, db).SendAsync(CreateQuiz(), CreateAttempt(), CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task SendTestEmailAsync_reports_not_configured_instead_of_silently_no_opping()
+    {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid() });
+        var transport = Substitute.For<IMailTransport>();
+
+        var result = await CreateSender(transport, db).SendTestEmailAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.NotNull(result.Error);
+        Assert.Empty(transport.ReceivedCalls());
+    }
+
+    [Fact]
+    public async Task SendTestEmailAsync_returns_success_when_the_transport_succeeds()
+    {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid(), SmtpHost = "smtp.example.com", ReportRecipientEmail = "admin@example.com" });
+        var transport = Substitute.For<IMailTransport>();
+
+        var result = await CreateSender(transport, db).SendTestEmailAsync(CancellationToken.None);
+
+        Assert.True(result.Success);
+        Assert.Null(result.Error);
+    }
+
+    [Fact]
+    public async Task SendTestEmailAsync_surfaces_the_real_error_message_instead_of_swallowing_it()
+    {
+        await using var db = TestSupport.CreateDbContext();
+        await SeedSettingsAsync(db, new NotificationSettings { Id = Guid.NewGuid(), SmtpHost = "smtp.example.com", ReportRecipientEmail = "admin@example.com" });
+        var transport = Substitute.For<IMailTransport>();
+        transport.When(t => t.ConnectAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<SecureSocketOptions>(), Arg.Any<CancellationToken>()))
+            .Throw(new InvalidOperationException("535: 5.7.8 Incorrect authentication data"));
+
+        var result = await CreateSender(transport, db).SendTestEmailAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Equal("535: 5.7.8 Incorrect authentication data", result.Error);
     }
 }

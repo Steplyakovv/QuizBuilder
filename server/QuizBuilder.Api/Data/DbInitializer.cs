@@ -25,5 +25,11 @@ public static class DbInitializer
             });
             await db.SaveChangesAsync();
         }
+
+        if (!await db.NotificationSettings.AnyAsync())
+        {
+            db.NotificationSettings.Add(new NotificationSettings { Id = Guid.NewGuid() });
+            await db.SaveChangesAsync();
+        }
     }
 }

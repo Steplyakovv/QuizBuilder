@@ -1,0 +1,47 @@
+.notification-settings {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.back-link {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.port-field {
+  max-width: 160px;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.save-message {
+  color: var(--mat-sys-primary);
+  font-size: 0.875rem;
+}
+
+.test-email-result {
+  color: var(--mat-sys-primary);
+  font-size: 0.875rem;
+
+  &.error {
+    color: var(--mat-sys-error);
+  }
+}

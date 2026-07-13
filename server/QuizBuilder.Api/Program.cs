@@ -26,8 +26,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<IAttemptWebhookSender, AttemptWebhookSender>(client =>
     client.Timeout = TimeSpan.FromSeconds(5));
 
-builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
-builder.Services.Configure<NotificationOptions>(builder.Configuration.GetSection("Notifications"));
 builder.Services.AddTransient<IMailTransport>(_ => new SmtpClient { Timeout = 10_000 });
 builder.Services.AddScoped<IAttemptReportEmailSender, AttemptReportEmailSender>();
 
@@ -81,6 +79,7 @@ app.UseAuthorization();
 app.MapAuthEndpoints();
 app.MapQuizzesEndpoints();
 app.MapAttemptsEndpoints();
+app.MapSettingsEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapTestSupportEndpoints();

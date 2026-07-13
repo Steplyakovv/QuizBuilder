@@ -24,4 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/quiz-results/quiz-results').then((m) => m.QuizResults),
     canActivate: [adminGuard],
   },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/notification-settings').then((m) => m.NotificationSettingsPage),
+    canActivate: [adminGuard],
+  },
 ];

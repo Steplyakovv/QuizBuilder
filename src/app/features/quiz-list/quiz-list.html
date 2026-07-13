@@ -4,6 +4,9 @@
     <div class="auth-status">
       @if (isAdmin()) {
         <span class="role-indicator">Вы вошли как администратор</span>
+        <a mat-icon-button routerLink="/settings" title="Настройки уведомлений">
+          <mat-icon>settings</mat-icon>
+        </a>
         <button mat-button (click)="logout()">Выйти</button>
       } @else {
         <a mat-button routerLink="/login">Войти как администратор</a>
