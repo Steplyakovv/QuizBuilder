@@ -110,6 +110,17 @@
           <mat-hint>Необязательно</mat-hint>
         </mat-form-field>
       </div>
+
+      <mat-form-field appearance="outline" class="webhook-url-field">
+        <mat-label>URL вебхука</mat-label>
+        <input
+          matInput
+          type="url"
+          [value]="quiz.settings.webhookUrl ?? ''"
+          (blur)="updateWebhookUrl($any($event.target).value)"
+        />
+        <mat-hint>Опционально — POST-запрос при каждом прохождении</mat-hint>
+      </mat-form-field>
     </div>
 
     <h2>Страницы</h2>

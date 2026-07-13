@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QuizBuilder.Api.Data;
 using QuizBuilder.Api.Endpoints;
+using QuizBuilder.Api.Features.Attempts;
 using QuizBuilder.Api.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,8 @@ builder.Services.AddScoped<IQuizMapper, QuizMapper>();
 builder.Services.AddScoped<IAttemptMapper, AttemptMapper>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient<IAttemptWebhookSender, AttemptWebhookSender>(client =>
+    client.Timeout = TimeSpan.FromSeconds(5));
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {

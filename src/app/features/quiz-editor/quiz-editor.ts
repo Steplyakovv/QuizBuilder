@@ -169,6 +169,11 @@ export class QuizEditor {
     this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, accessPassword } }));
   }
 
+  updateWebhookUrl(rawValue: string): void {
+    const webhookUrl = rawValue.trim() || undefined;
+    this.updateDraft((quiz) => ({ ...quiz, settings: { ...quiz.settings, webhookUrl } }));
+  }
+
   /** Formats settings.expiresAt (ISO, UTC) as a `datetime-local` input value in local time. */
   expiresAtInputValue(quiz: Quiz): string {
     const iso = quiz.settings.expiresAt;

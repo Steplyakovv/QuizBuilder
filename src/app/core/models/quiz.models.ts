@@ -28,6 +28,8 @@ export interface QuizSettings {
   accessPassword?: string;
   /** ISO timestamp; the quiz can no longer be taken once this passes. */
   expiresAt?: string;
+  /** POST target notified with a JSON payload on each attempt submission (Zapier/Make/Slack-incoming-webhook compatible). */
+  webhookUrl?: string;
 }
 
 export type Question =

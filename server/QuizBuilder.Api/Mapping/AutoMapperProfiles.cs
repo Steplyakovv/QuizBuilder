@@ -50,6 +50,7 @@ public class QuizMappingProfile : Profile
             .ForMember(d => d.Published, opt => opt.MapFrom(s => s.Settings.Published))
             .ForMember(d => d.AccessPassword, opt => opt.MapFrom(s => s.Settings.AccessPassword))
             .ForMember(d => d.ExpiresAt, opt => opt.MapFrom(s => s.Settings.ExpiresAt))
+            .ForMember(d => d.WebhookUrl, opt => opt.MapFrom(s => s.Settings.WebhookUrl))
             .ForMember(d => d.Pages, opt => opt.Ignore())
             .ForMember(d => d.Questions, opt => opt.Ignore())
             .ForMember(d => d.Attempts, opt => opt.Ignore());

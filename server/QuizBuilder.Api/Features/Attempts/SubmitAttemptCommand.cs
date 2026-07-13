@@ -11,17 +11,22 @@ public enum SubmitAttemptResult { Ok, QuizNotFound }
 /// <summary>Public: a respondent submitting their completed attempt.</summary>
 public record SubmitAttemptCommand(Guid QuizId, QuizAttemptDto Attempt) : IRequest<SubmitAttemptResult>;
 
-public class SubmitAttemptCommandHandler(QuizBuilderDbContext db, IAttemptMapper mapper) : IRequestHandler<SubmitAttemptCommand, SubmitAttemptResult>
+public class SubmitAttemptCommandHandler(QuizBuilderDbContext db, IAttemptMapper mapper, IAttemptWebhookSender webhookSender)
+    : IRequestHandler<SubmitAttemptCommand, SubmitAttemptResult>
 {
     public async Task<SubmitAttemptResult> Handle(SubmitAttemptCommand request, CancellationToken cancellationToken)
     {
-        if (!await db.Quizzes.AnyAsync(q => q.Id == request.QuizId, cancellationToken))
+        var quiz = await db.Quizzes.FirstOrDefaultAsync(q => q.Id == request.QuizId, cancellationToken);
+        if (quiz is null)
         {
             return SubmitAttemptResult.QuizNotFound;
         }
 
-        db.QuizAttempts.Add(mapper.ToEntity(request.Attempt));
+        var attempt = mapper.ToEntity(request.Attempt);
+        db.QuizAttempts.Add(attempt);
         await db.SaveChangesAsync(cancellationToken);
+
+        await webhookSender.NotifyAsync(quiz, attempt, cancellationToken);
         return SubmitAttemptResult.Ok;
     }
 }

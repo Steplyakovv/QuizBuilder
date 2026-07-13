@@ -15,6 +15,8 @@ public class Quiz
     public bool? Published { get; set; }
     public string? AccessPassword { get; set; }
     public DateTimeOffset? ExpiresAt { get; set; }
+    /// <summary>POSTed a JSON payload whenever a respondent submits an attempt, if set.</summary>
+    public string? WebhookUrl { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }

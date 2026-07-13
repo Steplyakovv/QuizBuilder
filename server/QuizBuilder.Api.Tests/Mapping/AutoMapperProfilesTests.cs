@@ -32,6 +32,7 @@ public class AutoMapperProfilesTests
             Published = false,
             AccessPassword = "secret",
             ExpiresAt = expiresAt,
+            WebhookUrl = "https://example.com/hook",
             CreatedAt = DateTimeOffset.Parse("2026-01-01T00:00:00Z"),
             UpdatedAt = DateTimeOffset.Parse("2026-02-01T00:00:00Z"),
         };
@@ -50,6 +51,7 @@ public class AutoMapperProfilesTests
         Assert.False(dto.Settings.Published);
         Assert.Equal("secret", dto.Settings.AccessPassword);
         Assert.Equal(expiresAt.ToString("o"), dto.Settings.ExpiresAt);
+        Assert.Equal("https://example.com/hook", dto.Settings.WebhookUrl);
     }
 
     [Fact]
@@ -73,6 +75,7 @@ public class AutoMapperProfilesTests
                 Published = true,
                 AccessPassword = null,
                 ExpiresAt = expiresAt,
+                WebhookUrl = "https://example.com/hook",
             },
             CreatedAt = "2026-01-01T00:00:00.0000000+00:00",
             UpdatedAt = "2026-03-01T00:00:00.0000000+00:00",
@@ -89,6 +92,7 @@ public class AutoMapperProfilesTests
         Assert.True(existing.Published);
         Assert.Null(existing.AccessPassword);
         Assert.Equal(DateTimeOffset.Parse(expiresAt), existing.ExpiresAt);
+        Assert.Equal("https://example.com/hook", existing.WebhookUrl);
         // Pages/Questions are deliberately untouched by this map - QuizMapper.BuildChildren
         // handles those separately.
         Assert.Empty(existing.Pages);

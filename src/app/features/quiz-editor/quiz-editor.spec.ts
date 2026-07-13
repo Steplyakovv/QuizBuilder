@@ -315,5 +315,13 @@ describe('QuizEditor', () => {
     fixture.componentInstance.updateExpiresAt('');
     await fixture.whenStable();
     expect(fixture.componentInstance.draft()!.settings.expiresAt).toBeUndefined();
+
+    fixture.componentInstance.updateWebhookUrl('  https://example.com/hook  ');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.webhookUrl).toBe('https://example.com/hook');
+
+    fixture.componentInstance.updateWebhookUrl('  ');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()!.settings.webhookUrl).toBeUndefined();
   });
 });

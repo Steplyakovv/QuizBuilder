@@ -15,6 +15,7 @@ public record QuizSettingsDto
     public bool? Published { get; init; }
     public string? AccessPassword { get; init; }
     public string? ExpiresAt { get; init; }
+    public string? WebhookUrl { get; init; }
 }
 
 public record QuizDto
