@@ -24,7 +24,7 @@ import {
   quizRequiresPassword,
 } from '../../core/models/quiz-access';
 import { paginateQuestions } from '../../core/models/quiz-pages';
-import { AttemptScore, scoreAttempt } from '../../core/models/quiz-scoring';
+import { AttemptScore, buildAttemptReport, scoreAttempt } from '../../core/models/quiz-scoring';
 import { Question, QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
@@ -410,6 +410,7 @@ export class QuizRunner {
         responses,
         score: score?.correct,
         quizSnapshot: quiz,
+        questionReport: buildAttemptReport(quiz, responses),
       };
       await this.attemptRepository.save(attempt);
       this.result.set(score);

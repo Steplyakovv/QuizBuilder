@@ -1,5 +1,5 @@
 import { Quiz } from './quiz.models';
-import { formatCorrectAnswer, scoreAttempt } from './quiz-scoring';
+import { buildAttemptReport, formatCorrectAnswer, scoreAttempt } from './quiz-scoring';
 
 function baseQuiz(isGraded: boolean): Quiz {
   return {
@@ -561,5 +561,107 @@ describe('formatCorrectAnswer', () => {
         correctRegionId: 'r2',
       }),
     ).toBe('Область №2');
+  });
+});
+
+describe('buildAttemptReport', () => {
+  it('marks each entry correct/incorrect and always includes the correct answer for a graded quiz', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push(
+      {
+        id: 'q1',
+        type: 'single-choice',
+        prompt: 'Correct one?',
+        required: true,
+        options: [
+          { id: 'o1', label: 'Right' },
+          { id: 'o2', label: 'Wrong' },
+        ],
+        correctOptionId: 'o1',
+      },
+      {
+        id: 'q2',
+        type: 'single-choice',
+        prompt: 'Wrong one?',
+        required: true,
+        options: [
+          { id: 'o3', label: 'Right' },
+          { id: 'o4', label: 'Wrong' },
+        ],
+        correctOptionId: 'o3',
+      },
+    );
+
+    const report = buildAttemptReport(quiz, [
+      { questionId: 'q1', selectedOptionIds: ['o1'] },
+      { questionId: 'q2', selectedOptionIds: ['o4'] },
+    ]);
+
+    expect(report).toEqual([
+      {
+        questionId: 'q1',
+        prompt: 'Correct one?',
+        respondentAnswer: 'Right',
+        isCorrect: true,
+        correctAnswer: 'Right',
+      },
+      {
+        questionId: 'q2',
+        prompt: 'Wrong one?',
+        respondentAnswer: 'Wrong',
+        isCorrect: false,
+        correctAnswer: 'Right',
+      },
+    ]);
+  });
+
+  it('omits correctness and the correct answer for an ungraded quiz', () => {
+    const quiz = baseQuiz(false);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'text',
+      prompt: 'Tell us about yourself',
+      required: false,
+      multiline: false,
+    });
+
+    const report = buildAttemptReport(quiz, [{ questionId: 'q1', text: 'Hello' }]);
+
+    expect(report).toEqual([
+      {
+        questionId: 'q1',
+        prompt: 'Tell us about yourself',
+        respondentAnswer: 'Hello',
+        isCorrect: undefined,
+        correctAnswer: undefined,
+      },
+    ]);
+  });
+
+  it('excludes a conditionally hidden question', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push(
+      {
+        id: 'q1',
+        type: 'single-choice',
+        prompt: 'p1',
+        required: false,
+        options: [{ id: 'o1', label: 'a' }],
+        correctOptionId: 'o1',
+      },
+      {
+        id: 'q2',
+        type: 'single-choice',
+        prompt: 'p2',
+        required: false,
+        options: [{ id: 'o2', label: 'a' }],
+        correctOptionId: 'o2',
+        condition: { questionId: 'q1' },
+      },
+    );
+
+    const report = buildAttemptReport(quiz, []);
+
+    expect(report.map((entry) => entry.questionId)).toEqual(['q1']);
   });
 });

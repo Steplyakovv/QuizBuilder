@@ -216,6 +216,18 @@ export interface QuizAttempt {
   score?: number;
   /** Quiz as it was when this attempt was submitted, so later edits don't rewrite old results. */
   quizSnapshot?: Quiz;
+  /** Per-question breakdown for the submit-time report email; not persisted, computed on submit. */
+  questionReport?: QuestionReportEntry[];
+}
+
+export interface QuestionReportEntry {
+  questionId: string;
+  prompt: string;
+  respondentAnswer: string;
+  /** Undefined when the quiz isn't graded or the question has no correct answer. */
+  isCorrect?: boolean;
+  /** Shown for every gradable question, not just wrong ones. */
+  correctAnswer?: string;
 }
 
 export interface QuestionResponse {

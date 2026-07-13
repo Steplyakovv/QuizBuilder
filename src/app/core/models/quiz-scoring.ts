@@ -1,6 +1,7 @@
 import { splitTemplate } from './fill-in-the-blank';
 import { isQuestionVisible } from './question-condition';
-import { Question, QuestionResponse, Quiz } from './quiz.models';
+import { formatResponse } from './quiz-attempt';
+import { Question, QuestionReportEntry, QuestionResponse, Quiz } from './quiz.models';
 
 export interface AttemptScore {
   correct: number;
@@ -151,4 +152,27 @@ export function scoreAttempt(quiz: Quiz, responses: QuestionResponse[]): Attempt
     isCorrect(question, responseByQuestionId.get(question.id)),
   ).length;
   return { correct, total: gradableQuestions.length };
+}
+
+/**
+ * Per-question breakdown for the submit-time report email: respondent's answer, correctness
+ * and the correct answer for every gradable question (not just wrong ones), skip-logic-hidden
+ * questions excluded - same visibility/grading rules as scoreAttempt/quiz-results.ts.
+ */
+export function buildAttemptReport(quiz: Quiz, responses: QuestionResponse[]): QuestionReportEntry[] {
+  const responseByQuestionId = new Map(responses.map((response) => [response.questionId, response]));
+  const responseRecord = Object.fromEntries(responseByQuestionId);
+  return quiz.questions
+    .filter((question) => isQuestionVisible(question, quiz.questions, responseRecord))
+    .map((question) => {
+      const response = responseByQuestionId.get(question.id);
+      const graded = quiz.settings.isGraded && hasCorrectAnswer(question);
+      return {
+        questionId: question.id,
+        prompt: question.prompt,
+        respondentAnswer: formatResponse(question, response),
+        isCorrect: graded ? isCorrect(question, response) : undefined,
+        correctAnswer: graded ? formatCorrectAnswer(question) : undefined,
+      };
+    });
 }

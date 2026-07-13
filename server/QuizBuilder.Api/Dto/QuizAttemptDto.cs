@@ -17,6 +17,15 @@ public record QuestionResponseDto
     public ResponseFileDto? File { get; init; }
 }
 
+public record QuestionReportEntryDto
+{
+    public required string QuestionId { get; init; }
+    public required string Prompt { get; init; }
+    public required string RespondentAnswer { get; init; }
+    public bool? IsCorrect { get; init; }
+    public string? CorrectAnswer { get; init; }
+}
+
 public record QuizAttemptDto
 {
     public required string Id { get; init; }
@@ -29,4 +38,10 @@ public record QuizAttemptDto
     public int? Score { get; init; }
     /// <summary>Quiz as the respondent saw it, captured client-side at submit time.</summary>
     public QuizDto? QuizSnapshot { get; init; }
+    /// <summary>
+    /// Per-question breakdown (respondent's answer, correctness, correct answer), computed
+    /// client-side at submit time using the same grading logic as the results screen. Not
+    /// persisted - only used to build the report email (AttemptReportEmailSender).
+    /// </summary>
+    public List<QuestionReportEntryDto>? QuestionReport { get; init; }
 }

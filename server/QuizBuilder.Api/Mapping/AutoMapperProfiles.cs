@@ -63,7 +63,8 @@ public class AttemptMappingProfile : Profile
     {
         CreateMap<QuizAttempt, QuizAttemptDto>()
             .ForMember(d => d.Responses, opt => opt.Ignore())
-            .ForMember(d => d.QuizSnapshot, opt => opt.Ignore());
+            .ForMember(d => d.QuizSnapshot, opt => opt.Ignore())
+            .ForMember(d => d.QuestionReport, opt => opt.Ignore());
 
         CreateMap<QuizAttemptDto, QuizAttempt>()
             .ForMember(d => d.SnapshotIsGraded, opt => opt.Ignore())

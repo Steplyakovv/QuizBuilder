@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MailKit;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QuizBuilder.Api.Data;
@@ -23,6 +25,11 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Pr
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<IAttemptWebhookSender, AttemptWebhookSender>(client =>
     client.Timeout = TimeSpan.FromSeconds(5));
+
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<NotificationOptions>(builder.Configuration.GetSection("Notifications"));
+builder.Services.AddTransient<IMailTransport>(_ => new SmtpClient { Timeout = 10_000 });
+builder.Services.AddScoped<IAttemptReportEmailSender, AttemptReportEmailSender>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
