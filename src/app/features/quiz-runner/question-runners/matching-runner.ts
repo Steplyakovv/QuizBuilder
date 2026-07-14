@@ -37,6 +37,8 @@ function rowCenterPercent(index: number, total: number): number {
             class="matching-node"
             [class.matching-node--pending]="isPending(pair.id, 'left')"
             [class.matching-node--matched]="isMatched(pair.id, 'left')"
+            [attr.aria-pressed]="isPending(pair.id, 'left') || isMatched(pair.id, 'left')"
+            [attr.aria-label]="pair.left + '. ' + matchStatusLabel(pair.id, 'left')"
             (click)="onNodeClick(pair.id, 'left')"
           >
             {{ pair.left }}
@@ -72,6 +74,8 @@ function rowCenterPercent(index: number, total: number): number {
             class="matching-node"
             [class.matching-node--pending]="isPending(option.id, 'right')"
             [class.matching-node--matched]="isMatched(option.id, 'right')"
+            [attr.aria-pressed]="isPending(option.id, 'right') || isMatched(option.id, 'right')"
+            [attr.aria-label]="option.right + '. ' + matchStatusLabel(option.id, 'right')"
             (click)="onNodeClick(option.id, 'right')"
           >
             {{ option.right }}
@@ -195,6 +199,24 @@ export class MatchingRunner {
   isMatched(id: string, side: MatchingSide): boolean {
     const matches = this.matches();
     return side === 'left' ? id in matches : Object.values(matches).includes(id);
+  }
+
+  matchStatusLabel(id: string, side: MatchingSide): string {
+    if (this.isPending(id, side)) {
+      return 'выбрано, ожидает пары';
+    }
+    if (side === 'left') {
+      const rightId = this.matches()[id];
+      const rightLabel = rightId
+        ? this.shuffledRight().find((option) => option.id === rightId)?.right
+        : undefined;
+      return rightLabel ? `сопоставлено с «${rightLabel}»` : 'не сопоставлено';
+    }
+    const leftId = Object.entries(this.matches()).find(([, value]) => value === id)?.[0];
+    const leftLabel = leftId
+      ? this.question().pairs.find((pair) => pair.id === leftId)?.left
+      : undefined;
+    return leftLabel ? `сопоставлено с «${leftLabel}»` : 'не сопоставлено';
   }
 
   onNodeClick(id: string, side: MatchingSide): void {

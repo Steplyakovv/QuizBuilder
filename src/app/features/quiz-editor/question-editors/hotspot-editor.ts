@@ -64,12 +64,16 @@ interface DragState {
           @for (region of question().regions; track region.id; let i = $index) {
             <div
               class="hotspot-region"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="regionLabel(region, i)"
               [class.hotspot-region--correct]="region.id === question().correctRegionId"
               [style.left.%]="region.x"
               [style.top.%]="region.y"
               [style.width.%]="region.width"
               [style.height.%]="region.height"
               (mousedown)="startMove($event, region)"
+              (keydown)="onRegionKeydown($event, region)"
             >
               {{ i + 1 }}
               @for (handle of handles; track handle) {
@@ -197,6 +201,11 @@ interface DragState {
       font-weight: 600;
       box-sizing: border-box;
       cursor: move;
+
+      &:focus-visible {
+        outline: 3px solid var(--mat-sys-primary);
+        outline-offset: 2px;
+      }
     }
 
     .hotspot-region--correct {
@@ -346,6 +355,60 @@ export class HotspotEditor {
     window.removeEventListener('mousemove', this.onDragMove);
     window.removeEventListener('mouseup', this.endDrag);
   };
+
+  regionLabel(region: HotspotRegion, index: number): string {
+    return (
+      `Область ${index + 1}: ${Math.round(region.width)}% × ${Math.round(region.height)}%, ` +
+      `слева ${Math.round(region.x)}%, сверху ${Math.round(region.y)}%. ` +
+      `Стрелки — переместить, Shift + стрелки — изменить размер.`
+    );
+  }
+
+  onRegionKeydown(event: KeyboardEvent, region: HotspotRegion): void {
+    const step = 1;
+    let updated: HotspotRegion | null = null;
+    if (event.shiftKey) {
+      switch (event.key) {
+        case 'ArrowRight':
+          updated = resizeRegion(region, 'e', step, 0);
+          break;
+        case 'ArrowLeft':
+          updated = resizeRegion(region, 'e', -step, 0);
+          break;
+        case 'ArrowDown':
+          updated = resizeRegion(region, 's', 0, step);
+          break;
+        case 'ArrowUp':
+          updated = resizeRegion(region, 's', 0, -step);
+          break;
+      }
+    } else {
+      switch (event.key) {
+        case 'ArrowRight':
+          updated = moveRegion(region, step, 0);
+          break;
+        case 'ArrowLeft':
+          updated = moveRegion(region, -step, 0);
+          break;
+        case 'ArrowDown':
+          updated = moveRegion(region, 0, step);
+          break;
+        case 'ArrowUp':
+          updated = moveRegion(region, 0, -step);
+          break;
+      }
+    }
+    if (!updated) {
+      return;
+    }
+    event.preventDefault();
+    const finalRegion = updated;
+    const question = this.question();
+    this.questionChange.emit({
+      ...question,
+      regions: question.regions.map((r) => (r.id === finalRegion.id ? finalRegion : r)),
+    });
+  }
 
   updateImageUrl(imageUrl: string): void {
     this.questionChange.emit({ ...this.question(), imageUrl });

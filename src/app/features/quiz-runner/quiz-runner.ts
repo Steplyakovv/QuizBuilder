@@ -2,13 +2,18 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
+  Injector,
+  afterNextRender,
   effect,
   inject,
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -79,6 +84,9 @@ import { WordChoiceRunner } from './question-runners/word-choice-runner';
 export class QuizRunner {
   private readonly store = inject(QuizStore);
   private readonly attemptRepository = inject(ATTEMPT_REPOSITORY);
+  private readonly liveAnnouncer = inject(LiveAnnouncer);
+  private readonly injector = inject(Injector);
+  private readonly resultRegion = viewChild<ElementRef<HTMLElement>>('resultRegion');
   private readonly attemptId = createId();
   private readonly startedAt = new Date().toISOString();
   private readonly startedAtMs = Date.now();
@@ -266,6 +274,21 @@ export class QuizRunner {
     }
   }
 
+  /**
+   * Announces the outcome and moves focus to the confirmation region, so a screen-reader
+   * user gets feedback that the submission succeeded instead of silence. Deferred via
+   * afterNextRender because the region only enters the DOM once `submitted` flips the @if.
+   */
+  private announceAndFocusResult(message: string): void {
+    afterNextRender(
+      () => {
+        void this.liveAnnouncer.announce(message, 'polite');
+        this.resultRegion()?.nativeElement.focus();
+      },
+      { injector: this.injector },
+    );
+  }
+
   selectedOptionIds(questionId: string): string[] {
     return this.responses()[questionId]?.selectedOptionIds ?? [];
   }
@@ -393,6 +416,7 @@ export class QuizRunner {
     if (this.isPreview()) {
       this.result.set(scoreAttempt(quiz, responses));
       this.submitted.set(true);
+      this.announceAndFocusResult('Это предпросмотр — ответы не сохранены.');
       return;
     }
 
@@ -415,6 +439,7 @@ export class QuizRunner {
       await this.attemptRepository.save(attempt);
       this.result.set(score);
       this.submitted.set(true);
+      this.announceAndFocusResult('Спасибо! Ваши ответы сохранены.');
     } catch (error) {
       this.saveError.set(
         error instanceof DOMException && error.name === 'QuotaExceededError'

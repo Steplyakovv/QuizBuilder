@@ -174,7 +174,13 @@
       @for (question of quiz.questions; track question.id) {
         <div cdkDrag class="question-item">
           <div class="question-header">
-            <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+            <span
+              cdkDragHandle
+              tabindex="0"
+              role="button"
+              class="drag-handle"
+              aria-label="Перетащить для изменения порядка"
+            >
               <mat-icon>drag_indicator</mat-icon>
             </span>
             <mat-form-field appearance="outline" class="question-order-field">

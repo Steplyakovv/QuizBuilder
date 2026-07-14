@@ -1,4 +1,5 @@
 import { expect, test, type Page, type APIRequestContext } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const API_BASE_URL = 'http://localhost:5131/api';
 
@@ -12,6 +13,19 @@ async function loginAsAdmin(page: Page): Promise<void> {
   await page.getByLabel('Логин').fill('admin');
   await page.getByLabel('Пароль').fill('admin');
   await page.getByRole('button', { name: 'Войти' }).click();
+}
+
+/**
+ * Fails only on serious/critical violations (contrast, missing labels, invalid ARIA, etc.) -
+ * not minor/moderate ones, which are often stylistic and would make this check too noisy to
+ * be worth keeping green.
+ */
+async function expectNoSeriousA11yViolations(page: Page): Promise<void> {
+  const results = await new AxeBuilder({ page }).analyze();
+  const serious = results.violations.filter(
+    (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+  );
+  expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 }
 
 test.describe('as admin', () => {
@@ -309,5 +323,95 @@ test.describe('authentication', () => {
 
     await page.goto(editHref!);
     await expect(page).toHaveURL('/');
+  });
+});
+
+test.describe('accessibility', () => {
+  test.beforeEach(async ({ request }) => {
+    await resetBackend(request);
+  });
+
+  test('login page has no serious a11y violations', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Войти как администратор' }).click();
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test('quiz list has no serious a11y violations, for admin and respondent', async ({ page }) => {
+    await page.goto('/');
+    await loginAsAdmin(page);
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+    await expectNoSeriousA11yViolations(page);
+
+    await page.getByRole('button', { name: 'Выйти' }).click();
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test('quiz editor has no serious a11y violations', async ({ page }) => {
+    await page.goto('/');
+    await loginAsAdmin(page);
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+    await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+    await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test('quiz runner has no serious a11y violations, before and after submitting', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await loginAsAdmin(page);
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+    await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+    await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+    const questionItem = page.locator('.question-item').first();
+    await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+    await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+    const optionInputs = questionItem.locator('.option-row input');
+    await optionInputs.nth(0).fill('Латте');
+    await optionInputs.nth(0).blur();
+    await optionInputs.nth(1).fill('Эспрессо');
+    await optionInputs.nth(1).blur();
+    await page.getByRole('button', { name: 'Сохранить' }).click();
+    await page.getByRole('link', { name: '← К списку опросников' }).click();
+    await page.getByRole('link', { name: 'Пройти опросник' }).click();
+    await expectNoSeriousA11yViolations(page);
+
+    await page.getByRole('radio', { name: 'Латте' }).click();
+    await page.getByRole('button', { name: 'Отправить ответы' }).click();
+    await expect(page.getByText('Спасибо! Ваши ответы сохранены.')).toBeVisible();
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test('quiz results page has no serious a11y violations', async ({ page }) => {
+    await page.goto('/');
+    await loginAsAdmin(page);
+    await page.getByLabel('Название нового опросника').fill('Опрос про кофе');
+    await page.getByRole('button', { name: 'Создать' }).click();
+    await page.getByRole('link', { name: 'Опрос про кофе' }).click();
+    await page.getByRole('button', { name: 'Добавить вопрос' }).click();
+    const questionItem = page.locator('.question-item').first();
+    await questionItem.getByRole('button', { name: 'Добавить вариант' }).click();
+    const optionInputs = questionItem.locator('.option-row input');
+    await optionInputs.nth(0).fill('Латте');
+    await optionInputs.nth(0).blur();
+    await page.getByRole('button', { name: 'Сохранить' }).click();
+    await page.getByRole('link', { name: '← К списку опросников' }).click();
+    await page.getByRole('link', { name: 'Пройти опросник' }).click();
+    await page.getByRole('radio', { name: 'Латте' }).click();
+    await page.getByRole('button', { name: 'Отправить ответы' }).click();
+    await page.getByRole('link', { name: '← К списку опросников' }).click();
+    await page.getByRole('link', { name: 'Результаты' }).click();
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test('notification settings page has no serious a11y violations', async ({ page }) => {
+    await page.goto('/');
+    await loginAsAdmin(page);
+    await page.getByRole('link', { name: 'Настройки уведомлений' }).click();
+    await expectNoSeriousA11yViolations(page);
   });
 });

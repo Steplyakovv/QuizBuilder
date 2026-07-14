@@ -12,7 +12,7 @@
     }
 
     @if (submitted()) {
-      <div class="quiz-runner-result">
+      <div class="quiz-runner-result" #resultRegion tabindex="-1">
         @if (isPreview()) {
           <p>Это предпросмотр — ответы не сохранены.</p>
         } @else {

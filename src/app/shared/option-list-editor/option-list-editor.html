@@ -7,7 +7,13 @@
   @for (option of options(); track option.id) {
     <div cdkDrag [cdkDragDisabled]="!reorderable()" class="option-row">
       @if (reorderable()) {
-        <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+        <span
+          cdkDragHandle
+          tabindex="0"
+          role="button"
+          class="drag-handle"
+          aria-label="Перетащить для изменения порядка"
+        >
           <mat-icon>drag_indicator</mat-icon>
         </span>
       }

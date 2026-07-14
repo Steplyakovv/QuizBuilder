@@ -11,7 +11,13 @@ import { RankingQuestion } from '../../../core/models/quiz.models';
     <div cdkDropList class="ranking-runner" (cdkDropListDropped)="drop($event)">
       @for (id of order(); track id) {
         <div cdkDrag class="ranking-item">
-          <span cdkDragHandle class="drag-handle" aria-label="Перетащить для изменения порядка">
+          <span
+            cdkDragHandle
+            tabindex="0"
+            role="button"
+            class="drag-handle"
+            aria-label="Перетащить для изменения порядка"
+          >
             <mat-icon>drag_indicator</mat-icon>
           </span>
           {{ labelFor(id) }}

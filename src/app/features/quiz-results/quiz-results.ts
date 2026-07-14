@@ -164,6 +164,13 @@ export class QuizResults {
     }
   }
 
+  ariaSortFor(field: SortField): 'ascending' | 'descending' | 'none' {
+    if (this.sortField() !== field) {
+      return 'none';
+    }
+    return this.sortDirection() === 'asc' ? 'ascending' : 'descending';
+  }
+
   exportCsv(): void {
     const quiz = this.quiz();
     if (!quiz) return;

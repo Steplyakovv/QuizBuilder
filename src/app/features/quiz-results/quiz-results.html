@@ -12,7 +12,14 @@
           @for (stat of stats(); track stat.questionId) {
             <div class="stat-row">
               <div class="stat-question">{{ questionById(stat.questionId)?.prompt }}</div>
-              <div class="stat-bar">
+              <div
+                class="stat-bar"
+                role="progressbar"
+                [attr.aria-valuenow]="percentCorrect(stat)"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-label]="stat.correct + ' из ' + stat.total + ' верно'"
+              >
                 <div class="stat-bar-correct" [style.width.%]="percentCorrect(stat)"></div>
               </div>
               <div class="stat-numbers">{{ stat.correct }} из {{ stat.total }} верно</div>
@@ -47,22 +54,26 @@
             <thead>
               <tr>
                 <th>Респондент</th>
-                <th class="sortable" (click)="toggleSort('date')">
-                  Завершено
-                  @if (sortField() === 'date') {
-                    <mat-icon class="sort-icon">{{
-                      sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward'
-                    }}</mat-icon>
-                  }
-                </th>
-                @if (quiz.settings.isGraded) {
-                  <th class="sortable" (click)="toggleSort('score')">
-                    Баллы
-                    @if (sortField() === 'score') {
+                <th class="sortable" [attr.aria-sort]="ariaSortFor('date')">
+                  <button type="button" class="sort-button" (click)="toggleSort('date')">
+                    Завершено
+                    @if (sortField() === 'date') {
                       <mat-icon class="sort-icon">{{
                         sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward'
                       }}</mat-icon>
                     }
+                  </button>
+                </th>
+                @if (quiz.settings.isGraded) {
+                  <th class="sortable" [attr.aria-sort]="ariaSortFor('score')">
+                    <button type="button" class="sort-button" (click)="toggleSort('score')">
+                      Баллы
+                      @if (sortField() === 'score') {
+                        <mat-icon class="sort-icon">{{
+                          sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward'
+                        }}</mat-icon>
+                      }
+                    </button>
                   </th>
                 }
                 <th></th>
