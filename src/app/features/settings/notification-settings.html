@@ -3,14 +3,16 @@
     <a routerLink="/" class="back-link">← К списку опросников</a>
 
     <h1>Настройки уведомлений</h1>
-    <p class="hint">
-      Email, на который придёт отчёт с ответами при каждом прохождении опросника.
-    </p>
+    <p class="hint">Email, на который придёт отчёт с ответами при каждом прохождении опросника.</p>
 
     <div class="settings-form">
       <mat-form-field appearance="outline">
         <mat-label>SMTP-хост</mat-label>
-        <input matInput [value]="settings.host ?? ''" (blur)="updateHost($any($event.target).value)" />
+        <input
+          matInput
+          [value]="settings.host ?? ''"
+          (blur)="updateHost($any($event.target).value)"
+        />
         <mat-hint>Например, smtp.gmail.com</mat-hint>
       </mat-form-field>
 
@@ -24,10 +26,7 @@
         />
       </mat-form-field>
 
-      <mat-checkbox
-        [checked]="settings.useStartTls"
-        (change)="updateUseStartTls($event.checked)"
-      >
+      <mat-checkbox [checked]="settings.useStartTls" (change)="updateUseStartTls($event.checked)">
         Использовать STARTTLS (выключите для портов с неявным SSL, например 465)
       </mat-checkbox>
 
@@ -42,21 +41,19 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Пароль</mat-label>
-        <input
-          matInput
-          type="password"
-          (blur)="updatePassword($any($event.target).value)"
-        />
+        <input matInput type="password" (blur)="updatePassword($any($event.target).value)" />
         <mat-hint>{{
-          settings.hasPassword
-            ? 'Уже задан — оставьте пустым, чтобы не менять'
-            : 'Не задан'
+          settings.hasPassword ? 'Уже задан — оставьте пустым, чтобы не менять' : 'Не задан'
         }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>От кого (From)</mat-label>
-        <input matInput [value]="settings.from ?? ''" (blur)="updateFrom($any($event.target).value)" />
+        <input
+          matInput
+          [value]="settings.from ?? ''"
+          (blur)="updateFrom($any($event.target).value)"
+        />
         <mat-hint>Необязательно — по умолчанию используется имя пользователя</mat-hint>
       </mat-form-field>
 

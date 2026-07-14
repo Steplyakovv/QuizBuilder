@@ -159,8 +159,13 @@ export function scoreAttempt(quiz: Quiz, responses: QuestionResponse[]): Attempt
  * and the correct answer for every gradable question (not just wrong ones), skip-logic-hidden
  * questions excluded - same visibility/grading rules as scoreAttempt/quiz-results.ts.
  */
-export function buildAttemptReport(quiz: Quiz, responses: QuestionResponse[]): QuestionReportEntry[] {
-  const responseByQuestionId = new Map(responses.map((response) => [response.questionId, response]));
+export function buildAttemptReport(
+  quiz: Quiz,
+  responses: QuestionResponse[],
+): QuestionReportEntry[] {
+  const responseByQuestionId = new Map(
+    responses.map((response) => [response.questionId, response]),
+  );
   const responseRecord = Object.fromEntries(responseByQuestionId);
   return quiz.questions
     .filter((question) => isQuestionVisible(question, quiz.questions, responseRecord))

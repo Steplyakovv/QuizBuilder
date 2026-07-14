@@ -92,7 +92,9 @@ export class NotificationSettingsPage {
       const result = await this.repository.sendTestEmail();
       this.testEmailResult.set({
         success: result.success,
-        message: result.success ? 'Тестовое письмо отправлено.' : (result.error ?? 'Не удалось отправить письмо.'),
+        message: result.success
+          ? 'Тестовое письмо отправлено.'
+          : (result.error ?? 'Не удалось отправить письмо.'),
       });
     } finally {
       this.sendingTestEmail.set(false);

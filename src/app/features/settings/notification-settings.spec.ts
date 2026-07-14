@@ -69,7 +69,10 @@ describe('NotificationSettingsPage', () => {
 
   it('shows the real error message when the test email fails', async () => {
     const repository = new FakeSettingsRepository();
-    repository.testEmailResult = { success: false, error: '535: 5.7.8 Incorrect authentication data' };
+    repository.testEmailResult = {
+      success: false,
+      error: '535: 5.7.8 Incorrect authentication data',
+    };
     const { fixture } = await createComponent(repository);
 
     await fixture.componentInstance.sendTestEmail();
