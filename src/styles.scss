@@ -10,6 +10,7 @@ html {
   @include mat.theme(
     (
       color: (
+        theme-type: light,
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
@@ -17,13 +18,32 @@ html {
       density: 0,
     )
   );
+
+  // Overridden at runtime by ThemeStore (src/app/core/state/theme-store.ts),
+  // which sets this attribute on <html> and persists the choice.
+  &[data-theme='dark'] {
+    @include mat.theme(
+      (
+        color: (
+          theme-type: dark,
+          primary: mat.$azure-palette,
+          tertiary: mat.$blue-palette,
+        ),
+        typography: Roboto,
+        density: 0,
+      )
+    );
+  }
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
+  // Kept in sync with the [data-theme] attribute on <html> by ThemeStore, so
+  // native form controls/scrollbars render with the matching color scheme.
   color-scheme: light;
+
+  html[data-theme='dark'] & {
+    color-scheme: dark;
+  }
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
