@@ -56,3 +56,4 @@ server/**/bin/
 server/**/obj/
 .vs/
 server/backups/
+server/QuizBuilder.Api/Logs/
