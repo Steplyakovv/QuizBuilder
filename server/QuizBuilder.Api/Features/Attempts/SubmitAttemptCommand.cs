@@ -14,8 +14,7 @@ public record SubmitAttemptCommand(Guid QuizId, QuizAttemptDto Attempt) : IReque
 public class SubmitAttemptCommandHandler(
     QuizBuilderDbContext db,
     IAttemptMapper mapper,
-    IAttemptWebhookSender webhookSender,
-    IAttemptReportEmailSender reportEmailSender) : IRequestHandler<SubmitAttemptCommand, SubmitAttemptResult>
+    IAttemptNotificationDispatcher notificationDispatcher) : IRequestHandler<SubmitAttemptCommand, SubmitAttemptResult>
 {
     public async Task<SubmitAttemptResult> Handle(SubmitAttemptCommand request, CancellationToken cancellationToken)
     {
@@ -29,9 +28,7 @@ public class SubmitAttemptCommandHandler(
         db.QuizAttempts.Add(attempt);
         await db.SaveChangesAsync(cancellationToken);
 
-        await Task.WhenAll(
-            webhookSender.NotifyAsync(quiz, attempt, cancellationToken),
-            reportEmailSender.SendAsync(quiz, request.Attempt, cancellationToken));
+        notificationDispatcher.Dispatch(quiz, attempt, request.Attempt);
         return SubmitAttemptResult.Ok;
     }
 }

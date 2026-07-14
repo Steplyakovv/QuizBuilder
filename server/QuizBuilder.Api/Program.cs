@@ -28,6 +28,7 @@ builder.Services.AddHttpClient<IAttemptWebhookSender, AttemptWebhookSender>(clie
 
 builder.Services.AddTransient<IMailTransport>(_ => new SmtpClient { Timeout = 10_000 });
 builder.Services.AddScoped<IAttemptReportEmailSender, AttemptReportEmailSender>();
+builder.Services.AddScoped<IAttemptNotificationDispatcher, BackgroundAttemptNotificationDispatcher>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
