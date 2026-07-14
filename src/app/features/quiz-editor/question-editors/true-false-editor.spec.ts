@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { TrueFalseQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { TrueFalseEditor } from './true-false-editor';
 
 describe('TrueFalseEditor', () => {
   async function createComponent(question: TrueFalseQuestion, graded = false) {
-    await TestBed.configureTestingModule({ imports: [TrueFalseEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [TrueFalseEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(TrueFalseEditor);
     fixture.componentRef.setInput('question', question);
     fixture.componentRef.setInput('graded', graded);

@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import {
   addPair,
   removePair,
@@ -38,6 +39,11 @@ import { MatchingQuestion } from '../../../core/models/quiz.models';
 export class MatchingEditor {
   readonly question = input.required<MatchingQuestion>();
   readonly questionChange = output<MatchingQuestion>();
+
+  protected readonly leftPlaceholder = translateSignal('matchingEditor.leftPlaceholder');
+  protected readonly rightPlaceholder = translateSignal('matchingEditor.rightPlaceholder');
+  protected readonly removePairLabel = translateSignal('matchingEditor.removePair');
+  protected readonly addPairLabel = translateSignal('matchingEditor.addPair');
 
   addPair(): void {
     this.questionChange.emit({ ...this.question(), pairs: addPair(this.question().pairs) });

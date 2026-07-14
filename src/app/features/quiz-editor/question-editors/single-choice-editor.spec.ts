@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { SingleChoiceQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { SingleChoiceEditor } from './single-choice-editor';
 
 describe('SingleChoiceEditor', () => {
   async function createComponent(question: SingleChoiceQuestion) {
-    await TestBed.configureTestingModule({ imports: [SingleChoiceEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [SingleChoiceEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(SingleChoiceEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

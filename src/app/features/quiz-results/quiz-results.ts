@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { TranslocoService, translateSignal } from '@jsverse/transloco';
 import { formatResponse } from '../../core/models/quiz-attempt';
 import { exportAttemptsToCsv } from '../../core/models/quiz-attempts-io';
 import { QuestionStat, questionStatistics } from '../../core/models/question-statistics';
@@ -19,7 +20,7 @@ import {
 import { Question, Quiz, QuizAttempt } from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
-import { ruPaginatorIntl } from '../../core/utils/ru-paginator-intl';
+import { localizedPaginatorIntl } from '../../core/utils/localized-paginator-intl';
 
 type SortField = 'date' | 'score';
 
@@ -37,13 +38,31 @@ const csvBom = '﻿';
     MatInputModule,
     MatPaginatorModule,
   ],
-  providers: [{ provide: MatPaginatorIntl, useFactory: ruPaginatorIntl }],
+  providers: [{ provide: MatPaginatorIntl, useFactory: localizedPaginatorIntl }],
   templateUrl: './quiz-results.html',
   styleUrl: './quiz-results.scss',
 })
 export class QuizResults {
   private readonly store = inject(QuizStore);
   private readonly attemptRepository = inject(ATTEMPT_REPOSITORY);
+  private readonly transloco = inject(TranslocoService);
+
+  protected readonly backToListLabel = translateSignal('common.backToList');
+  protected readonly noAttemptsLabel = translateSignal('quizResults.noAttempts');
+  protected readonly statsTitleLabel = translateSignal('quizResults.statsTitle');
+  protected readonly attemptsTitleLabel = translateSignal('quizResults.attemptsTitle');
+  protected readonly respondentFilterLabel = translateSignal('quizResults.respondentFilterLabel');
+  protected readonly exportCsvLabel = translateSignal('quizResults.exportCsv');
+  protected readonly noFilteredAttemptsLabel = translateSignal('quizResults.noFilteredAttempts');
+  protected readonly respondentHeaderLabel = translateSignal('quizResults.respondentHeader');
+  protected readonly completedHeaderLabel = translateSignal('quizResults.completedHeader');
+  protected readonly scoreHeaderLabel = translateSignal('quizResults.scoreHeader');
+  protected readonly hideLabel = translateSignal('quizResults.hide');
+  protected readonly answersLabel = translateSignal('quizResults.answers');
+  protected readonly correctLabel = translateSignal('quizResults.correct');
+  protected readonly incorrectLabel = translateSignal('quizResults.incorrect');
+  protected readonly quizNotFoundLabel = translateSignal('common.quizNotFound');
+  protected readonly anonymousLabel = translateSignal('quizResults.anonymous');
 
   readonly id = input.required<string>();
   readonly quiz = computed(() => this.store.quizzes().find((quiz) => quiz.id === this.id()));
@@ -60,9 +79,10 @@ export class QuizResults {
 
   readonly filteredAttempts = computed(() => {
     const filter = this.respondentFilter().trim().toLowerCase();
+    const anonymous = this.anonymousLabel();
     const matching = filter
       ? this.attempts().filter((attempt) =>
-          (attempt.respondentName ?? 'Аноним').toLowerCase().includes(filter),
+          (attempt.respondentName ?? anonymous).toLowerCase().includes(filter),
         )
       : this.attempts();
 
@@ -125,8 +145,33 @@ export class QuizResults {
     return stat.total === 0 ? 0 : (stat.correct / stat.total) * 100;
   }
 
+  resultsTitleFor(quiz: Quiz): string {
+    return this.transloco.translate('quizResults.resultsTitle', { title: quiz.title });
+  }
+
+  statLabel(stat: QuestionStat): string {
+    return this.transloco.translate('quizResults.statCorrectOf', {
+      correct: stat.correct,
+      total: stat.total,
+    });
+  }
+
+  scoreLabel(score: AttemptScore): string {
+    return this.transloco.translate('quizResults.scoreOf', {
+      correct: score.correct,
+      total: score.total,
+    });
+  }
+
+  correctAnswerHintFor(question: Question): string {
+    return this.transloco.translate('quizResults.correctAnswerPrefix', {
+      answer: this.correctAnswerFor(question),
+    });
+  }
+
   answerFor(attempt: QuizAttempt, question: Question): string {
     return formatResponse(
+      (key, params) => this.transloco.translate(key, params),
       question,
       attempt.responses.find((response) => response.questionId === question.id),
     );
@@ -143,7 +188,7 @@ export class QuizResults {
   }
 
   correctAnswerFor(question: Question): string | undefined {
-    return formatCorrectAnswer(question);
+    return formatCorrectAnswer((key, params) => this.transloco.translate(key, params), question);
   }
 
   toggleExpand(attemptId: string): void {
@@ -174,7 +219,11 @@ export class QuizResults {
   exportCsv(): void {
     const quiz = this.quiz();
     if (!quiz) return;
-    const csv = exportAttemptsToCsv(quiz, this.filteredAttempts());
+    const csv = exportAttemptsToCsv(
+      (key, params) => this.transloco.translate(key, params),
+      quiz,
+      this.filteredAttempts(),
+    );
     const blob = new Blob([csvBom + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

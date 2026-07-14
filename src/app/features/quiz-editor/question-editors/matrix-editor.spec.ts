@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { MatrixQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { MatrixEditor } from './matrix-editor';
 
 describe('MatrixEditor', () => {
   async function createComponent(question: MatrixQuestion) {
-    await TestBed.configureTestingModule({ imports: [MatrixEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [MatrixEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(MatrixEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

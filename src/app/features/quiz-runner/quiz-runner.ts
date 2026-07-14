@@ -17,6 +17,7 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoService, translateSignal } from '@jsverse/transloco';
 import { createId } from '../../core/utils/id';
 import { getClientId } from '../../core/utils/client-id';
 import { shuffle } from '../../core/utils/shuffle';
@@ -86,12 +87,30 @@ export class QuizRunner {
   private readonly attemptRepository = inject(ATTEMPT_REPOSITORY);
   private readonly liveAnnouncer = inject(LiveAnnouncer);
   private readonly injector = inject(Injector);
+  private readonly transloco = inject(TranslocoService);
   private readonly resultRegion = viewChild<ElementRef<HTMLElement>>('resultRegion');
   private readonly attemptId = createId();
   private readonly startedAt = new Date().toISOString();
   private readonly startedAtMs = Date.now();
   private readonly clientId = getClientId();
   private timerHandle: ReturnType<typeof setInterval> | undefined;
+
+  protected readonly backToListLabel = translateSignal('common.backToList');
+  protected readonly quizNotFoundLabel = translateSignal('common.quizNotFound');
+  protected readonly previewBannerLabel = translateSignal('quizRunner.previewBanner');
+  protected readonly previewSubmittedResultLabel = translateSignal(
+    'quizRunner.previewSubmittedResult',
+  );
+  protected readonly submittedThankYouLabel = translateSignal('quizRunner.submittedThankYou');
+  protected readonly draftBlockedLabel = translateSignal('quizRunner.draftBlocked');
+  protected readonly expiredBlockedLabel = translateSignal('quizRunner.expiredBlocked');
+  protected readonly accessPasswordLabel = translateSignal('quizRunner.accessPasswordLabel');
+  protected readonly continueButtonLabel = translateSignal('quizRunner.continueButton');
+  protected readonly respondentNameLabel = translateSignal('quizRunner.respondentNameLabel');
+  protected readonly requiredFieldErrorLabel = translateSignal('quizRunner.requiredFieldError');
+  protected readonly backLabel = translateSignal('quizRunner.back');
+  protected readonly nextLabel = translateSignal('quizRunner.next');
+  protected readonly submitAnswersLabel = translateSignal('quizRunner.submitAnswers');
 
   readonly id = input<string>();
   readonly previewQuiz = input<Quiz>();
@@ -164,6 +183,30 @@ export class QuizRunner {
   });
 
   readonly attemptsUsed = signal(0);
+  attemptsBlockedMessage(maxAttempts: number): string {
+    return this.transloco.translate('quizRunner.attemptsBlocked', { max: maxAttempts });
+  }
+
+  remainingTimeMessage(): string {
+    return this.transloco.translate('quizRunner.remainingTime', {
+      time: this.remainingTimeLabel(),
+    });
+  }
+
+  pageProgressMessage(): string {
+    return this.transloco.translate('quizRunner.pageProgress', {
+      current: this.clampedPageIndex() + 1,
+      total: this.pages().length,
+    });
+  }
+
+  scoreResultMessage(score: AttemptScore): string {
+    return this.transloco.translate('quizRunner.scoreResult', {
+      correct: score.correct,
+      total: score.total,
+    });
+  }
+
   readonly attemptsBlocked = computed(() => {
     const max = this.quiz()?.settings.maxAttempts;
     return max !== undefined && this.attemptsUsed() >= max;
@@ -235,7 +278,7 @@ export class QuizRunner {
       this.passwordUnlocked.set(true);
       this.passwordError.set(null);
     } else {
-      this.passwordError.set('Неверный код доступа.');
+      this.passwordError.set(this.transloco.translate('quizRunner.invalidAccessCode'));
     }
   }
 
@@ -416,7 +459,7 @@ export class QuizRunner {
     if (this.isPreview()) {
       this.result.set(scoreAttempt(quiz, responses));
       this.submitted.set(true);
-      this.announceAndFocusResult('Это предпросмотр — ответы не сохранены.');
+      this.announceAndFocusResult(this.transloco.translate('quizRunner.previewSubmittedResult'));
       return;
     }
 
@@ -434,17 +477,23 @@ export class QuizRunner {
         responses,
         score: score?.correct,
         quizSnapshot: quiz,
-        questionReport: buildAttemptReport(quiz, responses),
+        questionReport: buildAttemptReport(
+          (key, params) => this.transloco.translate(key, params),
+          quiz,
+          responses,
+        ),
       };
       await this.attemptRepository.save(attempt);
       this.result.set(score);
       this.submitted.set(true);
-      this.announceAndFocusResult('Спасибо! Ваши ответы сохранены.');
+      this.announceAndFocusResult(this.transloco.translate('quizRunner.submittedThankYou'));
     } catch (error) {
       this.saveError.set(
-        error instanceof DOMException && error.name === 'QuotaExceededError'
-          ? 'Не удалось сохранить ответы: превышен лимит хранилища браузера.'
-          : 'Не удалось сохранить ответы. Попробуйте ещё раз.',
+        this.transloco.translate(
+          error instanceof DOMException && error.name === 'QuotaExceededError'
+            ? 'quizRunner.quotaExceededError'
+            : 'quizRunner.genericSaveError',
+        ),
       );
     } finally {
       this.saving.set(false);

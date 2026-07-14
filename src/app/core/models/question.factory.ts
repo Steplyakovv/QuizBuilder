@@ -3,26 +3,27 @@ import { Option, Question } from './quiz.models';
 
 export type QuestionType = Question['type'];
 
-export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
-  'single-choice': 'Одиночный выбор',
-  'multiple-choice': 'Множественный выбор',
-  text: 'Текстовый ответ',
-  'image-choice': 'Выбор картинки',
-  'true-false': 'Да/Нет',
-  dropdown: 'Выпадающий список',
-  number: 'Числовой ответ',
-  date: 'Дата',
-  rating: 'Шкала оценки',
-  slider: 'Ползунок',
-  'constant-sum': 'Распределение баллов',
-  'word-choice': 'Выбор слов',
-  'fill-in-the-blank': 'Текст с пропусками',
-  ranking: 'Сортировка вариантов',
-  matching: 'Сопоставление пар',
-  matrix: 'Таблица (матрица)',
-  hotspot: 'Область на изображении',
-  'file-upload': 'Загрузка файла',
-};
+/** Order used for the "add question" dropdown; labels live in public/i18n/*.json's questionTypes. */
+export const QUESTION_TYPES: QuestionType[] = [
+  'single-choice',
+  'multiple-choice',
+  'text',
+  'image-choice',
+  'true-false',
+  'dropdown',
+  'number',
+  'date',
+  'rating',
+  'slider',
+  'constant-sum',
+  'word-choice',
+  'fill-in-the-blank',
+  'ranking',
+  'matching',
+  'matrix',
+  'hotspot',
+  'file-upload',
+];
 
 export function createQuestion(type: QuestionType): Question {
   const id = createId();

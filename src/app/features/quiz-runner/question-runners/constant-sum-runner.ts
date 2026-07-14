@@ -1,6 +1,7 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoService } from '@jsverse/transloco';
 import { ConstantSumQuestion } from '../../../core/models/quiz.models';
 
 @Component({
@@ -20,7 +21,7 @@ import { ConstantSumQuestion } from '../../../core/models/quiz.models';
         </mat-form-field>
       }
       <p class="constant-sum-runner-remaining" [class.invalid]="remaining() !== 0">
-        Осталось распределить: {{ remaining() }} из {{ question().total }}
+        {{ remainingLabel() }}
       </p>
     </div>
   `,
@@ -43,6 +44,8 @@ import { ConstantSumQuestion } from '../../../core/models/quiz.models';
   `,
 })
 export class ConstantSumRunner {
+  private readonly transloco = inject(TranslocoService);
+
   readonly question = input.required<ConstantSumQuestion>();
   readonly distribution = input<Record<string, number>>({});
   readonly distributionChange = output<Record<string, number>>();
@@ -51,6 +54,13 @@ export class ConstantSumRunner {
     Object.values(this.distribution()).reduce((total, value) => total + value, 0),
   );
   readonly remaining = computed(() => this.question().total - this.sum());
+
+  remainingLabel(): string {
+    return this.transloco.translate('constantSumRunner.remainingLabel', {
+      remaining: this.remaining(),
+      total: this.question().total,
+    });
+  }
 
   onValueChange(optionId: string, value: string): void {
     const parsed = value.trim() ? Number(value) : 0;

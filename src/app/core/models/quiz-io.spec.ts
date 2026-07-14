@@ -1,5 +1,6 @@
 import { createQuiz } from './quiz.factory';
 import { addQuestion } from './quiz-questions';
+import { testTranslate } from '../testing/test-translate';
 import { exportQuizToJson, parseImportedQuiz } from './quiz-io';
 
 describe('quiz-io', () => {
@@ -17,7 +18,7 @@ describe('quiz-io', () => {
     quiz = addQuestion(quiz, 'single-choice');
     const json = exportQuizToJson(quiz);
 
-    const imported = parseImportedQuiz(json);
+    const imported = parseImportedQuiz(json, testTranslate);
 
     expect(imported.id).not.toBe(quiz.id);
     expect(imported.title).toBe(quiz.title);
@@ -26,11 +27,15 @@ describe('quiz-io', () => {
   });
 
   it('throws a readable error for invalid JSON', () => {
-    expect(() => parseImportedQuiz('not json')).toThrow(/JSON/);
+    expect(() => parseImportedQuiz('not json', testTranslate)).toThrow(/JSON/);
   });
 
   it('throws a readable error when required fields are missing', () => {
-    expect(() => parseImportedQuiz(JSON.stringify({ title: 'x' }))).toThrow(/опросник/);
-    expect(() => parseImportedQuiz(JSON.stringify({ questions: [], settings: {} }))).toThrow();
+    expect(() => parseImportedQuiz(JSON.stringify({ title: 'x' }), testTranslate)).toThrow(
+      /опросник/,
+    );
+    expect(() =>
+      parseImportedQuiz(JSON.stringify({ questions: [], settings: {} }), testTranslate),
+    ).toThrow();
   });
 });

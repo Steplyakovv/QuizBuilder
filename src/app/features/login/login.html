@@ -1,17 +1,17 @@
 <div class="login">
-  <a routerLink="/" class="back-link">← К списку опросников</a>
+  <a routerLink="/" class="back-link">{{ backToListLabel() }}</a>
 
-  <h1>Вход для администратора</h1>
-  <p class="hint">Учётные данные администратора по умолчанию: admin / admin</p>
+  <h1>{{ titleLabel() }}</h1>
+  <p class="hint">{{ hintLabel() }}</p>
 
   <form class="login-form" (submit)="submit(); $event.preventDefault()">
     <mat-form-field appearance="outline">
-      <mat-label>Логин</mat-label>
+      <mat-label>{{ usernameLabel() }}</mat-label>
       <input matInput [value]="username()" (input)="username.set($any($event.target).value)" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Пароль</mat-label>
+      <mat-label>{{ passwordLabel() }}</mat-label>
       <input
         matInput
         type="password"
@@ -24,6 +24,6 @@
       <p class="login-error">{{ error() }}</p>
     }
 
-    <button mat-flat-button color="primary" type="submit">Войти</button>
+    <button mat-flat-button color="primary" type="submit">{{ submitLabel() }}</button>
   </form>
 </div>

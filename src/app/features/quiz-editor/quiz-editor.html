@@ -1,18 +1,18 @@
 @if (draft(); as quiz) {
   <div class="quiz-editor">
     <div class="editor-header">
-      <a routerLink="/" class="back-link">← К списку опросников</a>
+      <a routerLink="/" class="back-link">{{ backToListLabel() }}</a>
       <div class="save-actions">
         @if (dirty()) {
-          <span class="unsaved-indicator">Есть несохранённые изменения</span>
+          <span class="unsaved-indicator">{{ unsavedIndicatorLabel() }}</span>
         }
         <button mat-button (click)="togglePreview()">
           <mat-icon>visibility</mat-icon>
-          {{ previewing() ? 'Закрыть предпросмотр' : 'Предпросмотр' }}
+          {{ previewing() ? closePreviewLabel() : previewLabel() }}
         </button>
         <button mat-flat-button color="primary" [disabled]="!dirty() || saving()" (click)="save()">
           <mat-icon>save</mat-icon>
-          Сохранить
+          {{ saveLabel() }}
         </button>
       </div>
     </div>
@@ -28,12 +28,12 @@
     }
 
     <mat-form-field appearance="outline" class="title-field">
-      <mat-label>Название опросника</mat-label>
+      <mat-label>{{ titleLabel() }}</mat-label>
       <input matInput [value]="quiz.title" (blur)="updateTitle($any($event.target).value)" />
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="description-field">
-      <mat-label>Описание</mat-label>
+      <mat-label>{{ descriptionLabel() }}</mat-label>
       <textarea
         matInput
         [value]="quiz.description ?? ''"
@@ -41,30 +41,30 @@
       ></textarea>
     </mat-form-field>
 
-    <h2>Настройки опросника</h2>
+    <h2>{{ settingsHeadingLabel() }}</h2>
 
     <div class="quiz-settings">
       <mat-checkbox [checked]="quiz.settings.isGraded" (change)="updateGraded($event.checked)">
-        Квиз с баллами (отмечать правильные ответы)
+        {{ gradedCheckboxLabel() }}
       </mat-checkbox>
 
       <mat-checkbox
         [checked]="quiz.settings.shuffleQuestions ?? false"
         (change)="updateShuffleQuestions($event.checked)"
       >
-        Перемешивать порядок вопросов
+        {{ shuffleCheckboxLabel() }}
       </mat-checkbox>
 
       <mat-checkbox
         [checked]="quiz.settings.published ?? true"
         (change)="updatePublished($event.checked)"
       >
-        Опубликован (доступен для прохождения)
+        {{ publishedCheckboxLabel() }}
       </mat-checkbox>
 
       <div class="quiz-settings-limits">
         <mat-form-field appearance="outline" class="time-limit-field">
-          <mat-label>Лимит времени (мин)</mat-label>
+          <mat-label>{{ timeLimitLabel() }}</mat-label>
           <input
             matInput
             type="number"
@@ -72,11 +72,11 @@
             [value]="quiz.settings.timeLimitMinutes ?? ''"
             (blur)="updateTimeLimit($any($event.target).value)"
           />
-          <mat-hint>Необязательно</mat-hint>
+          <mat-hint>{{ optionalHintLabel() }}</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="max-attempts-field">
-          <mat-label>Лимит попыток</mat-label>
+          <mat-label>{{ maxAttemptsLabel() }}</mat-label>
           <input
             matInput
             type="number"
@@ -84,73 +84,73 @@
             [value]="quiz.settings.maxAttempts ?? ''"
             (blur)="updateMaxAttempts($any($event.target).value)"
           />
-          <mat-hint>Необязательно</mat-hint>
+          <mat-hint>{{ optionalHintLabel() }}</mat-hint>
         </mat-form-field>
       </div>
 
       <div class="quiz-settings-limits">
         <mat-form-field appearance="outline" class="access-password-field">
-          <mat-label>Код доступа</mat-label>
+          <mat-label>{{ accessPasswordLabel() }}</mat-label>
           <input
             matInput
             [value]="quiz.settings.accessPassword ?? ''"
             (blur)="updateAccessPassword($any($event.target).value)"
           />
-          <mat-hint>Необязательно</mat-hint>
+          <mat-hint>{{ optionalHintLabel() }}</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="expires-at-field">
-          <mat-label>Доступен до</mat-label>
+          <mat-label>{{ expiresAtLabel() }}</mat-label>
           <input
             matInput
             type="datetime-local"
             [value]="expiresAtInputValue(quiz)"
             (blur)="updateExpiresAt($any($event.target).value)"
           />
-          <mat-hint>Необязательно</mat-hint>
+          <mat-hint>{{ optionalHintLabel() }}</mat-hint>
         </mat-form-field>
       </div>
 
       <mat-form-field appearance="outline" class="webhook-url-field">
-        <mat-label>URL вебхука</mat-label>
+        <mat-label>{{ webhookUrlLabel() }}</mat-label>
         <input
           matInput
           type="url"
           [value]="quiz.settings.webhookUrl ?? ''"
           (blur)="updateWebhookUrl($any($event.target).value)"
         />
-        <mat-hint>Опционально — POST-запрос при каждом прохождении</mat-hint>
+        <mat-hint>{{ webhookHintLabel() }}</mat-hint>
       </mat-form-field>
     </div>
 
-    <h2>Страницы</h2>
+    <h2>{{ pagesHeadingLabel() }}</h2>
 
     <div class="quiz-pages">
       @if (!quiz.pages || quiz.pages.length === 0) {
-        <p class="empty-state">
-          Страниц пока нет — вопросы показываются одним списком. Добавьте страницу, чтобы
-          группировать вопросы по темам: в прохождении они будут показаны по очереди, со своим
-          названием.
-        </p>
+        <p class="empty-state">{{ noPagesHintLabel() }}</p>
       }
       @for (page of quiz.pages; track page.id) {
         <div class="quiz-page-item">
           <mat-form-field appearance="outline" class="page-title-field">
-            <mat-label>Название страницы</mat-label>
+            <mat-label>{{ pageTitleLabel() }}</mat-label>
             <input
               matInput
               [value]="page.title"
               (blur)="renamePage(page.id, $any($event.target).value)"
             />
           </mat-form-field>
-          <button mat-icon-button (click)="removePage(page.id)" aria-label="Удалить страницу">
+          <button
+            mat-icon-button
+            (click)="removePage(page.id)"
+            [attr.aria-label]="deletePageLabel()"
+          >
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       }
       <div class="add-page">
         <mat-form-field appearance="outline" class="page-title-field">
-          <mat-label>Новая страница</mat-label>
+          <mat-label>{{ newPageLabel() }}</mat-label>
           <input
             matInput
             [value]="newPageTitle()"
@@ -159,15 +159,15 @@
         </mat-form-field>
         <button mat-flat-button (click)="addPage()">
           <mat-icon>add</mat-icon>
-          Добавить страницу
+          {{ addPageLabel() }}
         </button>
       </div>
     </div>
 
-    <h2>Вопросы</h2>
+    <h2>{{ questionsHeadingLabel() }}</h2>
 
     @if (quiz.questions.length === 0) {
-      <p class="empty-state">Вопросов пока нет — добавьте первый ниже.</p>
+      <p class="empty-state">{{ noQuestionsLabel() }}</p>
     }
 
     <div cdkDropList class="question-list" (cdkDropListDropped)="drop($event)">
@@ -179,12 +179,12 @@
               tabindex="0"
               role="button"
               class="drag-handle"
-              aria-label="Перетащить для изменения порядка"
+              [attr.aria-label]="dragToReorderLabel()"
             >
               <mat-icon>drag_indicator</mat-icon>
             </span>
             <mat-form-field appearance="outline" class="question-order-field">
-              <mat-label>№</mat-label>
+              <mat-label>{{ questionOrderLabel() }}</mat-label>
               <input
                 matInput
                 type="number"
@@ -195,7 +195,7 @@
               />
             </mat-form-field>
             <mat-form-field appearance="outline" class="question-prompt">
-              <mat-label>{{ questionTypeLabels[question.type] }}</mat-label>
+              <mat-label>{{ questionTypeLabels()[question.type] }}</mat-label>
               <input
                 matInput
                 [value]="question.prompt"
@@ -206,12 +206,12 @@
               [checked]="question.required"
               (change)="updateQuestionRequired(question.id, $event.checked)"
             >
-              Обязательный
+              {{ requiredCheckboxLabel() }}
             </mat-checkbox>
             <button
               mat-icon-button
               (click)="removeQuestion(question.id)"
-              aria-label="Удалить вопрос"
+              [attr.aria-label]="deleteQuestionLabel()"
             >
               <mat-icon>delete</mat-icon>
             </button>
@@ -290,12 +290,12 @@
           @if (quiz.pages && quiz.pages.length > 0) {
             <div class="question-meta">
               <mat-form-field appearance="outline" class="page-select-field">
-                <mat-label>Страница</mat-label>
+                <mat-label>{{ pageSelectLabel() }}</mat-label>
                 <mat-select
                   [value]="question.pageId ?? ''"
                   (valueChange)="updateQuestionPage(question.id, $event)"
                 >
-                  <mat-option value="">— без страницы —</mat-option>
+                  <mat-option value="">{{ noPageOptionLabel() }}</mat-option>
                   @for (page of quiz.pages; track page.id) {
                     <mat-option [value]="page.id">{{ page.title }}</mat-option>
                   }
@@ -308,15 +308,15 @@
             @if (sources.length > 0) {
               <div class="question-condition">
                 <mat-form-field appearance="outline" class="condition-source-field">
-                  <mat-label>Показывать после выбранного вопроса</mat-label>
+                  <mat-label>{{ conditionSourceLabel() }}</mat-label>
                   <mat-select
                     [value]="question.condition?.questionId ?? ''"
                     (valueChange)="updateConditionSource(question.id, $event)"
                   >
-                    <mat-option value="">— всегда показывать —</mat-option>
+                    <mat-option value="">{{ alwaysShowOptionLabel() }}</mat-option>
                     @for (source of sources; track source.id) {
                       <mat-option [value]="source.id">{{
-                        source.prompt || '(без текста)'
+                        source.prompt || noPromptTextLabel()
                       }}</mat-option>
                     }
                   </mat-select>
@@ -330,19 +330,19 @@
 
     <div class="add-question">
       <mat-form-field appearance="outline">
-        <mat-label>Тип вопроса</mat-label>
+        <mat-label>{{ questionTypeLabel() }}</mat-label>
         <mat-select [value]="newQuestionType()" (valueChange)="newQuestionType.set($event)">
           @for (type of questionTypes; track type) {
-            <mat-option [value]="type">{{ questionTypeLabels[type] }}</mat-option>
+            <mat-option [value]="type">{{ questionTypeLabels()[type] }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <button mat-flat-button (click)="addQuestion()">
         <mat-icon>add</mat-icon>
-        Добавить вопрос
+        {{ addQuestionLabel() }}
       </button>
     </div>
   </div>
 } @else {
-  <p class="empty-state">Опросник не найден.</p>
+  <p class="empty-state">{{ quizNotFoundLabel() }}</p>
 }

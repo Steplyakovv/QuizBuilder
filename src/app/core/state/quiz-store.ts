@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { createQuiz } from '../models/quiz.factory';
 import { Quiz } from '../models/quiz.models';
 import { isQuizTitleValid } from '../models/quiz.validation';
@@ -8,6 +9,7 @@ import { createId } from '../utils/id';
 @Injectable({ providedIn: 'root' })
 export class QuizStore {
   private readonly repository = inject(QUIZ_REPOSITORY);
+  private readonly transloco = inject(TranslocoService);
 
   private readonly quizzesState = signal<Quiz[]>([]);
   private readonly loadedState = signal(false);
@@ -55,7 +57,7 @@ export class QuizStore {
     const copy: Quiz = {
       ...structuredClone(source),
       id: createId(),
-      title: `${source.title} (копия)`,
+      title: `${source.title} ${this.transloco.translate('common.copySuffix')}`,
       createdAt: now,
       updatedAt: now,
     };

@@ -1,6 +1,6 @@
 <div class="fill-in-the-blank-editor">
   <mat-form-field appearance="outline" class="template-field">
-    <mat-label>Текст с пропусками ({{ '{{}}' }} — место пропуска)</mat-label>
+    <mat-label>{{ templateLabel() }}</mat-label>
     <textarea
       matInput
       [value]="question().template"
@@ -9,11 +9,11 @@
   </mat-form-field>
 
   @if (graded() && blankCount() > 0) {
-    <p class="blank-answers-label">Правильные ответы для пропусков:</p>
+    <p class="blank-answers-label">{{ correctAnswersLabel() }}</p>
     <div class="blank-answer-fields">
       @for (index of blankIndexes(); track index) {
         <mat-form-field appearance="outline" class="blank-answer-field">
-          <mat-label>Пропуск {{ index + 1 }}</mat-label>
+          <mat-label>{{ blankLabel(index) }}</mat-label>
           <input
             matInput
             [value]="correctAnswer(index)"

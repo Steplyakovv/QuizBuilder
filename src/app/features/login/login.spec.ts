@@ -3,6 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { AUTH_REPOSITORY } from '../../core/repositories/auth-repository';
 import { AuthStore } from '../../core/state/auth-store';
 import { FakeAuthRepository } from '../../core/testing/fake-auth-repository';
+import { provideTestTransloco } from '../../core/testing/provide-test-transloco';
 import { Login } from './login';
 
 describe('Login', () => {
@@ -11,6 +12,7 @@ describe('Login', () => {
       imports: [Login],
       providers: [
         provideRouter([]),
+        provideTestTransloco(),
         { provide: AUTH_REPOSITORY, useValue: new FakeAuthRepository() },
       ],
     }).compileComponents();

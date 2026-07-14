@@ -1,4 +1,5 @@
 import { Quiz } from './quiz.models';
+import { testTranslate } from '../testing/test-translate';
 import { buildAttemptReport, formatCorrectAnswer, scoreAttempt } from './quiz-scoring';
 
 function baseQuiz(isGraded: boolean): Quiz {
@@ -433,7 +434,7 @@ describe('scoreAttempt', () => {
 describe('formatCorrectAnswer', () => {
   it('returns undefined for a question with no correct answer configured', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'single-choice',
         prompt: 'p',
@@ -445,7 +446,7 @@ describe('formatCorrectAnswer', () => {
 
   it('shows the correct option label for single-choice/dropdown questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'single-choice',
         prompt: 'p',
@@ -461,7 +462,7 @@ describe('formatCorrectAnswer', () => {
 
   it('joins the correct option labels for multiple-choice questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'multiple-choice',
         prompt: 'p',
@@ -478,7 +479,7 @@ describe('formatCorrectAnswer', () => {
 
   it('shows Да/Нет for true-false questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'true-false',
         prompt: 'p',
@@ -490,7 +491,7 @@ describe('formatCorrectAnswer', () => {
 
   it('joins the words in correct order for word-choice questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'word-choice',
         prompt: 'p',
@@ -505,7 +506,7 @@ describe('formatCorrectAnswer', () => {
 
   it('joins the options in correct order for ranking questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'ranking',
         prompt: 'p',
@@ -520,7 +521,7 @@ describe('formatCorrectAnswer', () => {
 
   it('fills the template with correct answers, marking ungraded blanks', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'fill-in-the-blank',
         prompt: 'p',
@@ -533,7 +534,7 @@ describe('formatCorrectAnswer', () => {
 
   it('shows the pair matches for matching questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'matching',
         prompt: 'p',
@@ -548,7 +549,7 @@ describe('formatCorrectAnswer', () => {
 
   it('shows the correct region number for hotspot questions', () => {
     expect(
-      formatCorrectAnswer({
+      formatCorrectAnswer(testTranslate, {
         id: 'q1',
         type: 'hotspot',
         prompt: 'p',
@@ -592,7 +593,7 @@ describe('buildAttemptReport', () => {
       },
     );
 
-    const report = buildAttemptReport(quiz, [
+    const report = buildAttemptReport(testTranslate, quiz, [
       { questionId: 'q1', selectedOptionIds: ['o1'] },
       { questionId: 'q2', selectedOptionIds: ['o4'] },
     ]);
@@ -625,7 +626,7 @@ describe('buildAttemptReport', () => {
       multiline: false,
     });
 
-    const report = buildAttemptReport(quiz, [{ questionId: 'q1', text: 'Hello' }]);
+    const report = buildAttemptReport(testTranslate, quiz, [{ questionId: 'q1', text: 'Hello' }]);
 
     expect(report).toEqual([
       {
@@ -660,7 +661,7 @@ describe('buildAttemptReport', () => {
       },
     );
 
-    const report = buildAttemptReport(quiz, []);
+    const report = buildAttemptReport(testTranslate, quiz, []);
 
     expect(report.map((entry) => entry.questionId)).toEqual(['q1']);
   });

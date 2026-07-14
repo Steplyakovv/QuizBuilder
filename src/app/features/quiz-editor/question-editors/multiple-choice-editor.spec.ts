@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { MultipleChoiceQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { MultipleChoiceEditor } from './multiple-choice-editor';
 
 describe('MultipleChoiceEditor', () => {
   async function createComponent(question: MultipleChoiceQuestion) {
-    await TestBed.configureTestingModule({ imports: [MultipleChoiceEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [MultipleChoiceEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(MultipleChoiceEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

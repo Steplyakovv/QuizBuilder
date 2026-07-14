@@ -1,10 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Option } from '../../core/models/quiz.models';
+import { provideTestTransloco } from '../../core/testing/provide-test-transloco';
 import { OptionListEditor } from './option-list-editor';
 
 describe('OptionListEditor', () => {
   async function createComponent(options: Option[], correctOptionIds: string[] = []) {
-    await TestBed.configureTestingModule({ imports: [OptionListEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [OptionListEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(OptionListEditor);
     fixture.componentRef.setInput('options', options);
     fixture.componentRef.setInput('correctOptionIds', correctOptionIds);

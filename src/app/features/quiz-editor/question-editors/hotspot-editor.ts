@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoService, translateSignal } from '@jsverse/transloco';
 import {
   addRegion,
   moveRegion,
@@ -30,7 +31,7 @@ interface DragState {
     <div class="hotspot-editor">
       <div class="image-url-row">
         <mat-form-field appearance="outline" class="image-url-field">
-          <mat-label>URL картинки</mat-label>
+          <mat-label>{{ imageUrlLabel() }}</mat-label>
           <input
             matInput
             [value]="question().imageUrl"
@@ -39,7 +40,7 @@ interface DragState {
         </mat-form-field>
         <button mat-stroked-button type="button" (click)="fileInput.click()">
           <mat-icon>upload</mat-icon>
-          Загрузить файл
+          {{ uploadFileLabel() }}
         </button>
         <input
           #fileInput
@@ -51,12 +52,12 @@ interface DragState {
       </div>
 
       @if (question().imageUrl) {
-        <p class="hotspot-hint">Кликните по картинке, чтобы добавить область.</p>
+        <p class="hotspot-hint">{{ clickHintLabel() }}</p>
         <div
           class="hotspot-image-wrap"
           tabindex="0"
           role="button"
-          aria-label="Добавить область по клику или нажатию Enter (в центр изображения)"
+          [attr.aria-label]="addRegionAriaLabel()"
           (click)="onImageClick($event)"
           (keydown.enter)="addRegionAtCenter()"
         >
@@ -91,10 +92,10 @@ interface DragState {
         <table class="hotspot-region-list">
           @for (region of question().regions; track region.id; let i = $index) {
             <tr>
-              <td class="hotspot-region-index">Область №{{ i + 1 }}</td>
+              <td class="hotspot-region-index">{{ hotspotRegionLabel(i + 1) }}</td>
               <td>
                 <mat-form-field appearance="outline" class="size-field">
-                  <mat-label>Ширина, %</mat-label>
+                  <mat-label>{{ widthLabel() }}</mat-label>
                   <input
                     matInput
                     type="number"
@@ -107,7 +108,7 @@ interface DragState {
               </td>
               <td>
                 <mat-form-field appearance="outline" class="size-field">
-                  <mat-label>Высота, %</mat-label>
+                  <mat-label>{{ heightLabel() }}</mat-label>
                   <input
                     matInput
                     type="number"
@@ -126,8 +127,8 @@ interface DragState {
                     [attr.aria-pressed]="region.id === question().correctRegionId"
                     [attr.aria-label]="
                       region.id === question().correctRegionId
-                        ? 'Правильная область'
-                        : 'Отметить как правильную'
+                        ? correctRegionLabel()
+                        : markCorrectRegionLabel()
                     "
                     (click)="toggleCorrect(region.id)"
                   >
@@ -142,7 +143,7 @@ interface DragState {
                   mat-icon-button
                   type="button"
                   (click)="removeRegion(region.id)"
-                  aria-label="Удалить область"
+                  [attr.aria-label]="removeRegionLabel()"
                 >
                   <mat-icon>close</mat-icon>
                 </button>
@@ -291,9 +292,25 @@ interface DragState {
   `,
 })
 export class HotspotEditor {
+  private readonly transloco = inject(TranslocoService);
+
   readonly question = input.required<HotspotQuestion>();
   readonly graded = input(false);
   readonly questionChange = output<HotspotQuestion>();
+
+  protected readonly imageUrlLabel = translateSignal('hotspotEditor.imageUrlLabel');
+  protected readonly uploadFileLabel = translateSignal('hotspotEditor.uploadFile');
+  protected readonly clickHintLabel = translateSignal('hotspotEditor.clickHint');
+  protected readonly addRegionAriaLabel = translateSignal('hotspotEditor.addRegionAriaLabel');
+  protected readonly widthLabel = translateSignal('hotspotEditor.widthLabel');
+  protected readonly heightLabel = translateSignal('hotspotEditor.heightLabel');
+  protected readonly correctRegionLabel = translateSignal('hotspotEditor.correctRegion');
+  protected readonly markCorrectRegionLabel = translateSignal('hotspotEditor.markCorrectRegion');
+  protected readonly removeRegionLabel = translateSignal('hotspotEditor.removeRegion');
+
+  hotspotRegionLabel(index: number): string {
+    return this.transloco.translate('quizAttempt.hotspotRegion', { index });
+  }
 
   readonly handles: ResizeHandle[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
 
@@ -357,11 +374,13 @@ export class HotspotEditor {
   };
 
   regionLabel(region: HotspotRegion, index: number): string {
-    return (
-      `Область ${index + 1}: ${Math.round(region.width)}% × ${Math.round(region.height)}%, ` +
-      `слева ${Math.round(region.x)}%, сверху ${Math.round(region.y)}%. ` +
-      `Стрелки — переместить, Shift + стрелки — изменить размер.`
-    );
+    return this.transloco.translate('hotspotEditor.regionAriaLabel', {
+      index: index + 1,
+      width: Math.round(region.width),
+      height: Math.round(region.height),
+      x: Math.round(region.x),
+      y: Math.round(region.y),
+    });
   }
 
   onRegionKeydown(event: KeyboardEvent, region: HotspotRegion): void {

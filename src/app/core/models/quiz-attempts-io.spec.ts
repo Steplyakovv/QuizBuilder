@@ -1,6 +1,7 @@
 import { addQuestion, replaceQuestion } from './quiz-questions';
 import { createQuiz } from './quiz.factory';
 import { SingleChoiceQuestion } from './quiz.models';
+import { testTranslate } from '../testing/test-translate';
 import { exportAttemptsToCsv } from './quiz-attempts-io';
 
 describe('exportAttemptsToCsv', () => {
@@ -19,7 +20,7 @@ describe('exportAttemptsToCsv', () => {
     quiz = replaceQuestion(quiz, question);
     quiz = { ...quiz, settings: { isGraded: true } };
 
-    const csv = exportAttemptsToCsv(quiz, [
+    const csv = exportAttemptsToCsv(testTranslate, quiz, [
       {
         id: 'a1',
         quizId: quiz.id,
@@ -44,7 +45,7 @@ describe('exportAttemptsToCsv', () => {
     const question = { ...quiz.questions[0], prompt: 'Комментарий; если есть' };
     quiz = replaceQuestion(quiz, question);
 
-    const csv = exportAttemptsToCsv(quiz, [
+    const csv = exportAttemptsToCsv(testTranslate, quiz, [
       {
         id: 'a1',
         quizId: quiz.id,
@@ -77,7 +78,7 @@ describe('exportAttemptsToCsv', () => {
     const snapshotQuestion = { ...question, correctOptionId: 'o2' } as SingleChoiceQuestion;
     const snapshotQuiz = replaceQuestion(quiz, snapshotQuestion);
 
-    const csv = exportAttemptsToCsv(quiz, [
+    const csv = exportAttemptsToCsv(testTranslate, quiz, [
       {
         id: 'a1',
         quizId: quiz.id,

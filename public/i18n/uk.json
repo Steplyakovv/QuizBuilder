@@ -1,0 +1,263 @@
+{
+  "common": {
+    "switchToLightTheme": "Увімкнути світлу тему",
+    "switchToDarkTheme": "Увімкнути темну тему",
+    "languageSwitcherLabel": "Мова інтерфейсу",
+    "backToList": "← До списку опитувань",
+    "quizNotFound": "Опитування не знайдено.",
+    "dragToReorder": "Перетягніть, щоб змінити порядок",
+    "optionalHint": "Необов'язково",
+    "minLabel": "Мінімум",
+    "maxLabel": "Максимум",
+    "stepLabel": "Крок",
+    "copySuffix": "(копія)",
+    "importCorruptedFile": "Файл пошкоджено або він не є коректним JSON.",
+    "importNotAQuiz": "Файл не схожий на експортоване опитування."
+  },
+  "login": {
+    "title": "Вхід для адміністратора",
+    "hint": "Облікові дані адміністратора за замовчуванням: admin / admin",
+    "usernameLabel": "Логін",
+    "passwordLabel": "Пароль",
+    "submit": "Увійти",
+    "invalidCredentials": "Невірний логін або пароль."
+  },
+  "quizList": {
+    "title": "Опитування",
+    "loggedInAsAdmin": "Ви увійшли як адміністратор",
+    "settingsTitle": "Налаштування сповіщень",
+    "logout": "Вийти",
+    "loginAsAdmin": "Увійти як адміністратор",
+    "newQuizNameLabel": "Назва нового опитування",
+    "newQuizPlaceholder": "Наприклад: Опитування про продукт",
+    "create": "Створити",
+    "import": "Імпортувати",
+    "emptyStateAdmin": "Опитувань поки немає — створіть перше вище.",
+    "emptyState": "Опитувань поки немає.",
+    "openEditorTitle": "Відкрити редактор питань",
+    "draftBadge": "Чернетка",
+    "questionsCount": "{{count}} питання(нь)",
+    "takeQuiz": "Пройти опитування",
+    "results": "Результати",
+    "exportJson": "Експортувати в JSON",
+    "rename": "Перейменувати",
+    "duplicate": "Дублювати",
+    "delete": "Видалити",
+    "deleteConfirm": "Видалити опитування «{{title}}»?",
+    "emptyTitleError": "Введіть назву опитування.",
+    "importGenericError": "Не вдалося імпортувати опитування."
+  },
+  "quizEditor": {
+    "unsavedIndicator": "Є незбережені зміни",
+    "closePreview": "Закрити перегляд",
+    "preview": "Перегляд",
+    "save": "Зберегти",
+    "titleLabel": "Назва опитування",
+    "descriptionLabel": "Опис",
+    "settingsHeading": "Налаштування опитування",
+    "gradedCheckbox": "Квіз з балами (позначати правильні відповіді)",
+    "shuffleCheckbox": "Перемішувати порядок питань",
+    "publishedCheckbox": "Опубліковано (доступне для проходження)",
+    "timeLimitLabel": "Ліміт часу (хв)",
+    "maxAttemptsLabel": "Ліміт спроб",
+    "accessPasswordLabel": "Код доступу",
+    "expiresAtLabel": "Доступне до",
+    "webhookUrlLabel": "URL вебхука",
+    "webhookHint": "Необов'язково — POST-запит під час кожного проходження",
+    "pagesHeading": "Сторінки",
+    "noPagesHint": "Сторінок поки немає — питання показуються одним списком. Додайте сторінку, щоб групувати питання за темами: під час проходження вони показуватимуться по черзі, кожна зі своєю назвою.",
+    "pageTitleLabel": "Назва сторінки",
+    "deletePage": "Видалити сторінку",
+    "newPageLabel": "Нова сторінка",
+    "addPage": "Додати сторінку",
+    "questionsHeading": "Питання",
+    "noQuestions": "Питань поки немає — додайте перше нижче.",
+    "questionOrderLabel": "№",
+    "requiredCheckbox": "Обов'язкове",
+    "deleteQuestion": "Видалити питання",
+    "pageSelectLabel": "Сторінка",
+    "noPageOption": "— без сторінки —",
+    "conditionSourceLabel": "Показувати після вибраного питання",
+    "alwaysShowOption": "— завжди показувати —",
+    "noPromptText": "(без тексту)",
+    "questionTypeLabel": "Тип питання",
+    "addQuestion": "Додати питання",
+    "quotaExceededError": "Не вдалося зберегти: перевищено ліміт сховища браузера. Спробуйте використати менші зображення.",
+    "genericSaveError": "Не вдалося зберегти опитування. Спробуйте ще раз."
+  },
+  "constantSumEditor": {
+    "totalLabel": "Усього балів"
+  },
+  "textEditor": {
+    "multilineCheckbox": "Багаторядкова відповідь",
+    "maxLengthLabel": "Максимум символів"
+  },
+  "trueFalseEditor": {
+    "correctAnswerLabel": "Правильна відповідь:"
+  },
+  "imageChoiceEditor": {
+    "multipleCheckbox": "Декілька правильних варіантів"
+  },
+  "fillInTheBlankEditor": {
+    "templateLabel": "Текст із пропусками ({{marker}} — місце пропуску)",
+    "correctAnswersLabel": "Правильні відповіді для пропусків:",
+    "blankLabel": "Пропуск {{index}}"
+  },
+  "matrixEditor": {
+    "rowsLabel": "Рядки (твердження)",
+    "columnsLabel": "Стовпці (шкала)"
+  },
+  "rankingEditor": {
+    "reorderHint": "Порядок варіантів нижче — правильний порядок сортування.",
+    "correctOrderPreview": "Правильний порядок: {{order}}"
+  },
+  "wordChoiceEditor": {
+    "reorderHint": "Порядок слів нижче — правильний порядок фрази.",
+    "correctPhrasePreview": "Правильна відповідь: «{{phrase}}»"
+  },
+  "matchingEditor": {
+    "leftPlaceholder": "Лівий варіант",
+    "rightPlaceholder": "Правий варіант",
+    "removePair": "Видалити пару",
+    "addPair": "Додати пару"
+  },
+  "hotspotEditor": {
+    "imageUrlLabel": "URL зображення",
+    "uploadFile": "Завантажити файл",
+    "clickHint": "Клацніть по зображенню, щоб додати область.",
+    "addRegionAriaLabel": "Додати область по кліку або натисканню Enter (у центр зображення)",
+    "regionAriaLabel": "Область {{index}}: {{width}}% × {{height}}%, зліва {{x}}%, зверху {{y}}%. Стрілки — перемістити, Shift + стрілки — змінити розмір.",
+    "widthLabel": "Ширина, %",
+    "heightLabel": "Висота, %",
+    "correctRegion": "Правильна область",
+    "markCorrectRegion": "Позначити як правильну",
+    "removeRegion": "Видалити область"
+  },
+  "optionListEditor": {
+    "correctAnswer": "Правильна відповідь",
+    "markCorrect": "Позначити як правильний",
+    "optionLabelPlaceholder": "Текст варіанта",
+    "imageUrlPlaceholder": "URL зображення",
+    "uploadImage": "Завантажити зображення з диска",
+    "removeOption": "Видалити варіант",
+    "addOption": "Додати варіант"
+  },
+  "quizAttempt": {
+    "yes": "Так",
+    "no": "Ні",
+    "hotspotRegion": "Область №{{index}}",
+    "anyAnswer": "[будь-яка відповідь]"
+  },
+  "quizResults": {
+    "resultsTitle": "Результати: {{title}}",
+    "noAttempts": "Поки що ніхто не пройшов це опитування.",
+    "statsTitle": "Статистика за питаннями",
+    "statCorrectOf": "{{correct}} з {{total}} правильно",
+    "attemptsTitle": "Спроби",
+    "respondentFilterLabel": "Пошук за респондентом",
+    "exportCsv": "Експорт у CSV",
+    "noFilteredAttempts": "Немає спроб, що відповідають фільтру.",
+    "respondentHeader": "Респондент",
+    "startedHeader": "Розпочато",
+    "completedHeader": "Завершено",
+    "scoreHeader": "Бали",
+    "anonymous": "Анонім",
+    "scoreOf": "{{correct}} з {{total}}",
+    "hide": "Приховати",
+    "answers": "Відповіді",
+    "correct": "Правильно",
+    "incorrect": "Неправильно",
+    "correctAnswerPrefix": "Правильна відповідь: {{answer}}"
+  },
+  "settings": {
+    "title": "Налаштування сповіщень",
+    "hint": "Email, на який надходитиме звіт із відповідями під час кожного проходження опитування.",
+    "hostLabel": "SMTP-хост",
+    "hostHint": "Наприклад, smtp.gmail.com",
+    "portLabel": "Порт",
+    "startTlsCheckbox": "Використовувати STARTTLS (вимкніть для портів з неявним SSL, наприклад 465)",
+    "usernameLabel": "Ім'я користувача",
+    "passwordLabel": "Пароль",
+    "passwordSetHint": "Вже встановлено — залиште порожнім, щоб не змінювати",
+    "passwordNotSetHint": "Не встановлено",
+    "fromLabel": "Від кого (From)",
+    "fromHint": "Необов'язково — за замовчуванням використовується ім'я користувача",
+    "recipientLabel": "Отримувач звітів",
+    "save": "Зберегти",
+    "sendTestEmail": "Надіслати тестовий лист",
+    "savedMessage": "Збережено.",
+    "testEmailSentMessage": "Тестовий лист надіслано.",
+    "testEmailFailedMessage": "Не вдалося надіслати лист."
+  },
+  "hotspotRunner": {
+    "regionAriaLabel": "Область на зображенні"
+  },
+  "fileUploadRunner": {
+    "replaceFile": "Замінити файл",
+    "selectFile": "Вибрати файл"
+  },
+  "wordChoiceRunner": {
+    "placeholder": "Складіть фразу, натискаючи на слова нижче"
+  },
+  "constantSumRunner": {
+    "remainingLabel": "Залишилося розподілити: {{remaining}} з {{total}}"
+  },
+  "dropdownRunner": {
+    "selectOption": "Виберіть варіант"
+  },
+  "matchingRunner": {
+    "pendingStatus": "вибрано, очікує пари",
+    "matchedWith": "зіставлено з «{{label}}»",
+    "notMatched": "не зіставлено"
+  },
+  "quizRunner": {
+    "previewBanner": "Це попередній перегляд — відповіді не зберігаються.",
+    "previewSubmittedResult": "Це попередній перегляд — відповіді не збережено.",
+    "submittedThankYou": "Дякуємо! Ваші відповіді збережено.",
+    "scoreResult": "Результат: {{correct}} з {{total}} правильних відповідей",
+    "draftBlocked": "Це опитування ще не опубліковано.",
+    "expiredBlocked": "Термін проходження цього опитування минув.",
+    "accessPasswordLabel": "Код доступу",
+    "continueButton": "Продовжити",
+    "attemptsBlocked": "Ви вичерпали ліміт спроб проходження цього опитування ({{max}}).",
+    "remainingTime": "Залишилося часу: {{time}}",
+    "respondentNameLabel": "Ваше ім'я (необов'язково)",
+    "pageProgress": "Сторінка {{current}} з {{total}}",
+    "requiredFieldError": "Це поле обов'язкове для заповнення",
+    "back": "Назад",
+    "next": "Далі",
+    "submitAnswers": "Надіслати відповіді",
+    "invalidAccessCode": "Невірний код доступу.",
+    "quotaExceededError": "Не вдалося зберегти відповіді: перевищено ліміт сховища браузера.",
+    "genericSaveError": "Не вдалося зберегти відповіді. Спробуйте ще раз."
+  },
+  "questionTypes": {
+    "single-choice": "Одиночний вибір",
+    "multiple-choice": "Множинний вибір",
+    "text": "Текстова відповідь",
+    "image-choice": "Вибір картинки",
+    "true-false": "Так/Ні",
+    "dropdown": "Розкривний список",
+    "number": "Числова відповідь",
+    "date": "Дата",
+    "rating": "Шкала оцінки",
+    "slider": "Повзунок",
+    "constant-sum": "Розподіл балів",
+    "word-choice": "Вибір слів",
+    "fill-in-the-blank": "Текст із пропусками",
+    "ranking": "Сортування варіантів",
+    "matching": "Зіставлення пар",
+    "matrix": "Таблиця (матриця)",
+    "hotspot": "Область на зображенні",
+    "file-upload": "Завантаження файлу"
+  },
+  "paginator": {
+    "itemsPerPage": "Показувати по:",
+    "nextPage": "Наступна сторінка",
+    "previousPage": "Попередня сторінка",
+    "firstPage": "Перша сторінка",
+    "lastPage": "Остання сторінка",
+    "rangeEmpty": "0 з {{length}}",
+    "range": "{{start}} – {{end}} з {{length}}"
+  }
+}

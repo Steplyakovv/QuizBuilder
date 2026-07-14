@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { ConstantSumQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { ConstantSumEditor } from './constant-sum-editor';
 
 describe('ConstantSumEditor', () => {
   async function createComponent(question: ConstantSumQuestion) {
-    await TestBed.configureTestingModule({ imports: [ConstantSumEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [ConstantSumEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(ConstantSumEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

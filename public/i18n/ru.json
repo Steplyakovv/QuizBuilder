@@ -1,0 +1,263 @@
+{
+  "common": {
+    "switchToLightTheme": "Включить светлую тему",
+    "switchToDarkTheme": "Включить тёмную тему",
+    "languageSwitcherLabel": "Язык интерфейса",
+    "backToList": "← К списку опросников",
+    "quizNotFound": "Опросник не найден.",
+    "dragToReorder": "Перетащить для изменения порядка",
+    "optionalHint": "Необязательно",
+    "minLabel": "Минимум",
+    "maxLabel": "Максимум",
+    "stepLabel": "Шаг",
+    "copySuffix": "(копия)",
+    "importCorruptedFile": "Файл повреждён или не является корректным JSON.",
+    "importNotAQuiz": "Файл не похож на экспортированный опросник."
+  },
+  "login": {
+    "title": "Вход для администратора",
+    "hint": "Учётные данные администратора по умолчанию: admin / admin",
+    "usernameLabel": "Логин",
+    "passwordLabel": "Пароль",
+    "submit": "Войти",
+    "invalidCredentials": "Неверный логин или пароль."
+  },
+  "quizList": {
+    "title": "Опросники",
+    "loggedInAsAdmin": "Вы вошли как администратор",
+    "settingsTitle": "Настройки уведомлений",
+    "logout": "Выйти",
+    "loginAsAdmin": "Войти как администратор",
+    "newQuizNameLabel": "Название нового опросника",
+    "newQuizPlaceholder": "Например: Опрос о продукте",
+    "create": "Создать",
+    "import": "Импортировать",
+    "emptyStateAdmin": "Опросников пока нет — создайте первый выше.",
+    "emptyState": "Опросников пока нет.",
+    "openEditorTitle": "Открыть редактор вопросов",
+    "draftBadge": "Черновик",
+    "questionsCount": "{{count}} вопрос(ов)",
+    "takeQuiz": "Пройти опросник",
+    "results": "Результаты",
+    "exportJson": "Экспортировать в JSON",
+    "rename": "Переименовать",
+    "duplicate": "Дублировать",
+    "delete": "Удалить",
+    "deleteConfirm": "Удалить опросник «{{title}}»?",
+    "emptyTitleError": "Введите название опросника.",
+    "importGenericError": "Не удалось импортировать опросник."
+  },
+  "quizEditor": {
+    "unsavedIndicator": "Есть несохранённые изменения",
+    "closePreview": "Закрыть предпросмотр",
+    "preview": "Предпросмотр",
+    "save": "Сохранить",
+    "titleLabel": "Название опросника",
+    "descriptionLabel": "Описание",
+    "settingsHeading": "Настройки опросника",
+    "gradedCheckbox": "Квиз с баллами (отмечать правильные ответы)",
+    "shuffleCheckbox": "Перемешивать порядок вопросов",
+    "publishedCheckbox": "Опубликован (доступен для прохождения)",
+    "timeLimitLabel": "Лимит времени (мин)",
+    "maxAttemptsLabel": "Лимит попыток",
+    "accessPasswordLabel": "Код доступа",
+    "expiresAtLabel": "Доступен до",
+    "webhookUrlLabel": "URL вебхука",
+    "webhookHint": "Опционально — POST-запрос при каждом прохождении",
+    "pagesHeading": "Страницы",
+    "noPagesHint": "Страниц пока нет — вопросы показываются одним списком. Добавьте страницу, чтобы группировать вопросы по темам: в прохождении они будут показаны по очереди, со своим названием.",
+    "pageTitleLabel": "Название страницы",
+    "deletePage": "Удалить страницу",
+    "newPageLabel": "Новая страница",
+    "addPage": "Добавить страницу",
+    "questionsHeading": "Вопросы",
+    "noQuestions": "Вопросов пока нет — добавьте первый ниже.",
+    "questionOrderLabel": "№",
+    "requiredCheckbox": "Обязательный",
+    "deleteQuestion": "Удалить вопрос",
+    "pageSelectLabel": "Страница",
+    "noPageOption": "— без страницы —",
+    "conditionSourceLabel": "Показывать после выбранного вопроса",
+    "alwaysShowOption": "— всегда показывать —",
+    "noPromptText": "(без текста)",
+    "questionTypeLabel": "Тип вопроса",
+    "addQuestion": "Добавить вопрос",
+    "quotaExceededError": "Не удалось сохранить: превышен лимит хранилища браузера. Попробуйте использовать картинки меньшего размера.",
+    "genericSaveError": "Не удалось сохранить опросник. Попробуйте ещё раз."
+  },
+  "constantSumEditor": {
+    "totalLabel": "Всего очков"
+  },
+  "textEditor": {
+    "multilineCheckbox": "Многострочный ответ",
+    "maxLengthLabel": "Максимум символов"
+  },
+  "trueFalseEditor": {
+    "correctAnswerLabel": "Правильный ответ:"
+  },
+  "imageChoiceEditor": {
+    "multipleCheckbox": "Несколько правильных вариантов"
+  },
+  "fillInTheBlankEditor": {
+    "templateLabel": "Текст с пропусками ({{marker}} — место пропуска)",
+    "correctAnswersLabel": "Правильные ответы для пропусков:",
+    "blankLabel": "Пропуск {{index}}"
+  },
+  "matrixEditor": {
+    "rowsLabel": "Строки (утверждения)",
+    "columnsLabel": "Столбцы (шкала)"
+  },
+  "rankingEditor": {
+    "reorderHint": "Порядок вариантов ниже — правильный порядок сортировки.",
+    "correctOrderPreview": "Правильный порядок: {{order}}"
+  },
+  "wordChoiceEditor": {
+    "reorderHint": "Порядок слов ниже — правильный порядок фразы.",
+    "correctPhrasePreview": "Правильный ответ: «{{phrase}}»"
+  },
+  "matchingEditor": {
+    "leftPlaceholder": "Левый вариант",
+    "rightPlaceholder": "Правый вариант",
+    "removePair": "Удалить пару",
+    "addPair": "Добавить пару"
+  },
+  "hotspotEditor": {
+    "imageUrlLabel": "URL картинки",
+    "uploadFile": "Загрузить файл",
+    "clickHint": "Кликните по картинке, чтобы добавить область.",
+    "addRegionAriaLabel": "Добавить область по клику или нажатию Enter (в центр изображения)",
+    "regionAriaLabel": "Область {{index}}: {{width}}% × {{height}}%, слева {{x}}%, сверху {{y}}%. Стрелки — переместить, Shift + стрелки — изменить размер.",
+    "widthLabel": "Ширина, %",
+    "heightLabel": "Высота, %",
+    "correctRegion": "Правильная область",
+    "markCorrectRegion": "Отметить как правильную",
+    "removeRegion": "Удалить область"
+  },
+  "optionListEditor": {
+    "correctAnswer": "Правильный ответ",
+    "markCorrect": "Отметить как правильный",
+    "optionLabelPlaceholder": "Текст варианта",
+    "imageUrlPlaceholder": "URL картинки",
+    "uploadImage": "Загрузить картинку с диска",
+    "removeOption": "Удалить вариант",
+    "addOption": "Добавить вариант"
+  },
+  "quizAttempt": {
+    "yes": "Да",
+    "no": "Нет",
+    "hotspotRegion": "Область №{{index}}",
+    "anyAnswer": "[любой ответ]"
+  },
+  "quizResults": {
+    "resultsTitle": "Результаты: {{title}}",
+    "noAttempts": "Пока никто не прошёл этот опросник.",
+    "statsTitle": "Статистика по вопросам",
+    "statCorrectOf": "{{correct}} из {{total}} верно",
+    "attemptsTitle": "Попытки",
+    "respondentFilterLabel": "Поиск по респонденту",
+    "exportCsv": "Экспорт в CSV",
+    "noFilteredAttempts": "Нет попыток, соответствующих фильтру.",
+    "respondentHeader": "Респондент",
+    "startedHeader": "Начато",
+    "completedHeader": "Завершено",
+    "scoreHeader": "Баллы",
+    "anonymous": "Аноним",
+    "scoreOf": "{{correct}} из {{total}}",
+    "hide": "Скрыть",
+    "answers": "Ответы",
+    "correct": "Правильно",
+    "incorrect": "Неправильно",
+    "correctAnswerPrefix": "Правильный ответ: {{answer}}"
+  },
+  "settings": {
+    "title": "Настройки уведомлений",
+    "hint": "Email, на который придёт отчёт с ответами при каждом прохождении опросника.",
+    "hostLabel": "SMTP-хост",
+    "hostHint": "Например, smtp.gmail.com",
+    "portLabel": "Порт",
+    "startTlsCheckbox": "Использовать STARTTLS (выключите для портов с неявным SSL, например 465)",
+    "usernameLabel": "Имя пользователя",
+    "passwordLabel": "Пароль",
+    "passwordSetHint": "Уже задан — оставьте пустым, чтобы не менять",
+    "passwordNotSetHint": "Не задан",
+    "fromLabel": "От кого (From)",
+    "fromHint": "Необязательно — по умолчанию используется имя пользователя",
+    "recipientLabel": "Получатель отчётов",
+    "save": "Сохранить",
+    "sendTestEmail": "Отправить тестовое письмо",
+    "savedMessage": "Сохранено.",
+    "testEmailSentMessage": "Тестовое письмо отправлено.",
+    "testEmailFailedMessage": "Не удалось отправить письмо."
+  },
+  "hotspotRunner": {
+    "regionAriaLabel": "Область на изображении"
+  },
+  "fileUploadRunner": {
+    "replaceFile": "Заменить файл",
+    "selectFile": "Выбрать файл"
+  },
+  "wordChoiceRunner": {
+    "placeholder": "Собирайте фразу, нажимая на слова ниже"
+  },
+  "constantSumRunner": {
+    "remainingLabel": "Осталось распределить: {{remaining}} из {{total}}"
+  },
+  "dropdownRunner": {
+    "selectOption": "Выберите вариант"
+  },
+  "matchingRunner": {
+    "pendingStatus": "выбрано, ожидает пары",
+    "matchedWith": "сопоставлено с «{{label}}»",
+    "notMatched": "не сопоставлено"
+  },
+  "quizRunner": {
+    "previewBanner": "Это предпросмотр — ответы не сохраняются.",
+    "previewSubmittedResult": "Это предпросмотр — ответы не сохранены.",
+    "submittedThankYou": "Спасибо! Ваши ответы сохранены.",
+    "scoreResult": "Результат: {{correct}} из {{total}} правильных ответов",
+    "draftBlocked": "Этот опросник ещё не опубликован.",
+    "expiredBlocked": "Срок прохождения этого опросника истёк.",
+    "accessPasswordLabel": "Код доступа",
+    "continueButton": "Продолжить",
+    "attemptsBlocked": "Вы исчерпали лимит попыток прохождения этого опросника ({{max}}).",
+    "remainingTime": "Осталось времени: {{time}}",
+    "respondentNameLabel": "Ваше имя (необязательно)",
+    "pageProgress": "Страница {{current}} из {{total}}",
+    "requiredFieldError": "Это поле обязательно для заполнения",
+    "back": "Назад",
+    "next": "Далее",
+    "submitAnswers": "Отправить ответы",
+    "invalidAccessCode": "Неверный код доступа.",
+    "quotaExceededError": "Не удалось сохранить ответы: превышен лимит хранилища браузера.",
+    "genericSaveError": "Не удалось сохранить ответы. Попробуйте ещё раз."
+  },
+  "questionTypes": {
+    "single-choice": "Одиночный выбор",
+    "multiple-choice": "Множественный выбор",
+    "text": "Текстовый ответ",
+    "image-choice": "Выбор картинки",
+    "true-false": "Да/Нет",
+    "dropdown": "Выпадающий список",
+    "number": "Числовой ответ",
+    "date": "Дата",
+    "rating": "Шкала оценки",
+    "slider": "Ползунок",
+    "constant-sum": "Распределение баллов",
+    "word-choice": "Выбор слов",
+    "fill-in-the-blank": "Текст с пропусками",
+    "ranking": "Сортировка вариантов",
+    "matching": "Сопоставление пар",
+    "matrix": "Таблица (матрица)",
+    "hotspot": "Область на изображении",
+    "file-upload": "Загрузка файла"
+  },
+  "paginator": {
+    "itemsPerPage": "Показывать по:",
+    "nextPage": "Следующая страница",
+    "previousPage": "Предыдущая страница",
+    "firstPage": "Первая страница",
+    "lastPage": "Последняя страница",
+    "rangeEmpty": "0 из {{length}}",
+    "range": "{{start}} – {{end}} из {{length}}"
+  }
+}

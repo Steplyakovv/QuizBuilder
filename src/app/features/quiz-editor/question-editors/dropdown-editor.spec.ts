@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { DropdownQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { DropdownEditor } from './dropdown-editor';
 
 describe('DropdownEditor', () => {
   async function createComponent(question: DropdownQuestion) {
-    await TestBed.configureTestingModule({ imports: [DropdownEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [DropdownEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(DropdownEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

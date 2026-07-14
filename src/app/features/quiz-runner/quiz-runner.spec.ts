@@ -9,6 +9,7 @@ import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QUIZ_REPOSITORY } from '../../core/repositories/quiz-repository';
 import { FakeAttemptRepository } from '../../core/testing/fake-attempt-repository';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
+import { provideTestTransloco } from '../../core/testing/provide-test-transloco';
 import { QuizRunner } from './quiz-runner';
 
 describe('QuizRunner', () => {
@@ -20,6 +21,7 @@ describe('QuizRunner', () => {
       imports: [QuizRunner],
       providers: [
         provideRouter([]),
+        provideTestTransloco(),
         { provide: QUIZ_REPOSITORY, useValue: quizRepository },
         { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
       ],
@@ -145,6 +147,7 @@ describe('QuizRunner', () => {
       imports: [QuizRunner],
       providers: [
         provideRouter([]),
+        provideTestTransloco(),
         { provide: QUIZ_REPOSITORY, useValue: quizRepository },
         { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
       ],
@@ -451,6 +454,7 @@ describe('QuizRunner', () => {
         imports: [QuizRunner],
         providers: [
           provideRouter([]),
+          provideTestTransloco(),
           { provide: QUIZ_REPOSITORY, useValue: quizRepository },
           { provide: ATTEMPT_REPOSITORY, useValue: attemptRepository },
         ],

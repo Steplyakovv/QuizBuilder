@@ -1,10 +1,21 @@
 <div class="app-shell-bar">
+  <mat-button-toggle-group
+    class="language-switcher"
+    [value]="language()"
+    (change)="setLanguage($any($event.value))"
+    [attr.aria-label]="languageSwitcherLabel()"
+  >
+    @for (lang of languages; track lang) {
+      <mat-button-toggle [value]="lang">{{ lang.toUpperCase() }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+
   <button
     mat-icon-button
     type="button"
     (click)="toggleTheme()"
-    [attr.aria-label]="theme() === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'"
-    [attr.title]="theme() === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'"
+    [attr.aria-label]="theme() === 'dark' ? switchToLightThemeLabel() : switchToDarkThemeLabel()"
+    [attr.title]="theme() === 'dark' ? switchToLightThemeLabel() : switchToDarkThemeLabel()"
   >
     <mat-icon>{{ theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>

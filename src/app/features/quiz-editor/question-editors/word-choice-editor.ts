@@ -1,4 +1,5 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslocoService, translateSignal } from '@jsverse/transloco';
 import { Option, WordChoiceQuestion } from '../../../core/models/quiz.models';
 import { OptionListEditor } from '../../../shared/option-list-editor/option-list-editor';
 
@@ -6,9 +7,9 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
   selector: 'app-word-choice-editor',
   imports: [OptionListEditor],
   template: `
-    <p class="reorder-hint">Порядок слов ниже — правильный порядок фразы.</p>
+    <p class="reorder-hint">{{ reorderHintLabel() }}</p>
     @if (correctPhrase()) {
-      <p class="correct-preview">Правильный ответ: «{{ correctPhrase() }}»</p>
+      <p class="correct-preview">{{ correctPhraseLabel() }}</p>
     }
     <app-option-list-editor
       [options]="question().words"
@@ -30,14 +31,24 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
   `,
 })
 export class WordChoiceEditor {
+  private readonly transloco = inject(TranslocoService);
+
   readonly question = input.required<WordChoiceQuestion>();
   readonly questionChange = output<WordChoiceQuestion>();
+
+  protected readonly reorderHintLabel = translateSignal('wordChoiceEditor.reorderHint');
 
   readonly correctPhrase = computed(() =>
     this.question()
       .words.map((word) => word.label)
       .join(' '),
   );
+
+  correctPhraseLabel(): string {
+    return this.transloco.translate('wordChoiceEditor.correctPhrasePreview', {
+      phrase: this.correctPhrase(),
+    });
+  }
 
   onWordsChange(words: Option[]): void {
     this.questionChange.emit({ ...this.question(), words });

@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { translateSignal } from '@jsverse/transloco';
 import { MatrixQuestion, Option } from '../../../core/models/quiz.models';
 import { OptionListEditor } from '../../../shared/option-list-editor/option-list-editor';
 
@@ -8,14 +9,14 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
   template: `
     <div class="matrix-editor">
       <div class="matrix-editor-column">
-        <p class="matrix-editor-label">Строки (утверждения)</p>
+        <p class="matrix-editor-label">{{ rowsLabel() }}</p>
         <app-option-list-editor
           [options]="question().rows"
           (optionsChange)="onRowsChange($event)"
         />
       </div>
       <div class="matrix-editor-column">
-        <p class="matrix-editor-label">Столбцы (шкала)</p>
+        <p class="matrix-editor-label">{{ columnsLabel() }}</p>
         <app-option-list-editor
           [options]="question().columns"
           (optionsChange)="onColumnsChange($event)"
@@ -45,6 +46,9 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
 export class MatrixEditor {
   readonly question = input.required<MatrixQuestion>();
   readonly questionChange = output<MatrixQuestion>();
+
+  protected readonly rowsLabel = translateSignal('matrixEditor.rowsLabel');
+  protected readonly columnsLabel = translateSignal('matrixEditor.columnsLabel');
 
   onRowsChange(rows: Option[]): void {
     this.questionChange.emit({ ...this.question(), rows });

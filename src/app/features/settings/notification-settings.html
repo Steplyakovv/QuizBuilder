@@ -1,23 +1,23 @@
 @if (settings(); as settings) {
   <div class="notification-settings">
-    <a routerLink="/" class="back-link">← К списку опросников</a>
+    <a routerLink="/" class="back-link">{{ backToListLabel() }}</a>
 
-    <h1>Настройки уведомлений</h1>
-    <p class="hint">Email, на который придёт отчёт с ответами при каждом прохождении опросника.</p>
+    <h1>{{ titleLabel() }}</h1>
+    <p class="hint">{{ hintLabel() }}</p>
 
     <div class="settings-form">
       <mat-form-field appearance="outline">
-        <mat-label>SMTP-хост</mat-label>
+        <mat-label>{{ hostLabel() }}</mat-label>
         <input
           matInput
           [value]="settings.host ?? ''"
           (blur)="updateHost($any($event.target).value)"
         />
-        <mat-hint>Например, smtp.gmail.com</mat-hint>
+        <mat-hint>{{ hostHintLabel() }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="port-field">
-        <mat-label>Порт</mat-label>
+        <mat-label>{{ portLabel() }}</mat-label>
         <input
           matInput
           type="number"
@@ -27,11 +27,11 @@
       </mat-form-field>
 
       <mat-checkbox [checked]="settings.useStartTls" (change)="updateUseStartTls($event.checked)">
-        Использовать STARTTLS (выключите для портов с неявным SSL, например 465)
+        {{ startTlsCheckboxLabel() }}
       </mat-checkbox>
 
       <mat-form-field appearance="outline">
-        <mat-label>Имя пользователя</mat-label>
+        <mat-label>{{ usernameLabel() }}</mat-label>
         <input
           matInput
           [value]="settings.username ?? ''"
@@ -40,25 +40,25 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Пароль</mat-label>
+        <mat-label>{{ passwordLabel() }}</mat-label>
         <input matInput type="password" (blur)="updatePassword($any($event.target).value)" />
         <mat-hint>{{
-          settings.hasPassword ? 'Уже задан — оставьте пустым, чтобы не менять' : 'Не задан'
+          settings.hasPassword ? passwordSetHintLabel() : passwordNotSetHintLabel()
         }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>От кого (From)</mat-label>
+        <mat-label>{{ fromLabel() }}</mat-label>
         <input
           matInput
           [value]="settings.from ?? ''"
           (blur)="updateFrom($any($event.target).value)"
         />
-        <mat-hint>Необязательно — по умолчанию используется имя пользователя</mat-hint>
+        <mat-hint>{{ fromHintLabel() }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Получатель отчётов</mat-label>
+        <mat-label>{{ recipientLabel() }}</mat-label>
         <input
           matInput
           [value]="settings.reportRecipientEmail ?? ''"
@@ -69,10 +69,10 @@
 
     <div class="settings-actions">
       <button mat-flat-button color="primary" [disabled]="saving()" (click)="save()">
-        Сохранить
+        {{ saveLabel() }}
       </button>
       <button mat-button [disabled]="sendingTestEmail()" (click)="sendTestEmail()">
-        Отправить тестовое письмо
+        {{ sendTestEmailLabel() }}
       </button>
     </div>
 

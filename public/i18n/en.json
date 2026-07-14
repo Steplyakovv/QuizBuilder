@@ -1,0 +1,263 @@
+{
+  "common": {
+    "switchToLightTheme": "Switch to light theme",
+    "switchToDarkTheme": "Switch to dark theme",
+    "languageSwitcherLabel": "Interface language",
+    "backToList": "← Back to quiz list",
+    "quizNotFound": "Quiz not found.",
+    "dragToReorder": "Drag to reorder",
+    "optionalHint": "Optional",
+    "minLabel": "Minimum",
+    "maxLabel": "Maximum",
+    "stepLabel": "Step",
+    "copySuffix": "(copy)",
+    "importCorruptedFile": "The file is corrupted or is not valid JSON.",
+    "importNotAQuiz": "This file doesn't look like an exported quiz."
+  },
+  "login": {
+    "title": "Administrator sign-in",
+    "hint": "Default administrator credentials: admin / admin",
+    "usernameLabel": "Username",
+    "passwordLabel": "Password",
+    "submit": "Sign in",
+    "invalidCredentials": "Incorrect username or password."
+  },
+  "quizList": {
+    "title": "Quizzes",
+    "loggedInAsAdmin": "Signed in as administrator",
+    "settingsTitle": "Notification settings",
+    "logout": "Sign out",
+    "loginAsAdmin": "Sign in as administrator",
+    "newQuizNameLabel": "New quiz name",
+    "newQuizPlaceholder": "E.g. Product survey",
+    "create": "Create",
+    "import": "Import",
+    "emptyStateAdmin": "No quizzes yet — create your first one above.",
+    "emptyState": "No quizzes yet.",
+    "openEditorTitle": "Open question editor",
+    "draftBadge": "Draft",
+    "questionsCount": "{{count}} question(s)",
+    "takeQuiz": "Take quiz",
+    "results": "Results",
+    "exportJson": "Export to JSON",
+    "rename": "Rename",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "deleteConfirm": "Delete quiz “{{title}}”?",
+    "emptyTitleError": "Enter a quiz name.",
+    "importGenericError": "Failed to import the quiz."
+  },
+  "quizEditor": {
+    "unsavedIndicator": "You have unsaved changes",
+    "closePreview": "Close preview",
+    "preview": "Preview",
+    "save": "Save",
+    "titleLabel": "Quiz title",
+    "descriptionLabel": "Description",
+    "settingsHeading": "Quiz settings",
+    "gradedCheckbox": "Graded quiz (mark correct answers)",
+    "shuffleCheckbox": "Shuffle question order",
+    "publishedCheckbox": "Published (available to take)",
+    "timeLimitLabel": "Time limit (min)",
+    "maxAttemptsLabel": "Attempt limit",
+    "accessPasswordLabel": "Access code",
+    "expiresAtLabel": "Available until",
+    "webhookUrlLabel": "Webhook URL",
+    "webhookHint": "Optional — a POST request is sent on every submission",
+    "pagesHeading": "Pages",
+    "noPagesHint": "No pages yet — questions are shown as one list. Add a page to group questions by topic: during the attempt they're shown one at a time, each with its own title.",
+    "pageTitleLabel": "Page title",
+    "deletePage": "Delete page",
+    "newPageLabel": "New page",
+    "addPage": "Add page",
+    "questionsHeading": "Questions",
+    "noQuestions": "No questions yet — add the first one below.",
+    "questionOrderLabel": "#",
+    "requiredCheckbox": "Required",
+    "deleteQuestion": "Delete question",
+    "pageSelectLabel": "Page",
+    "noPageOption": "— no page —",
+    "conditionSourceLabel": "Show after this question is answered",
+    "alwaysShowOption": "— always show —",
+    "noPromptText": "(no text)",
+    "questionTypeLabel": "Question type",
+    "addQuestion": "Add question",
+    "quotaExceededError": "Failed to save: browser storage limit exceeded. Try using smaller images.",
+    "genericSaveError": "Failed to save the quiz. Please try again."
+  },
+  "constantSumEditor": {
+    "totalLabel": "Total points"
+  },
+  "textEditor": {
+    "multilineCheckbox": "Multiline answer",
+    "maxLengthLabel": "Maximum characters"
+  },
+  "trueFalseEditor": {
+    "correctAnswerLabel": "Correct answer:"
+  },
+  "imageChoiceEditor": {
+    "multipleCheckbox": "Multiple correct answers"
+  },
+  "fillInTheBlankEditor": {
+    "templateLabel": "Text with blanks ({{marker}} — blank placeholder)",
+    "correctAnswersLabel": "Correct answers for the blanks:",
+    "blankLabel": "Blank {{index}}"
+  },
+  "matrixEditor": {
+    "rowsLabel": "Rows (statements)",
+    "columnsLabel": "Columns (scale)"
+  },
+  "rankingEditor": {
+    "reorderHint": "The order of the options below is the correct sort order.",
+    "correctOrderPreview": "Correct order: {{order}}"
+  },
+  "wordChoiceEditor": {
+    "reorderHint": "The order of the words below is the correct phrase order.",
+    "correctPhrasePreview": "Correct answer: “{{phrase}}”"
+  },
+  "matchingEditor": {
+    "leftPlaceholder": "Left option",
+    "rightPlaceholder": "Right option",
+    "removePair": "Remove pair",
+    "addPair": "Add pair"
+  },
+  "hotspotEditor": {
+    "imageUrlLabel": "Image URL",
+    "uploadFile": "Upload file",
+    "clickHint": "Click the image to add a region.",
+    "addRegionAriaLabel": "Add a region by clicking or pressing Enter (at the image center)",
+    "regionAriaLabel": "Region {{index}}: {{width}}% × {{height}}%, {{x}}% from the left, {{y}}% from the top. Arrow keys move it, Shift + arrow keys resize it.",
+    "widthLabel": "Width, %",
+    "heightLabel": "Height, %",
+    "correctRegion": "Correct region",
+    "markCorrectRegion": "Mark as correct",
+    "removeRegion": "Remove region"
+  },
+  "optionListEditor": {
+    "correctAnswer": "Correct answer",
+    "markCorrect": "Mark as correct",
+    "optionLabelPlaceholder": "Option text",
+    "imageUrlPlaceholder": "Image URL",
+    "uploadImage": "Upload image from disk",
+    "removeOption": "Remove option",
+    "addOption": "Add option"
+  },
+  "quizAttempt": {
+    "yes": "Yes",
+    "no": "No",
+    "hotspotRegion": "Region #{{index}}",
+    "anyAnswer": "[any answer]"
+  },
+  "quizResults": {
+    "resultsTitle": "Results: {{title}}",
+    "noAttempts": "No one has taken this quiz yet.",
+    "statsTitle": "Question statistics",
+    "statCorrectOf": "{{correct}} of {{total}} correct",
+    "attemptsTitle": "Attempts",
+    "respondentFilterLabel": "Search by respondent",
+    "exportCsv": "Export to CSV",
+    "noFilteredAttempts": "No attempts match the filter.",
+    "respondentHeader": "Respondent",
+    "startedHeader": "Started",
+    "completedHeader": "Completed",
+    "scoreHeader": "Score",
+    "anonymous": "Anonymous",
+    "scoreOf": "{{correct}} of {{total}}",
+    "hide": "Hide",
+    "answers": "Answers",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "correctAnswerPrefix": "Correct answer: {{answer}}"
+  },
+  "settings": {
+    "title": "Notification settings",
+    "hint": "The email address that receives a report with the answers on every quiz submission.",
+    "hostLabel": "SMTP host",
+    "hostHint": "E.g. smtp.gmail.com",
+    "portLabel": "Port",
+    "startTlsCheckbox": "Use STARTTLS (turn off for implicit-SSL ports, e.g. 465)",
+    "usernameLabel": "Username",
+    "passwordLabel": "Password",
+    "passwordSetHint": "Already set — leave blank to keep it unchanged",
+    "passwordNotSetHint": "Not set",
+    "fromLabel": "From",
+    "fromHint": "Optional — defaults to the username",
+    "recipientLabel": "Report recipient",
+    "save": "Save",
+    "sendTestEmail": "Send test email",
+    "savedMessage": "Saved.",
+    "testEmailSentMessage": "Test email sent.",
+    "testEmailFailedMessage": "Failed to send the email."
+  },
+  "hotspotRunner": {
+    "regionAriaLabel": "Region on the image"
+  },
+  "fileUploadRunner": {
+    "replaceFile": "Replace file",
+    "selectFile": "Select file"
+  },
+  "wordChoiceRunner": {
+    "placeholder": "Build the phrase by clicking the words below"
+  },
+  "constantSumRunner": {
+    "remainingLabel": "Remaining to distribute: {{remaining}} of {{total}}"
+  },
+  "dropdownRunner": {
+    "selectOption": "Select an option"
+  },
+  "matchingRunner": {
+    "pendingStatus": "selected, waiting for a match",
+    "matchedWith": "matched with “{{label}}”",
+    "notMatched": "not matched"
+  },
+  "quizRunner": {
+    "previewBanner": "This is a preview — answers are not saved.",
+    "previewSubmittedResult": "This is a preview — the answers were not saved.",
+    "submittedThankYou": "Thank you! Your answers have been saved.",
+    "scoreResult": "Result: {{correct}} of {{total}} correct",
+    "draftBlocked": "This quiz hasn't been published yet.",
+    "expiredBlocked": "The deadline to take this quiz has passed.",
+    "accessPasswordLabel": "Access code",
+    "continueButton": "Continue",
+    "attemptsBlocked": "You've used up the attempt limit for this quiz ({{max}}).",
+    "remainingTime": "Time remaining: {{time}}",
+    "respondentNameLabel": "Your name (optional)",
+    "pageProgress": "Page {{current}} of {{total}}",
+    "requiredFieldError": "This field is required",
+    "back": "Back",
+    "next": "Next",
+    "submitAnswers": "Submit answers",
+    "invalidAccessCode": "Incorrect access code.",
+    "quotaExceededError": "Failed to save your answers: browser storage limit exceeded.",
+    "genericSaveError": "Failed to save your answers. Please try again."
+  },
+  "questionTypes": {
+    "single-choice": "Single choice",
+    "multiple-choice": "Multiple choice",
+    "text": "Text answer",
+    "image-choice": "Image choice",
+    "true-false": "True/False",
+    "dropdown": "Dropdown list",
+    "number": "Numeric answer",
+    "date": "Date",
+    "rating": "Rating scale",
+    "slider": "Slider",
+    "constant-sum": "Point allocation",
+    "word-choice": "Word choice",
+    "fill-in-the-blank": "Fill in the blank",
+    "ranking": "Ranking",
+    "matching": "Matching pairs",
+    "matrix": "Matrix table",
+    "hotspot": "Image hotspot",
+    "file-upload": "File upload"
+  },
+  "paginator": {
+    "itemsPerPage": "Items per page:",
+    "nextPage": "Next page",
+    "previousPage": "Previous page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "rangeEmpty": "0 of {{length}}",
+    "range": "{{start}} – {{end}} of {{length}}"
+  }
+}

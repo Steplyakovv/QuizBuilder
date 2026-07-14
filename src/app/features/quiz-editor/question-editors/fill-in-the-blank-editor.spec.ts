@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { FillInTheBlankQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { FillInTheBlankEditor } from './fill-in-the-blank-editor';
 
 describe('FillInTheBlankEditor', () => {
   async function createComponent(question: FillInTheBlankQuestion) {
     await TestBed.configureTestingModule({
       imports: [FillInTheBlankEditor],
+      providers: [provideTestTransloco()],
     }).compileComponents();
     const fixture = TestBed.createComponent(FillInTheBlankEditor);
     fixture.componentRef.setInput('question', question);

@@ -1,4 +1,5 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { shuffle } from '../../../core/utils/shuffle';
 import { MatchingQuestion } from '../../../core/models/quiz.models';
 
@@ -159,6 +160,8 @@ function rowCenterPercent(index: number, total: number): number {
   `,
 })
 export class MatchingRunner {
+  private readonly transloco = inject(TranslocoService);
+
   readonly question = input.required<MatchingQuestion>();
   readonly matches = input<Record<string, string>>({});
   readonly matchesChange = output<Record<string, string>>();
@@ -203,20 +206,24 @@ export class MatchingRunner {
 
   matchStatusLabel(id: string, side: MatchingSide): string {
     if (this.isPending(id, side)) {
-      return 'выбрано, ожидает пары';
+      return this.transloco.translate('matchingRunner.pendingStatus');
     }
     if (side === 'left') {
       const rightId = this.matches()[id];
       const rightLabel = rightId
         ? this.shuffledRight().find((option) => option.id === rightId)?.right
         : undefined;
-      return rightLabel ? `сопоставлено с «${rightLabel}»` : 'не сопоставлено';
+      return rightLabel
+        ? this.transloco.translate('matchingRunner.matchedWith', { label: rightLabel })
+        : this.transloco.translate('matchingRunner.notMatched');
     }
     const leftId = Object.entries(this.matches()).find(([, value]) => value === id)?.[0];
     const leftLabel = leftId
       ? this.question().pairs.find((pair) => pair.id === leftId)?.left
       : undefined;
-    return leftLabel ? `сопоставлено с «${leftLabel}»` : 'не сопоставлено';
+    return leftLabel
+      ? this.transloco.translate('matchingRunner.matchedWith', { label: leftLabel })
+      : this.transloco.translate('matchingRunner.notMatched');
   }
 
   onNodeClick(id: string, side: MatchingSide): void {

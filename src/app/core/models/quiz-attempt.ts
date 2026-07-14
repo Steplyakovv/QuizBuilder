@@ -48,7 +48,13 @@ export function isQuestionAnswered(
   }
 }
 
-export function formatResponse(question: Question, response: QuestionResponse | undefined): string {
+/** `translate` renders small fixed-vocabulary strings (Да/Нет, etc.) - kept as a plain callback
+ *  parameter (not injected TranslocoService) so this stays a framework-free, TestBed-free util. */
+export function formatResponse(
+  translate: (key: string, params?: Record<string, unknown>) => string,
+  question: Question,
+  response: QuestionResponse | undefined,
+): string {
   switch (question.type) {
     case 'text':
     case 'number':
@@ -57,8 +63,8 @@ export function formatResponse(question: Question, response: QuestionResponse | 
     case 'slider':
       return response?.text?.trim() || '—';
     case 'true-false':
-      if (response?.text === 'true') return 'Да';
-      if (response?.text === 'false') return 'Нет';
+      if (response?.text === 'true') return translate('quizAttempt.yes');
+      if (response?.text === 'false') return translate('quizAttempt.no');
       return '—';
     case 'constant-sum': {
       const distribution = response?.distribution ?? {};
@@ -114,7 +120,7 @@ export function formatResponse(question: Question, response: QuestionResponse | 
     case 'hotspot': {
       const selectedId = response?.selectedOptionIds?.[0];
       const index = question.regions.findIndex((region) => region.id === selectedId);
-      return index === -1 ? '—' : `Область №${index + 1}`;
+      return index === -1 ? '—' : translate('quizAttempt.hotspotRegion', { index: index + 1 });
     }
     case 'file-upload':
       return response?.file?.name ?? '—';

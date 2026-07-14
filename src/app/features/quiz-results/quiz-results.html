@@ -1,13 +1,13 @@
 @if (quiz(); as quiz) {
   <div class="quiz-results">
-    <a routerLink="/" class="back-link">← К списку опросников</a>
-    <h1>Результаты: {{ quiz.title }}</h1>
+    <a routerLink="/" class="back-link">{{ backToListLabel() }}</a>
+    <h1>{{ resultsTitleFor(quiz) }}</h1>
 
     @if (attempts().length === 0) {
-      <p class="empty-state">Пока никто не прошёл этот опросник.</p>
+      <p class="empty-state">{{ noAttemptsLabel() }}</p>
     } @else {
       @if (stats().length > 0) {
-        <h2>Статистика по вопросам</h2>
+        <h2>{{ statsTitleLabel() }}</h2>
         <div class="stats-list">
           @for (stat of stats(); track stat.questionId) {
             <div class="stat-row">
@@ -18,21 +18,21 @@
                 [attr.aria-valuenow]="percentCorrect(stat)"
                 aria-valuemin="0"
                 aria-valuemax="100"
-                [attr.aria-label]="stat.correct + ' из ' + stat.total + ' верно'"
+                [attr.aria-label]="statLabel(stat)"
               >
                 <div class="stat-bar-correct" [style.width.%]="percentCorrect(stat)"></div>
               </div>
-              <div class="stat-numbers">{{ stat.correct }} из {{ stat.total }} верно</div>
+              <div class="stat-numbers">{{ statLabel(stat) }}</div>
             </div>
           }
         </div>
       }
 
       <div class="attempts-header">
-        <h2>Попытки</h2>
+        <h2>{{ attemptsTitleLabel() }}</h2>
         <div class="attempts-toolbar">
           <mat-form-field appearance="outline" class="respondent-filter-field">
-            <mat-label>Поиск по респонденту</mat-label>
+            <mat-label>{{ respondentFilterLabel() }}</mat-label>
             <input
               matInput
               [value]="respondentFilter()"
@@ -41,22 +41,22 @@
           </mat-form-field>
           <button mat-stroked-button type="button" (click)="exportCsv()">
             <mat-icon>download</mat-icon>
-            Экспорт в CSV
+            {{ exportCsvLabel() }}
           </button>
         </div>
       </div>
 
       @if (filteredAttempts().length === 0) {
-        <p class="empty-state">Нет попыток, соответствующих фильтру.</p>
+        <p class="empty-state">{{ noFilteredAttemptsLabel() }}</p>
       } @else {
         <div class="table-wrapper">
           <table class="attempts-table">
             <thead>
               <tr>
-                <th>Респондент</th>
+                <th>{{ respondentHeaderLabel() }}</th>
                 <th class="sortable" [attr.aria-sort]="ariaSortFor('date')">
                   <button type="button" class="sort-button" (click)="toggleSort('date')">
-                    Завершено
+                    {{ completedHeaderLabel() }}
                     @if (sortField() === 'date') {
                       <mat-icon class="sort-icon">{{
                         sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward'
@@ -67,7 +67,7 @@
                 @if (quiz.settings.isGraded) {
                   <th class="sortable" [attr.aria-sort]="ariaSortFor('score')">
                     <button type="button" class="sort-button" (click)="toggleSort('score')">
-                      Баллы
+                      {{ scoreHeaderLabel() }}
                       @if (sortField() === 'score') {
                         <mat-icon class="sort-icon">{{
                           sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward'
@@ -82,12 +82,12 @@
             <tbody>
               @for (attempt of pagedAttempts(); track attempt.id) {
                 <tr>
-                  <td>{{ attempt.respondentName ?? 'Аноним' }}</td>
+                  <td>{{ attempt.respondentName ?? anonymousLabel() }}</td>
                   <td>{{ attempt.completedAt | date: 'short' }}</td>
                   @if (quiz.settings.isGraded) {
                     <td>
                       @if (scoreFor(attempt); as score) {
-                        {{ score.correct }} из {{ score.total }}
+                        {{ scoreLabel(score) }}
                       } @else {
                         —
                       }
@@ -95,7 +95,7 @@
                   }
                   <td>
                     <button mat-button type="button" (click)="toggleExpand(attempt.id)">
-                      {{ expandedAttemptId() === attempt.id ? 'Скрыть' : 'Ответы' }}
+                      {{ expandedAttemptId() === attempt.id ? hideLabel() : answersLabel() }}
                     </button>
                   </td>
                 </tr>
@@ -114,20 +114,22 @@
                             >
                               {{ answerFor(attempt, question) }}
                               @if (correctness === true) {
-                                <mat-icon class="correctness-icon correct" aria-label="Правильно"
+                                <mat-icon
+                                  class="correctness-icon correct"
+                                  [attr.aria-label]="correctLabel()"
                                   >check_circle</mat-icon
                                 >
                               } @else if (correctness === false) {
                                 <mat-icon
                                   class="correctness-icon incorrect"
-                                  aria-label="Неправильно"
+                                  [attr.aria-label]="incorrectLabel()"
                                   >cancel</mat-icon
                                 >
                               }
                             </span>
                             @if (correctness === false) {
                               <div class="correct-answer-hint">
-                                Правильный ответ: {{ correctAnswerFor(question) }}
+                                {{ correctAnswerHintFor(question) }}
                               </div>
                             }
                           </dd>
@@ -151,5 +153,5 @@
     }
   </div>
 } @else {
-  <p class="empty-state">Опросник не найден.</p>
+  <p class="empty-state">{{ quizNotFoundLabel() }}</p>
 }

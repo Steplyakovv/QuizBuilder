@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  Component,
+  Signal,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +16,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { QUESTION_TYPE_LABELS, QuestionType } from '../../core/models/question.factory';
+import { TranslocoService, translateObjectSignal, translateSignal } from '@jsverse/transloco';
+import { QUESTION_TYPES, QuestionType } from '../../core/models/question.factory';
 import { Question, Quiz } from '../../core/models/quiz.models';
 import {
   addQuestion,
@@ -76,6 +86,7 @@ import { WordChoiceEditor } from './question-editors/word-choice-editor';
 })
 export class QuizEditor {
   private readonly store = inject(QuizStore);
+  private readonly transloco = inject(TranslocoService);
 
   readonly id = input.required<string>();
   private readonly sourceQuiz = computed(() =>
@@ -88,10 +99,51 @@ export class QuizEditor {
   readonly saveError = signal<string | null>(null);
   readonly previewing = signal(false);
 
-  readonly questionTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
-  readonly questionTypeLabels = QUESTION_TYPE_LABELS;
+  readonly questionTypes = QUESTION_TYPES;
+  readonly questionTypeLabels = translateObjectSignal('questionTypes') as Signal<
+    Record<QuestionType, string>
+  >;
   readonly newQuestionType = signal<QuestionType>(this.questionTypes[0]);
   readonly newPageTitle = signal('');
+
+  protected readonly backToListLabel = translateSignal('common.backToList');
+  protected readonly quizNotFoundLabel = translateSignal('common.quizNotFound');
+  protected readonly dragToReorderLabel = translateSignal('common.dragToReorder');
+  protected readonly optionalHintLabel = translateSignal('common.optionalHint');
+  protected readonly unsavedIndicatorLabel = translateSignal('quizEditor.unsavedIndicator');
+  protected readonly closePreviewLabel = translateSignal('quizEditor.closePreview');
+  protected readonly previewLabel = translateSignal('quizEditor.preview');
+  protected readonly saveLabel = translateSignal('quizEditor.save');
+  protected readonly titleLabel = translateSignal('quizEditor.titleLabel');
+  protected readonly descriptionLabel = translateSignal('quizEditor.descriptionLabel');
+  protected readonly settingsHeadingLabel = translateSignal('quizEditor.settingsHeading');
+  protected readonly gradedCheckboxLabel = translateSignal('quizEditor.gradedCheckbox');
+  protected readonly shuffleCheckboxLabel = translateSignal('quizEditor.shuffleCheckbox');
+  protected readonly publishedCheckboxLabel = translateSignal('quizEditor.publishedCheckbox');
+  protected readonly timeLimitLabel = translateSignal('quizEditor.timeLimitLabel');
+  protected readonly maxAttemptsLabel = translateSignal('quizEditor.maxAttemptsLabel');
+  protected readonly accessPasswordLabel = translateSignal('quizEditor.accessPasswordLabel');
+  protected readonly expiresAtLabel = translateSignal('quizEditor.expiresAtLabel');
+  protected readonly webhookUrlLabel = translateSignal('quizEditor.webhookUrlLabel');
+  protected readonly webhookHintLabel = translateSignal('quizEditor.webhookHint');
+  protected readonly pagesHeadingLabel = translateSignal('quizEditor.pagesHeading');
+  protected readonly noPagesHintLabel = translateSignal('quizEditor.noPagesHint');
+  protected readonly pageTitleLabel = translateSignal('quizEditor.pageTitleLabel');
+  protected readonly deletePageLabel = translateSignal('quizEditor.deletePage');
+  protected readonly newPageLabel = translateSignal('quizEditor.newPageLabel');
+  protected readonly addPageLabel = translateSignal('quizEditor.addPage');
+  protected readonly questionsHeadingLabel = translateSignal('quizEditor.questionsHeading');
+  protected readonly noQuestionsLabel = translateSignal('quizEditor.noQuestions');
+  protected readonly questionOrderLabel = translateSignal('quizEditor.questionOrderLabel');
+  protected readonly requiredCheckboxLabel = translateSignal('quizEditor.requiredCheckbox');
+  protected readonly deleteQuestionLabel = translateSignal('quizEditor.deleteQuestion');
+  protected readonly pageSelectLabel = translateSignal('quizEditor.pageSelectLabel');
+  protected readonly noPageOptionLabel = translateSignal('quizEditor.noPageOption');
+  protected readonly conditionSourceLabel = translateSignal('quizEditor.conditionSourceLabel');
+  protected readonly alwaysShowOptionLabel = translateSignal('quizEditor.alwaysShowOption');
+  protected readonly noPromptTextLabel = translateSignal('quizEditor.noPromptText');
+  protected readonly questionTypeLabel = translateSignal('quizEditor.questionTypeLabel');
+  protected readonly addQuestionLabel = translateSignal('quizEditor.addQuestion');
 
   constructor() {
     void this.store.load();
@@ -297,9 +349,11 @@ export class QuizEditor {
       this.dirty.set(false);
     } catch (error) {
       this.saveError.set(
-        error instanceof DOMException && error.name === 'QuotaExceededError'
-          ? 'Не удалось сохранить: превышен лимит хранилища браузера. Попробуйте использовать картинки меньшего размера.'
-          : 'Не удалось сохранить опросник. Попробуйте ещё раз.',
+        this.transloco.translate(
+          error instanceof DOMException && error.name === 'QuotaExceededError'
+            ? 'quizEditor.quotaExceededError'
+            : 'quizEditor.genericSaveError',
+        ),
       );
     } finally {
       this.saving.set(false);

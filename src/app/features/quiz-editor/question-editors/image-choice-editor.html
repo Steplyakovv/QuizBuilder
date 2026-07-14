@@ -1,6 +1,6 @@
 <div class="image-choice-editor">
   <mat-checkbox [checked]="question().multiple" (change)="onMultipleChange($event.checked)">
-    Несколько правильных вариантов
+    {{ multipleCheckboxLabel() }}
   </mat-checkbox>
 
   <app-option-list-editor

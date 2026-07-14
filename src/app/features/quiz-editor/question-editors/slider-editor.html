@@ -1,6 +1,6 @@
 <div class="slider-editor">
   <mat-form-field appearance="outline" class="number-range-field">
-    <mat-label>Минимум</mat-label>
+    <mat-label>{{ minLabel() }}</mat-label>
     <input
       matInput
       type="number"
@@ -10,7 +10,7 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="number-range-field">
-    <mat-label>Максимум</mat-label>
+    <mat-label>{{ maxLabel() }}</mat-label>
     <input
       matInput
       type="number"
@@ -20,7 +20,7 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="number-range-field">
-    <mat-label>Шаг</mat-label>
+    <mat-label>{{ stepLabel() }}</mat-label>
     <input
       matInput
       type="number"

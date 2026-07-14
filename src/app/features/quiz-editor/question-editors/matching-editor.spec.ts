@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { MatchingQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { MatchingEditor } from './matching-editor';
 
 describe('MatchingEditor', () => {
   async function createComponent(question: MatchingQuestion) {
-    await TestBed.configureTestingModule({ imports: [MatchingEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [MatchingEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(MatchingEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

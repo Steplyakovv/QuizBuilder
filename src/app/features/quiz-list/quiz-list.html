@@ -1,15 +1,15 @@
 <div class="quiz-list">
   <div class="list-header">
-    <h1>Опросники</h1>
+    <h1>{{ titleLabel() }}</h1>
     <div class="auth-status">
       @if (isAdmin()) {
-        <span class="role-indicator">Вы вошли как администратор</span>
-        <a mat-icon-button routerLink="/settings" title="Настройки уведомлений">
+        <span class="role-indicator">{{ loggedInAsAdminLabel() }}</span>
+        <a mat-icon-button routerLink="/settings" [title]="settingsTitleLabel()">
           <mat-icon>settings</mat-icon>
         </a>
-        <button mat-button (click)="logout()">Выйти</button>
+        <button mat-button (click)="logout()">{{ logoutLabel() }}</button>
       } @else {
-        <a mat-button routerLink="/login">Войти как администратор</a>
+        <a mat-button routerLink="/login">{{ loginAsAdminLabel() }}</a>
       }
     </div>
   </div>
@@ -18,12 +18,12 @@
     <form class="new-quiz-form" (submit)="createQuiz(); $event.preventDefault()">
       <div class="new-quiz-field">
         <mat-form-field appearance="outline">
-          <mat-label>Название нового опросника</mat-label>
+          <mat-label>{{ newQuizNameLabel() }}</mat-label>
           <input
             matInput
             [value]="newQuizTitle()"
             (input)="newQuizTitle.set($any($event.target).value)"
-            placeholder="Например: Опрос о продукте"
+            [placeholder]="newQuizPlaceholderLabel()"
           />
         </mat-form-field>
         @if (newQuizError()) {
@@ -32,11 +32,11 @@
       </div>
       <button mat-flat-button type="submit">
         <mat-icon>add</mat-icon>
-        Создать
+        {{ createLabel() }}
       </button>
       <button mat-button type="button" (click)="importFileInput.click()">
         <mat-icon>upload_file</mat-icon>
-        Импортировать
+        {{ importLabel() }}
       </button>
       <input
         #importFileInput
@@ -53,11 +53,7 @@
 
   @if (visibleQuizzes().length === 0) {
     <p class="empty-state">
-      @if (isAdmin()) {
-        Опросников пока нет — создайте первый выше.
-      } @else {
-        Опросников пока нет.
-      }
+      {{ isAdmin() ? emptyStateAdminLabel() : emptyStateLabel() }}
     </p>
   } @else {
     <div class="quiz-cards">
@@ -78,22 +74,22 @@
             <a
               class="quiz-title"
               [routerLink]="['/quiz', quiz.id]"
-              title="Открыть редактор вопросов"
+              [title]="openEditorTitleLabel()"
               >{{ quiz.title }}</a
             >
           } @else {
             <span class="quiz-title">{{ quiz.title }}</span>
           }
           @if (isAdmin() && !isPublished(quiz)) {
-            <span class="draft-badge">Черновик</span>
+            <span class="draft-badge">{{ draftBadgeLabel() }}</span>
           }
-          <div class="quiz-meta">{{ quiz.questions.length }} вопрос(ов)</div>
+          <div class="quiz-meta">{{ questionsCountLabel(quiz.questions.length) }}</div>
           <div class="quiz-actions">
             <a
               mat-icon-button
               [routerLink]="['/quiz', quiz.id, 'run']"
-              aria-label="Пройти опросник"
-              title="Пройти опросник"
+              [attr.aria-label]="takeQuizLabel()"
+              [title]="takeQuizLabel()"
             >
               <mat-icon>play_arrow</mat-icon>
             </a>
@@ -101,31 +97,35 @@
               <a
                 mat-icon-button
                 [routerLink]="['/quiz', quiz.id, 'results']"
-                aria-label="Результаты"
-                title="Результаты"
+                [attr.aria-label]="resultsLabel()"
+                [title]="resultsLabel()"
               >
                 <mat-icon>bar_chart</mat-icon>
               </a>
               <button
                 mat-icon-button
                 (click)="exportQuiz(quiz)"
-                aria-label="Экспортировать в JSON"
-                title="Экспортировать в JSON"
+                [attr.aria-label]="exportJsonLabel()"
+                [title]="exportJsonLabel()"
               >
                 <mat-icon>download</mat-icon>
               </button>
               <button
                 mat-icon-button
                 (click)="startRename(quiz)"
-                aria-label="Переименовать"
-                title="Переименовать"
+                [attr.aria-label]="renameLabel()"
+                [title]="renameLabel()"
               >
                 <mat-icon>drive_file_rename_outline</mat-icon>
               </button>
-              <button mat-icon-button (click)="duplicateQuiz(quiz.id)" aria-label="Дублировать">
+              <button
+                mat-icon-button
+                (click)="duplicateQuiz(quiz.id)"
+                [attr.aria-label]="duplicateLabel()"
+              >
                 <mat-icon>content_copy</mat-icon>
               </button>
-              <button mat-icon-button (click)="deleteQuiz(quiz)" aria-label="Удалить">
+              <button mat-icon-button (click)="deleteQuiz(quiz)" [attr.aria-label]="deleteLabel()">
                 <mat-icon>delete</mat-icon>
               </button>
             }

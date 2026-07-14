@@ -2,13 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { SETTINGS_REPOSITORY } from '../../core/repositories/settings-repository';
 import { FakeSettingsRepository } from '../../core/testing/fake-settings-repository';
+import { provideTestTransloco } from '../../core/testing/provide-test-transloco';
 import { NotificationSettingsPage } from './notification-settings';
 
 describe('NotificationSettingsPage', () => {
   async function createComponent(repository = new FakeSettingsRepository()) {
     await TestBed.configureTestingModule({
       imports: [NotificationSettingsPage],
-      providers: [provideRouter([]), { provide: SETTINGS_REPOSITORY, useValue: repository }],
+      providers: [
+        provideRouter([]),
+        provideTestTransloco(),
+        { provide: SETTINGS_REPOSITORY, useValue: repository },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(NotificationSettingsPage);

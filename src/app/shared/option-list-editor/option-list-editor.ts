@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import {
   addOption,
   removeOption,
@@ -31,6 +32,17 @@ export class OptionListEditor {
   readonly correctOptionIdsChange = output<string[]>();
 
   private readonly correctOptionIdSet = computed(() => new Set(this.correctOptionIds()));
+
+  protected readonly dragToReorderLabel = translateSignal('common.dragToReorder');
+  protected readonly correctAnswerLabel = translateSignal('optionListEditor.correctAnswer');
+  protected readonly markCorrectLabel = translateSignal('optionListEditor.markCorrect');
+  protected readonly optionLabelPlaceholder = translateSignal(
+    'optionListEditor.optionLabelPlaceholder',
+  );
+  protected readonly imageUrlPlaceholder = translateSignal('optionListEditor.imageUrlPlaceholder');
+  protected readonly uploadImageLabel = translateSignal('optionListEditor.uploadImage');
+  protected readonly removeOptionLabel = translateSignal('optionListEditor.removeOption');
+  protected readonly addOptionLabel = translateSignal('optionListEditor.addOption');
 
   isCorrect(optionId: string): boolean {
     return this.correctOptionIdSet().has(optionId);

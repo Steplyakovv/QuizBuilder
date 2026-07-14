@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { SliderQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { SliderEditor } from './slider-editor';
 
 describe('SliderEditor', () => {
   async function createComponent(question: SliderQuestion) {
-    await TestBed.configureTestingModule({ imports: [SliderEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [SliderEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(SliderEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

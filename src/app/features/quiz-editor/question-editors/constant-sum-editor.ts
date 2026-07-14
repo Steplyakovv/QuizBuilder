@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import { ConstantSumQuestion, Option } from '../../../core/models/quiz.models';
 import { OptionListEditor } from '../../../shared/option-list-editor/option-list-editor';
 
@@ -12,6 +13,8 @@ import { OptionListEditor } from '../../../shared/option-list-editor/option-list
 export class ConstantSumEditor {
   readonly question = input.required<ConstantSumQuestion>();
   readonly questionChange = output<ConstantSumQuestion>();
+
+  protected readonly totalLabel = translateSignal('constantSumEditor.totalLabel');
 
   onOptionsChange(options: Option[]): void {
     this.questionChange.emit({ ...this.question(), options });

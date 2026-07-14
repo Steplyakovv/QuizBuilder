@@ -1,9 +1,9 @@
 @if (quiz(); as quiz) {
   <div class="quiz-runner">
     @if (!isPreview()) {
-      <a routerLink="/" class="back-link">← К списку опросников</a>
+      <a routerLink="/" class="back-link">{{ backToListLabel() }}</a>
     } @else {
-      <p class="preview-banner">Это предпросмотр — ответы не сохраняются.</p>
+      <p class="preview-banner">{{ previewBannerLabel() }}</p>
     }
 
     <h1>{{ quiz.title }}</h1>
@@ -14,24 +14,22 @@
     @if (submitted()) {
       <div class="quiz-runner-result" #resultRegion tabindex="-1">
         @if (isPreview()) {
-          <p>Это предпросмотр — ответы не сохранены.</p>
+          <p>{{ previewSubmittedResultLabel() }}</p>
         } @else {
-          <p>Спасибо! Ваши ответы сохранены.</p>
+          <p>{{ submittedThankYouLabel() }}</p>
         }
         @if (result(); as result) {
-          <p class="score">
-            Результат: {{ result.correct }} из {{ result.total }} правильных ответов
-          </p>
+          <p class="score">{{ scoreResultMessage(result) }}</p>
         }
       </div>
     } @else if (blockReason() === 'draft') {
-      <p class="empty-state">Этот опросник ещё не опубликован.</p>
+      <p class="empty-state">{{ draftBlockedLabel() }}</p>
     } @else if (blockReason() === 'expired') {
-      <p class="empty-state">Срок прохождения этого опросника истёк.</p>
+      <p class="empty-state">{{ expiredBlockedLabel() }}</p>
     } @else if (blockReason() === 'locked') {
       <form class="access-password-form" (submit)="unlock(); $event.preventDefault()">
         <mat-form-field appearance="outline" class="access-password-field">
-          <mat-label>Код доступа</mat-label>
+          <mat-label>{{ accessPasswordLabel() }}</mat-label>
           <input
             matInput
             type="password"
@@ -42,12 +40,10 @@
         @if (passwordError()) {
           <p class="field-error">{{ passwordError() }}</p>
         }
-        <button mat-flat-button color="primary" type="submit">Продолжить</button>
+        <button mat-flat-button color="primary" type="submit">{{ continueButtonLabel() }}</button>
       </form>
     } @else if (blockReason() === 'attempts') {
-      <p class="empty-state">
-        Вы исчерпали лимит попыток прохождения этого опросника ({{ quiz.settings.maxAttempts }}).
-      </p>
+      <p class="empty-state">{{ attemptsBlockedMessage(quiz.settings.maxAttempts ?? 0) }}</p>
     } @else {
       @if (saveError()) {
         <p class="save-error">{{ saveError() }}</p>
@@ -55,14 +51,14 @@
 
       @if (remainingTimeLabel(); as timeLabel) {
         <p class="time-limit" [class.time-limit-warning]="(remainingSeconds() ?? 0) <= 30">
-          Осталось времени: {{ timeLabel }}
+          {{ remainingTimeMessage() }}
         </p>
       }
 
       <form (submit)="submit(); $event.preventDefault()">
         @if (isFirstPage()) {
           <mat-form-field appearance="outline" class="respondent-name-field">
-            <mat-label>Ваше имя (необязательно)</mat-label>
+            <mat-label>{{ respondentNameLabel() }}</mat-label>
             <input
               matInput
               [value]="respondentName()"
@@ -72,7 +68,7 @@
         }
 
         @if (isPaginated()) {
-          <p class="page-progress">Страница {{ clampedPageIndex() + 1 }} из {{ pages().length }}</p>
+          <p class="page-progress">{{ pageProgressMessage() }}</p>
         }
         @if (currentPage()?.title; as pageTitle) {
           <h2 class="page-title">{{ pageTitle }}</h2>
@@ -198,22 +194,22 @@
             }
 
             @if (validationErrors().has(question.id)) {
-              <p class="field-error">Это поле обязательно для заполнения</p>
+              <p class="field-error">{{ requiredFieldErrorLabel() }}</p>
             }
           </div>
         }
 
         <div class="page-nav">
           @if (!isFirstPage()) {
-            <button mat-button type="button" (click)="goToPreviousPage()">Назад</button>
+            <button mat-button type="button" (click)="goToPreviousPage()">{{ backLabel() }}</button>
           }
           @if (!isLastPage()) {
             <button mat-flat-button color="primary" type="button" (click)="goToNextPage()">
-              Далее
+              {{ nextLabel() }}
             </button>
           } @else {
             <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-              Отправить ответы
+              {{ submitAnswersLabel() }}
             </button>
           }
         </div>
@@ -221,5 +217,5 @@
     }
   </div>
 } @else {
-  <p class="empty-state">Опросник не найден.</p>
+  <p class="empty-state">{{ quizNotFoundLabel() }}</p>
 }

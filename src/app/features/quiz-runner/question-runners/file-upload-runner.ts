@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { translateSignal } from '@jsverse/transloco';
 import { FileUploadQuestion } from '../../../core/models/quiz.models';
 
 @Component({
@@ -10,7 +11,7 @@ import { FileUploadQuestion } from '../../../core/models/quiz.models';
     <div class="file-upload-runner">
       <button mat-stroked-button type="button" (click)="fileInput.click()">
         <mat-icon>attach_file</mat-icon>
-        {{ file() ? 'Заменить файл' : 'Выбрать файл' }}
+        {{ file() ? replaceFileLabel() : selectFileLabel() }}
       </button>
       <input
         #fileInput
@@ -40,6 +41,9 @@ export class FileUploadRunner {
   readonly question = input.required<FileUploadQuestion>();
   readonly file = input<{ name: string; dataUrl: string } | undefined>(undefined);
   readonly fileChange = output<{ name: string; dataUrl: string } | undefined>();
+
+  protected readonly replaceFileLabel = translateSignal('fileUploadRunner.replaceFile');
+  protected readonly selectFileLabel = translateSignal('fileUploadRunner.selectFile');
 
   onFileSelected(files: FileList | null): void {
     const file = files?.[0];

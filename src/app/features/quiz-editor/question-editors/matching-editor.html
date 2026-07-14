@@ -6,7 +6,7 @@
           matInput
           [value]="pair.left"
           (blur)="updateLeft(pair.id, $any($event.target).value)"
-          placeholder="Левый вариант"
+          [placeholder]="leftPlaceholder()"
         />
       </mat-form-field>
       <mat-form-field appearance="outline" class="matching-pair-field">
@@ -14,16 +14,21 @@
           matInput
           [value]="pair.right"
           (blur)="updateRight(pair.id, $any($event.target).value)"
-          placeholder="Правый вариант"
+          [placeholder]="rightPlaceholder()"
         />
       </mat-form-field>
-      <button mat-icon-button type="button" (click)="removePair(pair.id)" aria-label="Удалить пару">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="removePair(pair.id)"
+        [attr.aria-label]="removePairLabel()"
+      >
         <mat-icon>close</mat-icon>
       </button>
     </div>
   }
   <button mat-stroked-button type="button" (click)="addPair()">
     <mat-icon>add</mat-icon>
-    Добавить пару
+    {{ addPairLabel() }}
   </button>
 </div>

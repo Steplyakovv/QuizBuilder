@@ -8,6 +8,7 @@ import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
 import { FakeAuthRepository } from '../../core/testing/fake-auth-repository';
 import { FakeQuizRepository } from '../../core/testing/fake-quiz-repository';
+import { provideTestTransloco } from '../../core/testing/provide-test-transloco';
 import { QuizList } from './quiz-list';
 
 describe('QuizList', () => {
@@ -19,6 +20,7 @@ describe('QuizList', () => {
       imports: [QuizList],
       providers: [
         provideRouter([]),
+        provideTestTransloco(),
         { provide: QUIZ_REPOSITORY, useValue: repository },
         { provide: AUTH_REPOSITORY, useValue: new FakeAuthRepository() },
       ],

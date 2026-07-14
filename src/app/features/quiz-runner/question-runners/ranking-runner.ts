@@ -1,6 +1,7 @@
 import { Component, computed, effect, input, output, untracked } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
+import { translateSignal } from '@jsverse/transloco';
 import { shuffle } from '../../../core/utils/shuffle';
 import { RankingQuestion } from '../../../core/models/quiz.models';
 
@@ -16,7 +17,7 @@ import { RankingQuestion } from '../../../core/models/quiz.models';
             tabindex="0"
             role="button"
             class="drag-handle"
-            aria-label="Перетащить для изменения порядка"
+            [attr.aria-label]="dragToReorderLabel()"
           >
             <mat-icon>drag_indicator</mat-icon>
           </span>
@@ -50,6 +51,8 @@ import { RankingQuestion } from '../../../core/models/quiz.models';
   `,
 })
 export class RankingRunner {
+  protected readonly dragToReorderLabel = translateSignal('common.dragToReorder');
+
   readonly question = input.required<RankingQuestion>();
   readonly selectedOptionIds = input<string[]>([]);
   readonly selectionChange = output<string[]>();

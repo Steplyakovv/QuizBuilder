@@ -1,18 +1,23 @@
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
+import { TranslocoService } from '@jsverse/transloco';
 import { Quiz } from '../models/quiz.models';
 import { QUIZ_REPOSITORY } from '../repositories/quiz-repository';
 import { FakeQuizRepository } from '../testing/fake-quiz-repository';
+import { provideTestTransloco } from '../testing/provide-test-transloco';
 import { QuizStore } from './quiz-store';
 
 describe('QuizStore', () => {
   let store: QuizStore;
   let repository: FakeQuizRepository;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     repository = new FakeQuizRepository();
     TestBed.configureTestingModule({
-      providers: [{ provide: QUIZ_REPOSITORY, useValue: repository }],
+      providers: [{ provide: QUIZ_REPOSITORY, useValue: repository }, provideTestTransloco()],
     });
+    const transloco = TestBed.inject(TranslocoService);
+    await firstValueFrom(transloco.load(transloco.getActiveLang()));
     store = TestBed.inject(QuizStore);
   });
 

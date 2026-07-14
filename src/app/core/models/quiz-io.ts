@@ -5,15 +5,15 @@ export function exportQuizToJson(quiz: Quiz): string {
   return JSON.stringify(quiz, null, 2);
 }
 
-export function parseImportedQuiz(json: string): Quiz {
+export function parseImportedQuiz(json: string, translate: (key: string) => string): Quiz {
   let parsed: unknown;
   try {
     parsed = JSON.parse(json);
   } catch {
-    throw new Error('Файл повреждён или не является корректным JSON.');
+    throw new Error(translate('common.importCorruptedFile'));
   }
   if (!isQuizShape(parsed)) {
-    throw new Error('Файл не похож на экспортированный опросник.');
+    throw new Error(translate('common.importNotAQuiz'));
   }
   const now = new Date().toISOString();
   return { ...parsed, id: createId(), createdAt: now, updatedAt: now };

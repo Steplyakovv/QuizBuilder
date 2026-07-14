@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import { NumberQuestion } from '../../../core/models/quiz.models';
 
 @Component({
@@ -11,6 +12,9 @@ import { NumberQuestion } from '../../../core/models/quiz.models';
 export class NumberEditor {
   readonly question = input.required<NumberQuestion>();
   readonly questionChange = output<NumberQuestion>();
+
+  protected readonly minLabel = translateSignal('common.minLabel');
+  protected readonly maxLabel = translateSignal('common.maxLabel');
 
   onMinChange(value: string): void {
     const parsed = value.trim() ? Number(value) : undefined;

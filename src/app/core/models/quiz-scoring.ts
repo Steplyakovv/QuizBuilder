@@ -89,7 +89,10 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
   }
 }
 
-export function formatCorrectAnswer(question: Question): string | undefined {
+export function formatCorrectAnswer(
+  translate: (key: string, params?: Record<string, unknown>) => string,
+  question: Question,
+): string | undefined {
   if (!hasCorrectAnswer(question)) {
     return undefined;
   }
@@ -106,7 +109,7 @@ export function formatCorrectAnswer(question: Question): string | undefined {
         .join(', ');
     }
     case 'true-false':
-      return question.correctAnswer ? 'Да' : 'Нет';
+      return question.correctAnswer ? translate('quizAttempt.yes') : translate('quizAttempt.no');
     case 'word-choice':
       return question.words.map((word) => word.label).join(' ');
     case 'ranking':
@@ -114,11 +117,10 @@ export function formatCorrectAnswer(question: Question): string | undefined {
     case 'fill-in-the-blank': {
       const segments = splitTemplate(question.template);
       const answers = question.correctAnswers ?? [];
+      const anyAnswer = translate('quizAttempt.anyAnswer');
       return segments.reduce(
         (result, segment, index) =>
-          index === 0
-            ? segment
-            : `${result}${answers[index - 1]?.trim() || '[любой ответ]'}${segment}`,
+          index === 0 ? segment : `${result}${answers[index - 1]?.trim() || anyAnswer}${segment}`,
         '',
       );
     }
@@ -126,7 +128,9 @@ export function formatCorrectAnswer(question: Question): string | undefined {
       return question.pairs.map((pair) => `${pair.left} → ${pair.right}`).join(', ');
     case 'hotspot': {
       const index = question.regions.findIndex((region) => region.id === question.correctRegionId);
-      return index === -1 ? undefined : `Область №${index + 1}`;
+      return index === -1
+        ? undefined
+        : translate('quizAttempt.hotspotRegion', { index: index + 1 });
     }
     default:
       return undefined;
@@ -160,6 +164,7 @@ export function scoreAttempt(quiz: Quiz, responses: QuestionResponse[]): Attempt
  * questions excluded - same visibility/grading rules as scoreAttempt/quiz-results.ts.
  */
 export function buildAttemptReport(
+  translate: (key: string, params?: Record<string, unknown>) => string,
   quiz: Quiz,
   responses: QuestionResponse[],
 ): QuestionReportEntry[] {
@@ -175,9 +180,9 @@ export function buildAttemptReport(
       return {
         questionId: question.id,
         prompt: question.prompt,
-        respondentAnswer: formatResponse(question, response),
+        respondentAnswer: formatResponse(translate, question, response),
         isCorrect: graded ? isCorrect(question, response) : undefined,
-        correctAnswer: graded ? formatCorrectAnswer(question) : undefined,
+        correctAnswer: graded ? formatCorrectAnswer(translate, question) : undefined,
       };
     });
 }

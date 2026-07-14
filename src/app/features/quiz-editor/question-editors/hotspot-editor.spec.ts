@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { HotspotQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { HotspotEditor } from './hotspot-editor';
 
 describe('HotspotEditor', () => {
   async function createComponent(question: HotspotQuestion, graded = false) {
-    await TestBed.configureTestingModule({ imports: [HotspotEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [HotspotEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(HotspotEditor);
     fixture.componentRef.setInput('question', question);
     fixture.componentRef.setInput('graded', graded);

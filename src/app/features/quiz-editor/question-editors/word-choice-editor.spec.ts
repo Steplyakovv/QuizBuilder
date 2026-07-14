@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { WordChoiceQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { WordChoiceEditor } from './word-choice-editor';
 
 describe('WordChoiceEditor', () => {
   it('emits an updated question when words change', async () => {
-    await TestBed.configureTestingModule({ imports: [WordChoiceEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [WordChoiceEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(WordChoiceEditor);
     fixture.componentRef.setInput('question', createQuestion('word-choice') as WordChoiceQuestion);
     await fixture.whenStable();
@@ -18,7 +22,10 @@ describe('WordChoiceEditor', () => {
   });
 
   it('shows the correct phrase as the joined word order', async () => {
-    await TestBed.configureTestingModule({ imports: [WordChoiceEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [WordChoiceEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(WordChoiceEditor);
     fixture.componentRef.setInput('question', {
       ...createQuestion('word-choice'),

@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import { SliderQuestion } from '../../../core/models/quiz.models';
 
 @Component({
@@ -11,6 +12,10 @@ import { SliderQuestion } from '../../../core/models/quiz.models';
 export class SliderEditor {
   readonly question = input.required<SliderQuestion>();
   readonly questionChange = output<SliderQuestion>();
+
+  protected readonly minLabel = translateSignal('common.minLabel');
+  protected readonly maxLabel = translateSignal('common.maxLabel');
+  protected readonly stepLabel = translateSignal('common.stepLabel');
 
   onMinChange(value: string): void {
     const parsed = Number(value);

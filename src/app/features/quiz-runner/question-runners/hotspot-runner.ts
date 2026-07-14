@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { translateSignal } from '@jsverse/transloco';
 import { HotspotQuestion } from '../../../core/models/quiz.models';
 
 @Component({
@@ -16,7 +17,7 @@ import { HotspotQuestion } from '../../../core/models/quiz.models';
           [style.width.%]="region.width"
           [style.height.%]="region.height"
           [attr.aria-pressed]="isSelected(region.id)"
-          aria-label="Область на изображении"
+          [attr.aria-label]="regionAriaLabel()"
           (click)="select(region.id)"
         ></button>
       }
@@ -62,6 +63,8 @@ export class HotspotRunner {
   readonly question = input.required<HotspotQuestion>();
   readonly selectedOptionIds = input<string[]>([]);
   readonly selectionChange = output<string[]>();
+
+  protected readonly regionAriaLabel = translateSignal('hotspotRunner.regionAriaLabel');
 
   isSelected(regionId: string): boolean {
     return this.selectedOptionIds()[0] === regionId;

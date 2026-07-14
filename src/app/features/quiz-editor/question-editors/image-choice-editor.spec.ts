@@ -1,11 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { createQuestion } from '../../../core/models/question.factory';
 import { ImageChoiceQuestion } from '../../../core/models/quiz.models';
+import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { ImageChoiceEditor } from './image-choice-editor';
 
 describe('ImageChoiceEditor', () => {
   async function createComponent(question: ImageChoiceQuestion) {
-    await TestBed.configureTestingModule({ imports: [ImageChoiceEditor] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [ImageChoiceEditor],
+      providers: [provideTestTransloco()],
+    }).compileComponents();
     const fixture = TestBed.createComponent(ImageChoiceEditor);
     fixture.componentRef.setInput('question', question);
     await fixture.whenStable();

@@ -1,4 +1,5 @@
 import { Question } from './quiz.models';
+import { testTranslate } from '../testing/test-translate';
 import { formatResponse, isQuestionAnswered } from './quiz-attempt';
 
 function textQuestion(): Question {
@@ -293,28 +294,36 @@ describe('isQuestionAnswered', () => {
 
 describe('formatResponse', () => {
   it('shows a dash for an unanswered text question', () => {
-    expect(formatResponse(textQuestion(), undefined)).toBe('—');
+    expect(formatResponse(testTranslate, textQuestion(), undefined)).toBe('—');
   });
 
   it('shows the entered text', () => {
-    expect(formatResponse(textQuestion(), { questionId: 'q1', text: 'Иван' })).toBe('Иван');
+    expect(formatResponse(testTranslate, textQuestion(), { questionId: 'q1', text: 'Иван' })).toBe(
+      'Иван',
+    );
   });
 
   it('shows a dash for a choice question with no selection', () => {
     expect(
-      formatResponse(singleChoiceQuestion(), { questionId: 'q1', selectedOptionIds: [] }),
+      formatResponse(testTranslate, singleChoiceQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: [],
+      }),
     ).toBe('—');
   });
 
   it('shows the labels of the selected options', () => {
     expect(
-      formatResponse(singleChoiceQuestion(), { questionId: 'q1', selectedOptionIds: ['o2'] }),
+      formatResponse(testTranslate, singleChoiceQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: ['o2'],
+      }),
     ).toBe('Эспрессо');
   });
 
   it('joins multiple selected option labels', () => {
     expect(
-      formatResponse(singleChoiceQuestion(), {
+      formatResponse(testTranslate, singleChoiceQuestion(), {
         questionId: 'q1',
         selectedOptionIds: ['o1', 'o2'],
       }),
@@ -322,31 +331,41 @@ describe('formatResponse', () => {
   });
 
   it('shows Да/Нет for a true-false response', () => {
-    expect(formatResponse(trueFalseQuestion(), { questionId: 'q1', text: 'true' })).toBe('Да');
-    expect(formatResponse(trueFalseQuestion(), { questionId: 'q1', text: 'false' })).toBe('Нет');
-    expect(formatResponse(trueFalseQuestion(), undefined)).toBe('—');
+    expect(
+      formatResponse(testTranslate, trueFalseQuestion(), { questionId: 'q1', text: 'true' }),
+    ).toBe('Да');
+    expect(
+      formatResponse(testTranslate, trueFalseQuestion(), { questionId: 'q1', text: 'false' }),
+    ).toBe('Нет');
+    expect(formatResponse(testTranslate, trueFalseQuestion(), undefined)).toBe('—');
   });
 
   it('shows the entered number as text', () => {
-    expect(formatResponse(numberQuestion(), { questionId: 'q1', text: '42' })).toBe('42');
+    expect(formatResponse(testTranslate, numberQuestion(), { questionId: 'q1', text: '42' })).toBe(
+      '42',
+    );
   });
 
   it('shows the chosen rating as text', () => {
-    expect(formatResponse(ratingQuestion(), { questionId: 'q1', text: '4' })).toBe('4');
-    expect(formatResponse(ratingQuestion(), undefined)).toBe('—');
+    expect(formatResponse(testTranslate, ratingQuestion(), { questionId: 'q1', text: '4' })).toBe(
+      '4',
+    );
+    expect(formatResponse(testTranslate, ratingQuestion(), undefined)).toBe('—');
   });
 
   it('shows the chosen slider value as text', () => {
-    expect(formatResponse(sliderQuestion(), { questionId: 'q1', text: '50' })).toBe('50');
+    expect(formatResponse(testTranslate, sliderQuestion(), { questionId: 'q1', text: '50' })).toBe(
+      '50',
+    );
   });
 
   it('shows a dash for a constant-sum question with no distribution', () => {
-    expect(formatResponse(constantSumQuestion(), undefined)).toBe('—');
+    expect(formatResponse(testTranslate, constantSumQuestion(), undefined)).toBe('—');
   });
 
   it('shows the option labels with their assigned points for a constant-sum response', () => {
     expect(
-      formatResponse(constantSumQuestion(), {
+      formatResponse(testTranslate, constantSumQuestion(), {
         questionId: 'q1',
         distribution: { o1: 40, o2: 60 },
       }),
@@ -355,20 +374,26 @@ describe('formatResponse', () => {
 
   it('joins the chosen words for a word-choice response in the chosen order', () => {
     expect(
-      formatResponse(wordChoiceQuestion(), { questionId: 'q1', selectedOptionIds: ['w2', 'w1'] }),
+      formatResponse(testTranslate, wordChoiceQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: ['w2', 'w1'],
+      }),
     ).toBe('голубое Небо');
-    expect(formatResponse(wordChoiceQuestion(), undefined)).toBe('—');
+    expect(formatResponse(testTranslate, wordChoiceQuestion(), undefined)).toBe('—');
   });
 
   it('joins the ranked option labels in the chosen order', () => {
     expect(
-      formatResponse(rankingQuestion(), { questionId: 'q1', selectedOptionIds: ['o2', 'o1'] }),
+      formatResponse(testTranslate, rankingQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: ['o2', 'o1'],
+      }),
     ).toBe('Большой → Маленький');
   });
 
   it('fills the template with the entered blanks', () => {
     expect(
-      formatResponse(fillInTheBlankQuestion(), {
+      formatResponse(testTranslate, fillInTheBlankQuestion(), {
         questionId: 'q1',
         blanks: ['хлебом', 'молоком'],
       }),
@@ -377,33 +402,42 @@ describe('formatResponse', () => {
 
   it('shows a dash for a fill-in-the-blank response with an empty blank', () => {
     expect(
-      formatResponse(fillInTheBlankQuestion(), { questionId: 'q1', blanks: ['хлебом', ''] }),
+      formatResponse(testTranslate, fillInTheBlankQuestion(), {
+        questionId: 'q1',
+        blanks: ['хлебом', ''],
+      }),
     ).toBe('—');
   });
 
   it('shows the matched right-hand labels for a matching response', () => {
     expect(
-      formatResponse(matchingQuestion(), { questionId: 'q1', matches: { p1: 'p2', p2: 'p1' } }),
+      formatResponse(testTranslate, matchingQuestion(), {
+        questionId: 'q1',
+        matches: { p1: 'p2', p2: 'p1' },
+      }),
     ).toBe('Франция → Рим, Италия → Париж');
   });
 
   it('shows the selected column labels for a matrix response', () => {
-    expect(formatResponse(matrixQuestion(), { questionId: 'q1', matches: { r1: 'c1' } })).toBe(
-      'Мне нравится этот опрос: Да',
-    );
+    expect(
+      formatResponse(testTranslate, matrixQuestion(), { questionId: 'q1', matches: { r1: 'c1' } }),
+    ).toBe('Мне нравится этот опрос: Да');
   });
 
   it('shows the selected region number for a hotspot response', () => {
-    expect(formatResponse(hotspotQuestion(), undefined)).toBe('—');
-    expect(formatResponse(hotspotQuestion(), { questionId: 'q1', selectedOptionIds: ['r2'] })).toBe(
-      'Область №2',
-    );
+    expect(formatResponse(testTranslate, hotspotQuestion(), undefined)).toBe('—');
+    expect(
+      formatResponse(testTranslate, hotspotQuestion(), {
+        questionId: 'q1',
+        selectedOptionIds: ['r2'],
+      }),
+    ).toBe('Область №2');
   });
 
   it('shows the attached file name for a file-upload response', () => {
-    expect(formatResponse(fileUploadQuestion(), undefined)).toBe('—');
+    expect(formatResponse(testTranslate, fileUploadQuestion(), undefined)).toBe('—');
     expect(
-      formatResponse(fileUploadQuestion(), {
+      formatResponse(testTranslate, fileUploadQuestion(), {
         questionId: 'q1',
         file: { name: 'photo.jpg', dataUrl: 'data:image/jpeg;base64,' },
       }),

@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { translateSignal } from '@jsverse/transloco';
 import { shuffle } from '../../../core/utils/shuffle';
 import { WordChoiceQuestion } from '../../../core/models/quiz.models';
 
@@ -20,7 +21,7 @@ import { WordChoiceQuestion } from '../../../core/models/quiz.models';
           </button>
         }
         @if (selectedOptionIds().length === 0) {
-          <span class="word-choice-placeholder">Собирайте фразу, нажимая на слова ниже</span>
+          <span class="word-choice-placeholder">{{ placeholderLabel() }}</span>
         }
       </div>
       <div class="word-choice-pool">
@@ -91,6 +92,8 @@ export class WordChoiceRunner {
   readonly question = input.required<WordChoiceQuestion>();
   readonly selectedOptionIds = input<string[]>([]);
   readonly selectionChange = output<string[]>();
+
+  protected readonly placeholderLabel = translateSignal('wordChoiceRunner.placeholder');
 
   private readonly shuffledWords = computed(() => shuffle(this.question().words));
 

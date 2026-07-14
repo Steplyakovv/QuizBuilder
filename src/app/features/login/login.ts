@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { translateSignal } from '@jsverse/transloco';
 import { AuthStore } from '../../core/state/auth-store';
 
 @Component({
@@ -19,12 +20,20 @@ export class Login {
   readonly password = signal('');
   readonly error = signal<string | null>(null);
 
+  protected readonly backToListLabel = translateSignal('common.backToList');
+  protected readonly titleLabel = translateSignal('login.title');
+  protected readonly hintLabel = translateSignal('login.hint');
+  protected readonly usernameLabel = translateSignal('login.usernameLabel');
+  protected readonly passwordLabel = translateSignal('login.passwordLabel');
+  protected readonly submitLabel = translateSignal('login.submit');
+  private readonly invalidCredentialsLabel = translateSignal('login.invalidCredentials');
+
   async submit(): Promise<void> {
     const success = await this.auth.login(this.username(), this.password());
     if (success) {
       void this.router.navigateByUrl('/');
       return;
     }
-    this.error.set('Неверный логин или пароль.');
+    this.error.set(this.invalidCredentialsLabel());
   }
 }

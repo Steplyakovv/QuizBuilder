@@ -6,12 +6,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { TranslocoService, translateSignal } from '@jsverse/transloco';
 import { isQuizPublished } from '../../core/models/quiz-access';
 import { exportQuizToJson, parseImportedQuiz } from '../../core/models/quiz-io';
 import { Quiz } from '../../core/models/quiz.models';
 import { AuthStore } from '../../core/state/auth-store';
 import { QuizStore } from '../../core/state/quiz-store';
-import { ruPaginatorIntl } from '../../core/utils/ru-paginator-intl';
+import { localizedPaginatorIntl } from '../../core/utils/localized-paginator-intl';
 
 @Component({
   selector: 'app-quiz-list',
@@ -24,16 +25,37 @@ import { ruPaginatorIntl } from '../../core/utils/ru-paginator-intl';
     MatInputModule,
     MatPaginatorModule,
   ],
-  providers: [{ provide: MatPaginatorIntl, useFactory: ruPaginatorIntl }],
+  providers: [{ provide: MatPaginatorIntl, useFactory: localizedPaginatorIntl }],
   templateUrl: './quiz-list.html',
   styleUrl: './quiz-list.scss',
 })
 export class QuizList {
   private readonly store = inject(QuizStore);
   private readonly auth = inject(AuthStore);
+  private readonly transloco = inject(TranslocoService);
 
   readonly quizzes = this.store.quizzes;
   readonly isAdmin = this.auth.isAdmin;
+
+  protected readonly titleLabel = translateSignal('quizList.title');
+  protected readonly loggedInAsAdminLabel = translateSignal('quizList.loggedInAsAdmin');
+  protected readonly settingsTitleLabel = translateSignal('quizList.settingsTitle');
+  protected readonly logoutLabel = translateSignal('quizList.logout');
+  protected readonly loginAsAdminLabel = translateSignal('quizList.loginAsAdmin');
+  protected readonly newQuizNameLabel = translateSignal('quizList.newQuizNameLabel');
+  protected readonly newQuizPlaceholderLabel = translateSignal('quizList.newQuizPlaceholder');
+  protected readonly createLabel = translateSignal('quizList.create');
+  protected readonly importLabel = translateSignal('quizList.import');
+  protected readonly emptyStateAdminLabel = translateSignal('quizList.emptyStateAdmin');
+  protected readonly emptyStateLabel = translateSignal('quizList.emptyState');
+  protected readonly openEditorTitleLabel = translateSignal('quizList.openEditorTitle');
+  protected readonly draftBadgeLabel = translateSignal('quizList.draftBadge');
+  protected readonly takeQuizLabel = translateSignal('quizList.takeQuiz');
+  protected readonly resultsLabel = translateSignal('quizList.results');
+  protected readonly exportJsonLabel = translateSignal('quizList.exportJson');
+  protected readonly renameLabel = translateSignal('quizList.rename');
+  protected readonly duplicateLabel = translateSignal('quizList.duplicate');
+  protected readonly deleteLabel = translateSignal('quizList.delete');
 
   /** Non-admins only ever see published quizzes; admins see everything, including drafts. */
   readonly visibleQuizzes = computed(() => {
@@ -68,10 +90,14 @@ export class QuizList {
     this.requestedPageIndex.set(event.pageIndex);
   }
 
+  questionsCountLabel(count: number): string {
+    return this.transloco.translate('quizList.questionsCount', { count });
+  }
+
   async createQuiz(): Promise<void> {
     const title = this.newQuizTitle().trim();
     if (!title) {
-      this.newQuizError.set('Введите название опросника.');
+      this.newQuizError.set(this.transloco.translate('quizList.emptyTitleError'));
       return;
     }
     this.newQuizError.set(null);
@@ -100,11 +126,13 @@ export class QuizList {
     this.importError.set(null);
     try {
       const json = await file.text();
-      const quiz = parseImportedQuiz(json);
+      const quiz = parseImportedQuiz(json, (key) => this.transloco.translate(key));
       await this.store.import(quiz);
     } catch (error) {
       this.importError.set(
-        error instanceof Error ? error.message : 'Не удалось импортировать опросник.',
+        error instanceof Error
+          ? error.message
+          : this.transloco.translate('quizList.importGenericError'),
       );
     }
   }
@@ -139,7 +167,8 @@ export class QuizList {
   }
 
   async deleteQuiz(quiz: Quiz): Promise<void> {
-    if (!confirm(`Удалить опросник «${quiz.title}»?`)) {
+    const message = this.transloco.translate('quizList.deleteConfirm', { title: quiz.title });
+    if (!confirm(message)) {
       return;
     }
     await this.store.remove(quiz.id);

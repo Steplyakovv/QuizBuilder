@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { translateSignal } from '@jsverse/transloco';
 import { ImageChoiceQuestion, Option } from '../../../core/models/quiz.models';
 import { OptionListEditor } from '../../../shared/option-list-editor/option-list-editor';
 
@@ -12,6 +13,8 @@ export class ImageChoiceEditor {
   readonly question = input.required<ImageChoiceQuestion>();
   readonly graded = input(false);
   readonly questionChange = output<ImageChoiceQuestion>();
+
+  protected readonly multipleCheckboxLabel = translateSignal('imageChoiceEditor.multipleCheckbox');
 
   onOptionsChange(options: Option[]): void {
     this.questionChange.emit({ ...this.question(), options });
