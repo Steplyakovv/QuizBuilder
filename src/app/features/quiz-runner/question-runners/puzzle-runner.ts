@@ -2,10 +2,16 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoService } from '@jsverse/transloco';
 import { puzzleGridSize } from '../../../core/models/puzzle';
+import {
+  pieceEdges,
+  piecePathD,
+  PUZZLE_PIECE_SIZE as PIECE_SIZE,
+  PUZZLE_TAB_MARGIN as TAB_MARGIN,
+} from '../../../core/models/puzzle-shape';
 import { PuzzlePlacement, PuzzleQuestion } from '../../../core/models/quiz.models';
 import { shuffle } from '../../../core/utils/shuffle';
 
-const PIECE_SIZE = 90;
+const BOX_SIZE = PIECE_SIZE + 2 * TAB_MARGIN;
 
 @Component({
   selector: 'app-puzzle-runner',
@@ -19,6 +25,8 @@ export class PuzzleRunner {
   readonly question = input.required<PuzzleQuestion>();
   readonly placements = input<PuzzlePlacement[]>([]);
   readonly placementsChange = output<PuzzlePlacement[]>();
+
+  protected readonly boxSize = BOX_SIZE;
 
   protected readonly gridSize = computed(() => puzzleGridSize(this.question().pieceCount));
   protected readonly cellIndexes = computed(() =>
@@ -63,6 +71,12 @@ export class PuzzleRunner {
     return this.trayRotationOverrides()[pieceIndex] ?? this.deterministicTrayRotation(pieceIndex);
   }
 
+  private clipPathFor(pieceIndex: number): string {
+    const { rows, columns } = this.gridSize();
+    const d = piecePathD(pieceEdges(pieceIndex, rows, columns), PIECE_SIZE, TAB_MARGIN);
+    return `path('${d}')`;
+  }
+
   pieceStyle(pieceIndex: number): Record<string, string> {
     const { rows, columns } = this.gridSize();
     const row = Math.floor(pieceIndex / columns);
@@ -70,9 +84,52 @@ export class PuzzleRunner {
     return {
       'background-image': `url(${this.question().imageUrl})`,
       'background-size': `${PIECE_SIZE * columns}px ${PIECE_SIZE * rows}px`,
-      'background-position': `${-col * PIECE_SIZE}px ${-row * PIECE_SIZE}px`,
+      'background-position': `${TAB_MARGIN - col * PIECE_SIZE}px ${TAB_MARGIN - row * PIECE_SIZE}px`,
+      'clip-path': this.clipPathFor(pieceIndex),
       transform: `rotate(${this.rotationOf(pieceIndex)}deg)`,
     };
+  }
+
+  /** Absolute position of a placed piece's bleed box, so its tabs can overlap into neighbours. */
+  gridWrapStyle(cellIndex: number): Record<string, string> {
+    const { columns } = this.gridSize();
+    const row = Math.floor(cellIndex / columns);
+    const col = cellIndex % columns;
+    return {
+      left: `${col * PIECE_SIZE - TAB_MARGIN}px`,
+      top: `${row * PIECE_SIZE - TAB_MARGIN}px`,
+      'z-index': String(cellIndex + 1),
+    };
+  }
+
+  /**
+   * Positioned relative to .puzzle-grid directly (a sibling of every .puzzle-tile-wrap), not
+   * nested inside its own piece's wrap - a wrap's z-index scopes its own stacking context, so a
+   * button nested inside a lower-z-index wrap could be covered by a higher-z-index neighbour's
+   * tab bleed with no way to out-z-index it locally. A shared very-high z-index sidesteps that.
+   */
+  rotateButtonStyle(cellIndex: number): Record<string, string> {
+    const { columns } = this.gridSize();
+    const row = Math.floor(cellIndex / columns);
+    const col = cellIndex % columns;
+    return {
+      left: `${col * PIECE_SIZE + PIECE_SIZE - 18}px`,
+      top: `${row * PIECE_SIZE - 6}px`,
+      right: 'auto',
+      'z-index': '1000',
+    };
+  }
+
+  emptyCellStyle(cellIndex: number): Record<string, string> {
+    const { columns } = this.gridSize();
+    const row = Math.floor(cellIndex / columns);
+    const col = cellIndex % columns;
+    return { left: `${col * PIECE_SIZE}px`, top: `${row * PIECE_SIZE}px` };
+  }
+
+  gridContainerStyle(): Record<string, string> {
+    const { rows, columns } = this.gridSize();
+    return { width: `${columns * PIECE_SIZE}px`, height: `${rows * PIECE_SIZE}px` };
   }
 
   isPicked(pieceIndex: number): boolean {

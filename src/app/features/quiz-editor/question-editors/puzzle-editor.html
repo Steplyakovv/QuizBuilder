@@ -33,12 +33,21 @@
     <div
       class="puzzle-preview"
       [style.background-image]="'url(' + question().imageUrl + ')'"
-      [style.grid-template-columns]="'repeat(' + gridSize().columns + ', 1fr)'"
-      [style.grid-template-rows]="'repeat(' + gridSize().rows + ', 1fr)'"
+      [style.width.px]="previewSize().width"
+      [style.height.px]="previewSize().height"
     >
-      @for (cell of gridCells(); track cell) {
-        <div class="puzzle-preview-cell"></div>
-      }
+      <svg
+        class="puzzle-preview-lines"
+        [attr.viewBox]="'0 0 ' + previewSize().width + ' ' + previewSize().height"
+      >
+        @for (piece of gridCells(); track piece) {
+          <path
+            class="puzzle-preview-outline"
+            [attr.transform]="pieceTransform(piece)"
+            [attr.d]="piecePathFor(piece)"
+          />
+        }
+      </svg>
     </div>
   }
 </div>

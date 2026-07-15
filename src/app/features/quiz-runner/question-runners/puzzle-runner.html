@@ -1,8 +1,8 @@
 <div class="puzzle-runner">
-  <div class="puzzle-grid" [style.grid-template-columns]="'repeat(' + gridSize().columns + ', 1fr)'">
+  <div class="puzzle-grid" [style]="gridContainerStyle()">
     @for (cellIndex of cellIndexes(); track cellIndex) {
       @if (grid()[cellIndex] !== null) {
-        <div class="puzzle-tile-wrap">
+        <div class="puzzle-tile-wrap" [style]="gridWrapStyle(cellIndex)">
           <button
             type="button"
             class="puzzle-tile-surface"
@@ -17,19 +17,23 @@
           >
             <span class="puzzle-tile-image" [style]="pieceStyle(grid()[cellIndex]!)"></span>
           </button>
-          <button
-            type="button"
-            class="puzzle-rotate-button"
-            [attr.aria-label]="rotateLabel()"
-            (click)="rotate(grid()[cellIndex]!, $event)"
-          >
-            <mat-icon>rotate_right</mat-icon>
-          </button>
         </div>
+        <!-- Rendered as a grid-level sibling (not nested in the wrap) so a neighbouring piece's
+             higher z-index tab bleed can never cover this button - see rotateButtonStyle(). -->
+        <button
+          type="button"
+          class="puzzle-rotate-button puzzle-rotate-button--grid"
+          [style]="rotateButtonStyle(cellIndex)"
+          [attr.aria-label]="rotateLabel()"
+          (click)="rotate(grid()[cellIndex]!, $event)"
+        >
+          <mat-icon>rotate_right</mat-icon>
+        </button>
       } @else {
         <button
           type="button"
           class="puzzle-cell-empty"
+          [style]="emptyCellStyle(cellIndex)"
           [attr.aria-label]="emptyCellLabel(cellIndex)"
           (dragover)="$event.preventDefault()"
           (drop)="onDropOnCell(cellIndex, $event)"
@@ -54,7 +58,7 @@
       (drop)="onDropOnTray($event)"
     >
       @for (pieceIndex of tray(); track pieceIndex) {
-        <div class="puzzle-tile-wrap">
+        <div class="puzzle-tile-wrap puzzle-tile-wrap--tray">
           <button
             type="button"
             class="puzzle-tile-surface"

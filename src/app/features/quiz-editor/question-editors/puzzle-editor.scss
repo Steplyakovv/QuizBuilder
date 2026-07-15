@@ -25,17 +25,23 @@
 }
 
 .puzzle-preview {
-  display: grid;
-  width: 320px;
+  position: relative;
   max-width: 100%;
-  aspect-ratio: 1;
-  background-size: cover;
-  background-position: center;
+  background-size: 100% 100%;
   border: 1px solid var(--mat-sys-outline);
 }
 
-.puzzle-preview-cell {
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  outline: 1px solid rgba(0, 0, 0, 0.3);
-  outline-offset: -1px;
+.puzzle-preview-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.puzzle-preview-outline {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
 }
