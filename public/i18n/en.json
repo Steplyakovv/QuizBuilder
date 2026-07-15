@@ -98,6 +98,9 @@
   "imageChoiceEditor": {
     "multipleCheckbox": "Multiple correct answers"
   },
+  "imageGridEditor": {
+    "columnsLabel": "Grid columns"
+  },
   "fillInTheBlankEditor": {
     "templateLabel": "Text with blanks ({{marker}} — blank placeholder)",
     "correctAnswersLabel": "Correct answers for the blanks:",
@@ -210,6 +213,11 @@
     "matchedWith": "matched with “{{label}}”",
     "notMatched": "not matched"
   },
+  "imageGridRunner": {
+    "tileLabel": "Image {{index}}",
+    "selected": "selected",
+    "notSelected": "not selected"
+  },
   "quizRunner": {
     "previewBanner": "This is a preview — answers are not saved.",
     "previewSubmittedResult": "This is a preview — the answers were not saved.",
@@ -236,6 +244,7 @@
     "multiple-choice": "Multiple choice",
     "text": "Text answer",
     "image-choice": "Image choice",
+    "image-grid": "Image grid",
     "true-false": "True/False",
     "dropdown": "Dropdown list",
     "number": "Numeric answer",

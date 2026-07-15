@@ -98,6 +98,9 @@
   "imageChoiceEditor": {
     "multipleCheckbox": "Декілька правильних варіантів"
   },
+  "imageGridEditor": {
+    "columnsLabel": "Колонок у сітці"
+  },
   "fillInTheBlankEditor": {
     "templateLabel": "Текст із пропусками ({{marker}} — місце пропуску)",
     "correctAnswersLabel": "Правильні відповіді для пропусків:",
@@ -210,6 +213,11 @@
     "matchedWith": "зіставлено з «{{label}}»",
     "notMatched": "не зіставлено"
   },
+  "imageGridRunner": {
+    "tileLabel": "Картинка {{index}}",
+    "selected": "вибрано",
+    "notSelected": "не вибрано"
+  },
   "quizRunner": {
     "previewBanner": "Це попередній перегляд — відповіді не зберігаються.",
     "previewSubmittedResult": "Це попередній перегляд — відповіді не збережено.",
@@ -236,6 +244,7 @@
     "multiple-choice": "Множинний вибір",
     "text": "Текстова відповідь",
     "image-choice": "Вибір картинки",
+    "image-grid": "Сітка картинок",
     "true-false": "Так/Ні",
     "dropdown": "Розкривний список",
     "number": "Числова відповідь",

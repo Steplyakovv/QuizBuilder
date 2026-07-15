@@ -1,0 +1,23 @@
+<div class="image-grid-editor">
+  <mat-form-field appearance="outline" class="columns-field">
+    <mat-label>{{ columnsLabel() }}</mat-label>
+    <input
+      matInput
+      type="number"
+      min="1"
+      [value]="question().columns"
+      (blur)="onColumnsChange($any($event.target).value)"
+    />
+  </mat-form-field>
+
+  <app-option-list-editor
+    [options]="question().options"
+    [correctOptionIds]="question().correctOptionIds ?? []"
+    selectionMode="multiple"
+    [showCorrectMarking]="graded()"
+    [showImageUrl]="true"
+    [reorderable]="true"
+    (optionsChange)="onOptionsChange($event)"
+    (correctOptionIdsChange)="onCorrectChange($event)"
+  />
+</div>

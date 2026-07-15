@@ -9,6 +9,7 @@ export const QUESTION_TYPES: QuestionType[] = [
   'multiple-choice',
   'text',
   'image-choice',
+  'image-grid',
   'true-false',
   'dropdown',
   'number',
@@ -36,6 +37,8 @@ export function createQuestion(type: QuestionType): Question {
       return { id, type, prompt: '', required: true, multiline: false };
     case 'image-choice':
       return { id, type, prompt: '', required: true, multiple: false, options: [] };
+    case 'image-grid':
+      return { id, type, prompt: '', required: true, columns: 3, options: [] };
     case 'true-false':
       return { id, type, prompt: '', required: true };
     case 'dropdown':

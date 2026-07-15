@@ -38,6 +38,7 @@ public class QuestionMapper : IQuestionMapper
         Multiline = (q as TextQuestion)?.Multiline,
         MaxLength = (q as TextQuestion)?.MaxLength,
         Multiple = (q as ImageChoiceQuestion)?.Multiple,
+        Columns = (q as ImageGridQuestion)?.Columns,
         CorrectAnswer = (q as TrueFalseQuestion)?.CorrectAnswer,
         CorrectOptionId = q switch
         {
@@ -82,6 +83,7 @@ public class QuestionMapper : IQuestionMapper
         Multiline = s.Multiline,
         MaxLength = s.MaxLength,
         Multiple = s.Multiple,
+        Columns = s.Columns,
         CorrectAnswer = s.CorrectAnswer,
         CorrectOptionId = s.CorrectOptionId,
         Min = s.Min,
@@ -99,6 +101,7 @@ public class QuestionMapper : IQuestionMapper
         MultipleChoiceQuestion => "multiple-choice",
         TextQuestion => "text",
         ImageChoiceQuestion => "image-choice",
+        ImageGridQuestion => "image-grid",
         TrueFalseQuestion => "true-false",
         DropdownQuestion => "dropdown",
         NumberQuestion => "number",
@@ -147,6 +150,7 @@ public class QuestionMapper : IQuestionMapper
                 ImageChoiceQuestionDto ic => ic.Multiple,
                 _ => null,
             },
+            Columns = (dto as ImageGridQuestionDto)?.Columns,
             CorrectAnswer = (dto as TrueFalseQuestionDto)?.CorrectAnswer,
             CorrectOptionId = dto switch
             {
@@ -188,6 +192,7 @@ public class QuestionMapper : IQuestionMapper
             SingleChoiceQuestionDto s => Map(s.Options, OptionKind.Option, s.CorrectOptionId is null ? [] : [s.CorrectOptionId]),
             MultipleChoiceQuestionDto m => Map(m.Options, OptionKind.Option, m.CorrectOptionIds is null ? [] : [.. m.CorrectOptionIds]),
             ImageChoiceQuestionDto i => Map(i.Options, OptionKind.Option, i.CorrectOptionIds is null ? [] : [.. i.CorrectOptionIds]),
+            ImageGridQuestionDto ig => Map(ig.Options, OptionKind.Option, ig.CorrectOptionIds is null ? [] : [.. ig.CorrectOptionIds]),
             DropdownQuestionDto d => Map(d.Options, OptionKind.Option, d.CorrectOptionId is null ? [] : [d.CorrectOptionId]),
             ConstantSumQuestionDto c => Map(c.Options, OptionKind.Option),
             WordChoiceQuestionDto w => Map(w.Words, OptionKind.Option),
@@ -203,6 +208,7 @@ public class QuestionMapper : IQuestionMapper
         MultipleChoiceQuestionDto => "multiple-choice",
         TextQuestionDto => "text",
         ImageChoiceQuestionDto => "image-choice",
+        ImageGridQuestionDto => "image-grid",
         TrueFalseQuestionDto => "true-false",
         DropdownQuestionDto => "dropdown",
         NumberQuestionDto => "number",
@@ -252,6 +258,11 @@ public class QuestionMapper : IQuestionMapper
             {
                 Id = id, Prompt = v.Prompt, Required = v.Required, Condition = condition, PageId = pageId,
                 Multiple = v.Multiple ?? false, Options = optionDtos, CorrectOptionIds = CorrectOptionIds(v),
+            },
+            "image-grid" => new ImageGridQuestionDto
+            {
+                Id = id, Prompt = v.Prompt, Required = v.Required, Condition = condition, PageId = pageId,
+                Columns = v.Columns ?? 3, Options = optionDtos, CorrectOptionIds = CorrectOptionIds(v),
             },
             "true-false" => new TrueFalseQuestionDto
             {
@@ -348,6 +359,7 @@ public class QuestionMapper : IQuestionMapper
             "multiple-choice" => new MultipleChoiceQuestion { Prompt = v.Prompt },
             "text" => new TextQuestion { Multiline = v.Multiline ?? false, MaxLength = v.MaxLength, Prompt = v.Prompt },
             "image-choice" => new ImageChoiceQuestion { Multiple = v.Multiple ?? false, Prompt = v.Prompt },
+            "image-grid" => new ImageGridQuestion { Columns = v.Columns ?? 3, Prompt = v.Prompt },
             "true-false" => new TrueFalseQuestion { CorrectAnswer = v.CorrectAnswer, Prompt = v.Prompt },
             "dropdown" => new DropdownQuestion { CorrectOptionId = v.CorrectOptionId, Prompt = v.Prompt },
             "number" => new NumberQuestion { Min = v.Min, Max = v.Max, Prompt = v.Prompt },
@@ -407,6 +419,7 @@ public class QuestionMapper : IQuestionMapper
         Multiline = v.Multiline,
         MaxLength = v.MaxLength,
         Multiple = v.Multiple,
+        Columns = v.Columns,
         CorrectAnswer = v.CorrectAnswer,
         CorrectOptionId = v.CorrectOptionId,
         Min = v.Min,

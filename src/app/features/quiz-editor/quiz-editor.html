@@ -238,6 +238,12 @@
                 [graded]="quiz.settings.isGraded"
                 (questionChange)="saveQuestion($event)"
               />
+            } @else if (question.type === 'image-grid') {
+              <app-image-grid-editor
+                [question]="question"
+                [graded]="quiz.settings.isGraded"
+                (questionChange)="saveQuestion($event)"
+              />
             } @else if (question.type === 'true-false') {
               <app-true-false-editor
                 [question]="question"

@@ -56,6 +56,13 @@ public record ImageChoiceQuestionDto : QuestionDto
     public List<string>? CorrectOptionIds { get; init; }
 }
 
+public record ImageGridQuestionDto : QuestionDto
+{
+    public int Columns { get; init; }
+    public required List<OptionDto> Options { get; init; }
+    public List<string>? CorrectOptionIds { get; init; }
+}
+
 public record TrueFalseQuestionDto : QuestionDto
 {
     public bool? CorrectAnswer { get; init; }

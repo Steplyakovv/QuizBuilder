@@ -41,6 +41,12 @@ public class ImageChoiceQuestion : Question
     public bool Multiple { get; set; }
 }
 
+/// <summary>Captcha-style grid of image tiles; always multi-select.</summary>
+public class ImageGridQuestion : Question
+{
+    public int Columns { get; set; }
+}
+
 public class TrueFalseQuestion : Question
 {
     public bool? CorrectAnswer { get; set; }

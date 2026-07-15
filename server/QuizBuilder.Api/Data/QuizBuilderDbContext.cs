@@ -73,6 +73,7 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
                 .HasValue<MultipleChoiceQuestion>("multiple-choice")
                 .HasValue<TextQuestion>("text")
                 .HasValue<ImageChoiceQuestion>("image-choice")
+                .HasValue<ImageGridQuestion>("image-grid")
                 .HasValue<TrueFalseQuestion>("true-false")
                 .HasValue<DropdownQuestion>("dropdown")
                 .HasValue<NumberQuestion>("number")

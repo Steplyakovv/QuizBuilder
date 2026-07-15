@@ -17,6 +17,7 @@ public sealed class QuestionDtoConverter : JsonConverter<QuestionDto>
         ["multiple-choice"] = typeof(MultipleChoiceQuestionDto),
         ["text"] = typeof(TextQuestionDto),
         ["image-choice"] = typeof(ImageChoiceQuestionDto),
+        ["image-grid"] = typeof(ImageGridQuestionDto),
         ["true-false"] = typeof(TrueFalseQuestionDto),
         ["dropdown"] = typeof(DropdownQuestionDto),
         ["number"] = typeof(NumberQuestionDto),

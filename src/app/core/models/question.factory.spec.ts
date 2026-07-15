@@ -20,6 +20,11 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'image-choice', multiple: false, options: [] });
   });
 
+  it('creates an image-grid question with 3 columns by default', () => {
+    const question = createQuestion('image-grid');
+    expect(question).toMatchObject({ type: 'image-grid', columns: 3, options: [] });
+  });
+
   it('creates a true-false question with no correct answer set', () => {
     const question = createQuestion('true-false');
     expect(question).toMatchObject({ type: 'true-false', prompt: '', required: true });

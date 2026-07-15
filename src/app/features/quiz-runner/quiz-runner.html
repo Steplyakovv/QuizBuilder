@@ -107,6 +107,12 @@
                 [selectedOptionIds]="selectedOptionIds(question.id)"
                 (selectionChange)="setSelection(question.id, $event)"
               />
+            } @else if (question.type === 'image-grid') {
+              <app-image-grid-runner
+                [question]="question"
+                [selectedOptionIds]="selectedOptionIds(question.id)"
+                (selectionChange)="setSelection(question.id, $event)"
+              />
             } @else if (question.type === 'true-false') {
               <app-true-false-runner
                 [question]="question"

@@ -41,6 +41,7 @@ import { FileUploadRunner } from './question-runners/file-upload-runner';
 import { FillInTheBlankRunner } from './question-runners/fill-in-the-blank-runner';
 import { HotspotRunner } from './question-runners/hotspot-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
+import { ImageGridRunner } from './question-runners/image-grid-runner';
 import { MatchingRunner } from './question-runners/matching-runner';
 import { MatrixRunner } from './question-runners/matrix-runner';
 import { MultipleChoiceRunner } from './question-runners/multiple-choice-runner';
@@ -67,6 +68,7 @@ import { WordChoiceRunner } from './question-runners/word-choice-runner';
     FillInTheBlankRunner,
     HotspotRunner,
     ImageChoiceRunner,
+    ImageGridRunner,
     MatchingRunner,
     MatrixRunner,
     MultipleChoiceRunner,

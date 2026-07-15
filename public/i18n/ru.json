@@ -98,6 +98,9 @@
   "imageChoiceEditor": {
     "multipleCheckbox": "Несколько правильных вариантов"
   },
+  "imageGridEditor": {
+    "columnsLabel": "Колонок в сетке"
+  },
   "fillInTheBlankEditor": {
     "templateLabel": "Текст с пропусками ({{marker}} — место пропуска)",
     "correctAnswersLabel": "Правильные ответы для пропусков:",
@@ -210,6 +213,11 @@
     "matchedWith": "сопоставлено с «{{label}}»",
     "notMatched": "не сопоставлено"
   },
+  "imageGridRunner": {
+    "tileLabel": "Картинка {{index}}",
+    "selected": "выбрано",
+    "notSelected": "не выбрано"
+  },
   "quizRunner": {
     "previewBanner": "Это предпросмотр — ответы не сохраняются.",
     "previewSubmittedResult": "Это предпросмотр — ответы не сохранены.",
@@ -236,6 +244,7 @@
     "multiple-choice": "Множественный выбор",
     "text": "Текстовый ответ",
     "image-choice": "Выбор картинки",
+    "image-grid": "Сетка картинок",
     "true-false": "Да/Нет",
     "dropdown": "Выпадающий список",
     "number": "Числовой ответ",

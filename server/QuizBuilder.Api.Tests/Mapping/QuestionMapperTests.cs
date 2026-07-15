@@ -167,6 +167,28 @@ public class QuestionMapperTests
     }
 
     [Fact]
+    public void Image_grid_question_round_trips_columns_and_correct_tiles()
+    {
+        var tileA = new OptionDto { Id = Guid.NewGuid().ToString(), Label = "Traffic light", ImageUrl = "a.png" };
+        var tileB = new OptionDto { Id = Guid.NewGuid().ToString(), Label = "Tree", ImageUrl = "b.png" };
+        var dto = new ImageGridQuestionDto
+        {
+            Id = Guid.NewGuid().ToString(),
+            Prompt = "Select all tiles with a traffic light",
+            Columns = 3,
+            Options = [tileA, tileB],
+            CorrectOptionIds = [tileA.Id],
+        };
+
+        var entity = Assert.IsType<ImageGridQuestion>(mapper.ToEntity(mapper.FromDto(dto, 0), Guid.NewGuid()));
+        Assert.Equal(3, entity.Columns);
+
+        var result = Assert.IsType<ImageGridQuestionDto>(mapper.ToDto(mapper.FromEntity(entity)));
+        Assert.Equal(3, result.Columns);
+        Assert.Equal([tileA.Id], result.CorrectOptionIds);
+    }
+
+    [Fact]
     public void Fill_in_the_blank_question_round_trips_ordered_answers_including_a_blank_one()
     {
         var dto = new FillInTheBlankQuestionDto

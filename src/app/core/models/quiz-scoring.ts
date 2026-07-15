@@ -15,6 +15,7 @@ export function hasCorrectAnswer(question: Question): boolean {
       return !!question.correctOptionId;
     case 'multiple-choice':
     case 'image-choice':
+    case 'image-grid':
       return !!question.correctOptionIds && question.correctOptionIds.length > 0;
     case 'true-false':
       return question.correctAnswer !== undefined;
@@ -47,7 +48,8 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
     case 'dropdown':
       return selected.length === 1 && selected[0] === question.correctOptionId;
     case 'multiple-choice':
-    case 'image-choice': {
+    case 'image-choice':
+    case 'image-grid': {
       const correct = question.correctOptionIds ?? [];
       return selected.length === correct.length && correct.every((id) => selected.includes(id));
     }
@@ -101,7 +103,8 @@ export function formatCorrectAnswer(
     case 'dropdown':
       return question.options.find((option) => option.id === question.correctOptionId)?.label;
     case 'multiple-choice':
-    case 'image-choice': {
+    case 'image-choice':
+    case 'image-grid': {
       const correctIds = question.correctOptionIds ?? [];
       return question.options
         .filter((option) => correctIds.includes(option.id))

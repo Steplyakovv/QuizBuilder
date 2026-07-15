@@ -21,6 +21,7 @@ public class AttemptQuestionSnapshot
     public bool? Multiline { get; set; }
     public int? MaxLength { get; set; }
     public bool? Multiple { get; set; }
+    public int? Columns { get; set; }
     public bool? CorrectAnswer { get; set; }
     public Guid? CorrectOptionId { get; set; }
     public decimal? Min { get; set; }

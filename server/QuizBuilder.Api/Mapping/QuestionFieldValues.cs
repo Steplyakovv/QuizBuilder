@@ -26,6 +26,7 @@ public sealed record QuestionFieldValues
     public bool? Multiline { get; init; }
     public int? MaxLength { get; init; }
     public bool? Multiple { get; init; }
+    public int? Columns { get; init; }
     public bool? CorrectAnswer { get; init; }
     public Guid? CorrectOptionId { get; init; }
     public decimal? Min { get; init; }

@@ -37,6 +37,7 @@ export type Question =
   | MultipleChoiceQuestion
   | TextQuestion
   | ImageChoiceQuestion
+  | ImageGridQuestion
   | TrueFalseQuestion
   | DropdownQuestion
   | NumberQuestion
@@ -94,6 +95,18 @@ export interface TextQuestion extends BaseQuestion {
 export interface ImageChoiceQuestion extends BaseQuestion {
   type: 'image-choice';
   multiple: boolean;
+  options: Option[];
+  correctOptionIds?: string[];
+}
+
+/**
+ * Captcha-style grid of tightly-packed image tiles (e.g. "select all tiles with a traffic
+ * light"). Always multi-select — a single-select toggle wouldn't match the "select all" premise.
+ * Option.label is used only as the tile's alt/aria-label, never displayed.
+ */
+export interface ImageGridQuestion extends BaseQuestion {
+  type: 'image-grid';
+  columns: number;
   options: Option[];
   correctOptionIds?: string[];
 }
