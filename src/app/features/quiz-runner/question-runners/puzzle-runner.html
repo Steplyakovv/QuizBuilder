@@ -1,0 +1,82 @@
+<div class="puzzle-runner">
+  <div class="puzzle-grid" [style.grid-template-columns]="'repeat(' + gridSize().columns + ', 1fr)'">
+    @for (cellIndex of cellIndexes(); track cellIndex) {
+      @if (grid()[cellIndex] !== null) {
+        <div class="puzzle-tile-wrap">
+          <button
+            type="button"
+            class="puzzle-tile-surface"
+            [class.puzzle-tile-surface--picked]="isPicked(grid()[cellIndex]!)"
+            [attr.aria-pressed]="isPicked(grid()[cellIndex]!)"
+            [attr.aria-label]="pieceLabel(grid()[cellIndex]!)"
+            draggable="true"
+            (dragstart)="onDragStart(grid()[cellIndex]!)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDropOnCell(cellIndex, $event)"
+            (click)="onTileClick(grid()[cellIndex]!)"
+          >
+            <span class="puzzle-tile-image" [style]="pieceStyle(grid()[cellIndex]!)"></span>
+          </button>
+          <button
+            type="button"
+            class="puzzle-rotate-button"
+            [attr.aria-label]="rotateLabel()"
+            (click)="rotate(grid()[cellIndex]!, $event)"
+          >
+            <mat-icon>rotate_right</mat-icon>
+          </button>
+        </div>
+      } @else {
+        <button
+          type="button"
+          class="puzzle-cell-empty"
+          [attr.aria-label]="emptyCellLabel(cellIndex)"
+          (dragover)="$event.preventDefault()"
+          (drop)="onDropOnCell(cellIndex, $event)"
+          (click)="placeInCell(cellIndex)"
+        ></button>
+      }
+    }
+  </div>
+
+  @if (picked() !== null) {
+    <button type="button" class="puzzle-return-button" (click)="returnToTray()">
+      {{ returnToTrayLabel() }}
+    </button>
+  }
+
+  @if (tray().length > 0) {
+    <div
+      class="puzzle-tray"
+      role="group"
+      [attr.aria-label]="trayLabel()"
+      (dragover)="$event.preventDefault()"
+      (drop)="onDropOnTray($event)"
+    >
+      @for (pieceIndex of tray(); track pieceIndex) {
+        <div class="puzzle-tile-wrap">
+          <button
+            type="button"
+            class="puzzle-tile-surface"
+            [class.puzzle-tile-surface--picked]="isPicked(pieceIndex)"
+            [attr.aria-pressed]="isPicked(pieceIndex)"
+            [attr.aria-label]="pieceLabel(pieceIndex)"
+            draggable="true"
+            (dragstart)="onDragStart(pieceIndex)"
+            (click)="onTileClick(pieceIndex)"
+          >
+            <span class="puzzle-tile-image" [style]="pieceStyle(pieceIndex)"></span>
+          </button>
+          <button
+            type="button"
+            class="puzzle-rotate-button"
+            [attr.aria-label]="rotateLabel()"
+            (click)="rotate(pieceIndex, $event)"
+          >
+            <mat-icon>rotate_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

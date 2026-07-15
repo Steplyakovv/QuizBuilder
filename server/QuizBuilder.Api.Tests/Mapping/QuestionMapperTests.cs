@@ -189,6 +189,26 @@ public class QuestionMapperTests
     }
 
     [Fact]
+    public void Puzzle_question_round_trips_image_url_and_piece_count()
+    {
+        var dto = new PuzzleQuestionDto
+        {
+            Id = Guid.NewGuid().ToString(),
+            Prompt = "Assemble the picture",
+            ImageUrl = "data:image/png;base64,abc",
+            PieceCount = 12,
+        };
+
+        var entity = Assert.IsType<PuzzleQuestion>(mapper.ToEntity(mapper.FromDto(dto, 0), Guid.NewGuid()));
+        Assert.Equal(dto.ImageUrl, entity.ImageUrl);
+        Assert.Equal(12, entity.PieceCount);
+
+        var result = Assert.IsType<PuzzleQuestionDto>(mapper.ToDto(mapper.FromEntity(entity)));
+        Assert.Equal(dto.ImageUrl, result.ImageUrl);
+        Assert.Equal(12, result.PieceCount);
+    }
+
+    [Fact]
     public void Fill_in_the_blank_question_round_trips_ordered_answers_including_a_blank_one()
     {
         var dto = new FillInTheBlankQuestionDto

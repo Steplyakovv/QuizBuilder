@@ -80,7 +80,12 @@ public class AttemptMappingProfile : Profile
             .ForMember(d => d.Blanks, opt => opt.MapFrom(s =>
                 s.Blanks.Count == 0 ? null : s.Blanks.OrderBy(b => b.Position).Select(b => b.Answer ?? "").ToList()))
             .ForMember(d => d.Matches, opt => opt.MapFrom(s =>
-                s.Matches.Count == 0 ? null : s.Matches.ToDictionary(m => m.KeyId.ToString(), m => m.ValueId.ToString())));
+                s.Matches.Count == 0 ? null : s.Matches.ToDictionary(m => m.KeyId.ToString(), m => m.ValueId.ToString())))
+            .ForMember(d => d.PuzzlePlacements, opt => opt.MapFrom(s =>
+                s.PuzzlePlacements.Count == 0 ? null : s.PuzzlePlacements.Select(p => new PuzzlePlacementDto
+                {
+                    PieceIndex = p.PieceIndex, CellIndex = p.CellIndex, RotationDegrees = p.RotationDegrees,
+                }).ToList()));
 
         CreateMap<QuestionResponseDto, QuestionResponse>()
             .ForMember(d => d.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
@@ -93,7 +98,12 @@ public class AttemptMappingProfile : Profile
             .ForMember(d => d.Blanks, opt => opt.MapFrom(s =>
                 (s.Blanks ?? new List<string>()).Select((b, i) => new ResponseBlank { Id = Guid.NewGuid(), Position = i, Answer = b })))
             .ForMember(d => d.Matches, opt => opt.MapFrom(s =>
-                (s.Matches ?? new Dictionary<string, string>()).Select(kv => new ResponseMatch { Id = Guid.NewGuid(), KeyId = Guid.Parse(kv.Key), ValueId = Guid.Parse(kv.Value) })));
+                (s.Matches ?? new Dictionary<string, string>()).Select(kv => new ResponseMatch { Id = Guid.NewGuid(), KeyId = Guid.Parse(kv.Key), ValueId = Guid.Parse(kv.Value) })))
+            .ForMember(d => d.PuzzlePlacements, opt => opt.MapFrom(s =>
+                (s.PuzzlePlacements ?? new List<PuzzlePlacementDto>()).Select(p => new ResponsePuzzlePlacement
+                {
+                    Id = Guid.NewGuid(), PieceIndex = p.PieceIndex, CellIndex = p.CellIndex, RotationDegrees = p.RotationDegrees,
+                })));
 
         CreateMap<ResponseFile, ResponseFileDto>()
             .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FileName))

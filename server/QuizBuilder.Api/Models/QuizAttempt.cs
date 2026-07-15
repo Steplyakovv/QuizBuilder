@@ -43,6 +43,7 @@ public class QuestionResponse
     public List<ResponseBlank> Blanks { get; set; } = [];
     public List<ResponseMatch> Matches { get; set; } = [];
     public ResponseFile? File { get; set; }
+    public List<ResponsePuzzlePlacement> PuzzlePlacements { get; set; } = [];
 }
 
 public class ResponseSelectedOption
@@ -81,6 +82,18 @@ public class ResponseMatch
     public Guid ResponseId { get; set; }
     public Guid KeyId { get; set; }
     public Guid ValueId { get; set; }
+
+    public QuestionResponse? Response { get; set; }
+}
+
+/// <summary>Where a puzzle piece currently sits and how it's rotated; correct when CellIndex == PieceIndex && RotationDegrees == 0.</summary>
+public class ResponsePuzzlePlacement
+{
+    public Guid Id { get; set; }
+    public Guid ResponseId { get; set; }
+    public int PieceIndex { get; set; }
+    public int CellIndex { get; set; }
+    public int RotationDegrees { get; set; }
 
     public QuestionResponse? Response { get; set; }
 }

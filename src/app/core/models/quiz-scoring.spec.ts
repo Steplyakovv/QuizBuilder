@@ -388,6 +388,64 @@ describe('scoreAttempt', () => {
     expect(scoreAttempt(quiz, [{ questionId: 'q1', selectedOptionIds: ['r1'] }])).toBeUndefined();
   });
 
+  it('scores a puzzle question correct only when every piece is in its own cell unrotated', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'puzzle',
+      prompt: 'p',
+      required: true,
+      imageUrl: 'https://example.com/pic.png',
+      pieceCount: 2,
+    });
+
+    expect(
+      scoreAttempt(quiz, [
+        {
+          questionId: 'q1',
+          puzzlePlacements: [
+            { pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 },
+            { pieceIndex: 1, cellIndex: 1, rotationDegrees: 0 },
+          ],
+        },
+      ]),
+    ).toEqual({ correct: 1, total: 1 });
+
+    expect(
+      scoreAttempt(quiz, [
+        {
+          questionId: 'q1',
+          puzzlePlacements: [
+            { pieceIndex: 0, cellIndex: 0, rotationDegrees: 90 },
+            { pieceIndex: 1, cellIndex: 1, rotationDegrees: 0 },
+          ],
+        },
+      ]),
+    ).toEqual({ correct: 0, total: 1 });
+
+    expect(
+      scoreAttempt(quiz, [
+        { questionId: 'q1', puzzlePlacements: [{ pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 }] },
+      ]),
+    ).toEqual({ correct: 0, total: 1 });
+  });
+
+  it('ignores a puzzle question with no image or a single piece', () => {
+    const quiz = baseQuiz(true);
+    quiz.questions.push({
+      id: 'q1',
+      type: 'puzzle',
+      prompt: 'p',
+      required: true,
+      imageUrl: '',
+      pieceCount: 4,
+    });
+
+    expect(
+      scoreAttempt(quiz, [{ questionId: 'q1', puzzlePlacements: [] }]),
+    ).toBeUndefined();
+  });
+
   it('excludes a conditionally hidden question from the gradable total', () => {
     const quiz = baseQuiz(true);
     quiz.questions.push(

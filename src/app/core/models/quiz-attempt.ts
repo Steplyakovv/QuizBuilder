@@ -43,6 +43,8 @@ export function isQuestionAnswered(
       return (response?.selectedOptionIds?.length ?? 0) === 1;
     case 'file-upload':
       return !!response?.file;
+    case 'puzzle':
+      return (response?.puzzlePlacements?.length ?? 0) === question.pieceCount;
     default:
       return !!response?.selectedOptionIds && response.selectedOptionIds.length > 0;
   }
@@ -124,6 +126,14 @@ export function formatResponse(
     }
     case 'file-upload':
       return response?.file?.name ?? '—';
+    case 'puzzle': {
+      const placed = response?.puzzlePlacements ?? [];
+      if (placed.length === 0) return '—';
+      const correct = placed.filter(
+        (p) => p.cellIndex === p.pieceIndex && p.rotationDegrees % 360 === 0,
+      ).length;
+      return translate('quizAttempt.puzzlePartial', { correct, total: question.pieceCount });
+    }
     default: {
       const selectedIds = response?.selectedOptionIds ?? [];
       const labels = question.options

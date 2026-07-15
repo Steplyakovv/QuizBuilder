@@ -1,0 +1,44 @@
+<div class="puzzle-editor">
+  <div class="image-url-row">
+    <mat-form-field appearance="outline" class="image-url-field">
+      <mat-label>{{ imageUrlLabel() }}</mat-label>
+      <input matInput [value]="question().imageUrl" (blur)="updateImageUrl($any($event.target).value)" />
+    </mat-form-field>
+    <button mat-stroked-button type="button" (click)="fileInput.click()">
+      <mat-icon>upload</mat-icon>
+      {{ uploadFileLabel() }}
+    </button>
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onFileSelected($any($event.target).files); $any($event.target).value = ''"
+    />
+  </div>
+
+  <mat-form-field appearance="outline" class="piece-count-field">
+    <mat-label>{{ pieceCountLabel() }}</mat-label>
+    <input
+      matInput
+      type="number"
+      min="2"
+      [value]="question().pieceCount"
+      (blur)="onPieceCountChange($any($event.target).value)"
+    />
+  </mat-form-field>
+  <p class="grid-hint">{{ gridHintLabel() }}</p>
+
+  @if (question().imageUrl) {
+    <div
+      class="puzzle-preview"
+      [style.background-image]="'url(' + question().imageUrl + ')'"
+      [style.grid-template-columns]="'repeat(' + gridSize().columns + ', 1fr)'"
+      [style.grid-template-rows]="'repeat(' + gridSize().rows + ', 1fr)'"
+    >
+      @for (cell of gridCells(); track cell) {
+        <div class="puzzle-preview-cell"></div>
+      }
+    </div>
+  }
+</div>

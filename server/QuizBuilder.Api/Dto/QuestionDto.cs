@@ -152,3 +152,9 @@ public record HotspotQuestionDto : QuestionDto
 }
 
 public record FileUploadQuestionDto : QuestionDto;
+
+public record PuzzleQuestionDto : QuestionDto
+{
+    public required string ImageUrl { get; init; }
+    public int PieceCount { get; init; }
+}

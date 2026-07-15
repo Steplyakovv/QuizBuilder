@@ -197,6 +197,12 @@
                 [file]="fileResponse(question.id)"
                 (fileChange)="setFile(question.id, $event)"
               />
+            } @else if (question.type === 'puzzle') {
+              <app-puzzle-runner
+                [question]="question"
+                [placements]="puzzlePlacements(question.id)"
+                (placementsChange)="setPuzzlePlacements(question.id, $event)"
+              />
             }
 
             @if (validationErrors().has(question.id)) {

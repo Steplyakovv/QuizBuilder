@@ -124,3 +124,10 @@ public class HotspotQuestion : Question
 public class FileUploadQuestion : Question
 {
 }
+
+/// <summary>Jigsaw puzzle; correctness is structural (piece i belongs in cell i at 0deg).</summary>
+public class PuzzleQuestion : Question
+{
+    public required string ImageUrl { get; set; }
+    public int PieceCount { get; set; }
+}

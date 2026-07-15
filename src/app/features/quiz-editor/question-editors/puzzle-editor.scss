@@ -1,0 +1,41 @@
+.puzzle-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.image-url-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.image-url-field {
+  flex: 1;
+}
+
+.piece-count-field {
+  max-width: 12rem;
+}
+
+.grid-hint {
+  margin: -0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.puzzle-preview {
+  display: grid;
+  width: 320px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--mat-sys-outline);
+}
+
+.puzzle-preview-cell {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  outline: 1px solid rgba(0, 0, 0, 0.3);
+  outline-offset: -1px;
+}

@@ -29,6 +29,8 @@ export function hasCorrectAnswer(question: Question): boolean {
       return question.pairs.length > 1;
     case 'hotspot':
       return !!question.correctRegionId;
+    case 'puzzle':
+      return !!question.imageUrl && question.pieceCount > 1;
     case 'text':
     case 'number':
     case 'date':
@@ -79,6 +81,13 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
       return question.pairs.every((pair) => response?.matches?.[pair.id] === pair.id);
     case 'hotspot':
       return selected.length === 1 && selected[0] === question.correctRegionId;
+    case 'puzzle': {
+      const placements = response?.puzzlePlacements ?? [];
+      return (
+        placements.length === question.pieceCount &&
+        placements.every((p) => p.cellIndex === p.pieceIndex && p.rotationDegrees % 360 === 0)
+      );
+    }
     case 'text':
     case 'number':
     case 'date':
@@ -135,6 +144,8 @@ export function formatCorrectAnswer(
         ? undefined
         : translate('quizAttempt.hotspotRegion', { index: index + 1 });
     }
+    case 'puzzle':
+      return translate('quizAttempt.puzzleCorrectAnswer');
     default:
       return undefined;
   }

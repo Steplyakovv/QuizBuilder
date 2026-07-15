@@ -136,6 +136,12 @@
     "markCorrectRegion": "Отметить как правильную",
     "removeRegion": "Удалить область"
   },
+  "puzzleEditor": {
+    "imageUrlLabel": "URL картинки",
+    "uploadFile": "Загрузить файл",
+    "pieceCountLabel": "Количество кусочков",
+    "gridHint": "Сетка: {{rows}} × {{columns}}"
+  },
   "optionListEditor": {
     "correctAnswer": "Правильный ответ",
     "markCorrect": "Отметить как правильный",
@@ -149,7 +155,9 @@
     "yes": "Да",
     "no": "Нет",
     "hotspotRegion": "Область №{{index}}",
-    "anyAnswer": "[любой ответ]"
+    "anyAnswer": "[любой ответ]",
+    "puzzleCorrectAnswer": "Все кусочки на своих местах, без поворота",
+    "puzzlePartial": "{{correct}} из {{total}} кусочков на своих местах"
   },
   "quizResults": {
     "resultsTitle": "Результаты: {{title}}",
@@ -194,6 +202,15 @@
   },
   "hotspotRunner": {
     "regionAriaLabel": "Область на изображении"
+  },
+  "puzzleRunner": {
+    "pieceLabel": "Кусочек {{index}}",
+    "pickedUp": "выбран, ожидает места",
+    "notPicked": "не выбран",
+    "rotateLabel": "Повернуть на 90°",
+    "emptyCell": "Пустая ячейка {{index}}",
+    "trayLabel": "Нераспределённые кусочки",
+    "returnToTray": "Вернуть в лоток"
   },
   "fileUploadRunner": {
     "replaceFile": "Заменить файл",
@@ -258,7 +275,8 @@
     "matching": "Сопоставление пар",
     "matrix": "Таблица (матрица)",
     "hotspot": "Область на изображении",
-    "file-upload": "Загрузка файла"
+    "file-upload": "Загрузка файла",
+    "puzzle": "Пазл"
   },
   "paginator": {
     "itemsPerPage": "Показывать по:",

@@ -32,6 +32,7 @@ public sealed class QuestionDtoConverter : JsonConverter<QuestionDto>
         ["matrix"] = typeof(MatrixQuestionDto),
         ["hotspot"] = typeof(HotspotQuestionDto),
         ["file-upload"] = typeof(FileUploadQuestionDto),
+        ["puzzle"] = typeof(PuzzleQuestionDto),
     };
 
     private static readonly Dictionary<Type, string> DiscriminatorsByType =

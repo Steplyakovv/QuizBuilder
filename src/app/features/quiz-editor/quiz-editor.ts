@@ -38,6 +38,7 @@ import { FillInTheBlankEditor } from './question-editors/fill-in-the-blank-edito
 import { HotspotEditor } from './question-editors/hotspot-editor';
 import { ImageChoiceEditor } from './question-editors/image-choice-editor';
 import { ImageGridEditor } from './question-editors/image-grid-editor';
+import { PuzzleEditor } from './question-editors/puzzle-editor';
 import { MatchingEditor } from './question-editors/matching-editor';
 import { MatrixEditor } from './question-editors/matrix-editor';
 import { MultipleChoiceEditor } from './question-editors/multiple-choice-editor';
@@ -67,6 +68,7 @@ import { WordChoiceEditor } from './question-editors/word-choice-editor';
     HotspotEditor,
     ImageChoiceEditor,
     ImageGridEditor,
+    PuzzleEditor,
     MatchingEditor,
     MatrixEditor,
     MultipleChoiceEditor,

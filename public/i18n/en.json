@@ -136,6 +136,12 @@
     "markCorrectRegion": "Mark as correct",
     "removeRegion": "Remove region"
   },
+  "puzzleEditor": {
+    "imageUrlLabel": "Image URL",
+    "uploadFile": "Upload file",
+    "pieceCountLabel": "Number of pieces",
+    "gridHint": "Grid: {{rows}} × {{columns}}"
+  },
   "optionListEditor": {
     "correctAnswer": "Correct answer",
     "markCorrect": "Mark as correct",
@@ -149,7 +155,9 @@
     "yes": "Yes",
     "no": "No",
     "hotspotRegion": "Region #{{index}}",
-    "anyAnswer": "[any answer]"
+    "anyAnswer": "[any answer]",
+    "puzzleCorrectAnswer": "All pieces are in place, unrotated",
+    "puzzlePartial": "{{correct}} of {{total}} pieces in place"
   },
   "quizResults": {
     "resultsTitle": "Results: {{title}}",
@@ -194,6 +202,15 @@
   },
   "hotspotRunner": {
     "regionAriaLabel": "Region on the image"
+  },
+  "puzzleRunner": {
+    "pieceLabel": "Piece {{index}}",
+    "pickedUp": "picked up, waiting for a slot",
+    "notPicked": "not picked up",
+    "rotateLabel": "Rotate 90°",
+    "emptyCell": "Empty cell {{index}}",
+    "trayLabel": "Unplaced pieces",
+    "returnToTray": "Return to tray"
   },
   "fileUploadRunner": {
     "replaceFile": "Replace file",
@@ -258,7 +275,8 @@
     "matching": "Matching pairs",
     "matrix": "Matrix table",
     "hotspot": "Image hotspot",
-    "file-upload": "File upload"
+    "file-upload": "File upload",
+    "puzzle": "Jigsaw puzzle"
   },
   "paginator": {
     "itemsPerPage": "Items per page:",

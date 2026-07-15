@@ -290,6 +290,8 @@
                 [graded]="quiz.settings.isGraded"
                 (questionChange)="saveQuestion($event)"
               />
+            } @else if (question.type === 'puzzle') {
+              <app-puzzle-editor [question]="question" (questionChange)="saveQuestion($event)" />
             }
           </div>
 

@@ -102,6 +102,11 @@ describe('createQuestion', () => {
     expect(question).toMatchObject({ type: 'file-upload', prompt: '', required: true });
   });
 
+  it('creates a puzzle question with a 9-piece default', () => {
+    const question = createQuestion('puzzle');
+    expect(question).toMatchObject({ type: 'puzzle', imageUrl: '', pieceCount: 9 });
+  });
+
   it('generates a unique id for every question', () => {
     expect(createQuestion('text').id).not.toBe(createQuestion('text').id);
   });

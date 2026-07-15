@@ -22,6 +22,7 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
     public DbSet<ResponseDistribution> ResponseDistributions => Set<ResponseDistribution>();
     public DbSet<ResponseBlank> ResponseBlanks => Set<ResponseBlank>();
     public DbSet<ResponseMatch> ResponseMatches => Set<ResponseMatch>();
+    public DbSet<ResponsePuzzlePlacement> ResponsePuzzlePlacements => Set<ResponsePuzzlePlacement>();
     public DbSet<ResponseFile> ResponseFiles => Set<ResponseFile>();
 
     public DbSet<AttemptQuestionSnapshot> AttemptQuestionSnapshots => Set<AttemptQuestionSnapshot>();
@@ -87,7 +88,8 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
                 .HasValue<MatchingQuestion>("matching")
                 .HasValue<MatrixQuestion>("matrix")
                 .HasValue<HotspotQuestion>("hotspot")
-                .HasValue<FileUploadQuestion>("file-upload");
+                .HasValue<FileUploadQuestion>("file-upload")
+                .HasValue<PuzzleQuestion>("puzzle");
 
             entity.HasMany(q => q.Options)
                 .WithOne(o => o.Question)
@@ -112,6 +114,13 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
             .WithOne(r => r.Question)
             .HasForeignKey(r => r.QuestionId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // HotspotQuestion.ImageUrl and PuzzleQuestion.ImageUrl are independently-declared
+        // properties with the same name - without an explicit shared column, EF's default TPH
+        // disambiguation silently moves one of them to a new (empty) column, orphaning existing
+        // hotspot image URLs. Pin both to the same "image_url" column explicitly instead.
+        modelBuilder.Entity<HotspotQuestion>().Property(q => q.ImageUrl).HasColumnName("image_url");
+        modelBuilder.Entity<PuzzleQuestion>().Property(q => q.ImageUrl).HasColumnName("image_url");
 
         // SingleChoiceQuestion.CorrectOptionId, DropdownQuestion.CorrectOptionId and
         // HotspotQuestion.CorrectRegionId, Question.ConditionQuestionId are plain Guid
@@ -153,6 +162,11 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
             entity.HasMany(r => r.Matches)
                 .WithOne(m => m.Response)
                 .HasForeignKey(m => m.ResponseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(r => r.PuzzlePlacements)
+                .WithOne(p => p.Response)
+                .HasForeignKey(p => p.ResponseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(r => r.File)

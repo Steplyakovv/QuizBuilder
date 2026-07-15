@@ -136,6 +136,17 @@ function hotspotQuestion(): Question {
   };
 }
 
+function puzzleQuestion(): Question {
+  return {
+    id: 'q1',
+    type: 'puzzle',
+    prompt: 'Соберите картинку',
+    required: true,
+    imageUrl: 'https://example.com/pic.png',
+    pieceCount: 4,
+  };
+}
+
 function fileUploadQuestion(): Question {
   return { id: 'q1', type: 'file-upload', prompt: 'Прикрепите файл', required: true };
 }
@@ -278,6 +289,27 @@ describe('isQuestionAnswered', () => {
     expect(isQuestionAnswered(hotspotQuestion(), undefined)).toBe(false);
     expect(
       isQuestionAnswered(hotspotQuestion(), { questionId: 'q1', selectedOptionIds: ['r1'] }),
+    ).toBe(true);
+  });
+
+  it('treats a puzzle question as answered only once every piece has been placed', () => {
+    expect(isQuestionAnswered(puzzleQuestion(), undefined)).toBe(false);
+    expect(
+      isQuestionAnswered(puzzleQuestion(), {
+        questionId: 'q1',
+        puzzlePlacements: [{ pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 }],
+      }),
+    ).toBe(false);
+    expect(
+      isQuestionAnswered(puzzleQuestion(), {
+        questionId: 'q1',
+        puzzlePlacements: [
+          { pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 },
+          { pieceIndex: 1, cellIndex: 1, rotationDegrees: 90 },
+          { pieceIndex: 2, cellIndex: 2, rotationDegrees: 0 },
+          { pieceIndex: 3, cellIndex: 3, rotationDegrees: 0 },
+        ],
+      }),
     ).toBe(true);
   });
 
@@ -432,6 +464,22 @@ describe('formatResponse', () => {
         selectedOptionIds: ['r2'],
       }),
     ).toBe('Область №2');
+  });
+
+  it('shows how many puzzle pieces are correctly placed', () => {
+    expect(formatResponse(testTranslate, puzzleQuestion(), undefined)).toBe('—');
+    expect(
+      formatResponse(testTranslate, puzzleQuestion(), { questionId: 'q1', puzzlePlacements: [] }),
+    ).toBe('—');
+    expect(
+      formatResponse(testTranslate, puzzleQuestion(), {
+        questionId: 'q1',
+        puzzlePlacements: [
+          { pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 },
+          { pieceIndex: 1, cellIndex: 1, rotationDegrees: 90 },
+        ],
+      }),
+    ).toBe('1 из 4 кусочков на своих местах');
   });
 
   it('shows the attached file name for a file-upload response', () => {

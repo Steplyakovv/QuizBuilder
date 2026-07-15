@@ -51,7 +51,8 @@ export type Question =
   | MatchingQuestion
   | MatrixQuestion
   | HotspotQuestion
-  | FileUploadQuestion;
+  | FileUploadQuestion
+  | PuzzleQuestion;
 
 export interface QuestionCondition {
   /** id of an earlier question that must be answered before this question is shown. */
@@ -217,6 +218,17 @@ export interface FileUploadQuestion extends BaseQuestion {
   type: 'file-upload';
 }
 
+/**
+ * Jigsaw puzzle: the image is sliced into a rows x columns grid (derived from pieceCount via
+ * puzzleGridSize()) and the respondent drags/rotates pieces back into place. Correctness is
+ * structural (piece i belongs in cell i at 0deg), so there's no separate "correct answer" field.
+ */
+export interface PuzzleQuestion extends BaseQuestion {
+  type: 'puzzle';
+  imageUrl: string;
+  pieceCount: number;
+}
+
 export interface QuizAttempt {
   id: string;
   quizId: string;
@@ -243,6 +255,14 @@ export interface QuestionReportEntry {
   correctAnswer?: string;
 }
 
+export interface PuzzlePlacement {
+  /** 0..pieceCount-1, row-major position in the original (unshuffled) image. */
+  pieceIndex: number;
+  /** Grid cell the piece currently occupies. */
+  cellIndex: number;
+  rotationDegrees: number;
+}
+
 export interface QuestionResponse {
   questionId: string;
   selectedOptionIds?: string[];
@@ -252,4 +272,6 @@ export interface QuestionResponse {
   /** Maps a left-pair id to a right-pair id (matching) or a row id to a column id (matrix). */
   matches?: Record<string, string>;
   file?: { name: string; dataUrl: string };
+  /** Only placed pieces appear here; a piece absent from this array is still in the tray. */
+  puzzlePlacements?: PuzzlePlacement[];
 }

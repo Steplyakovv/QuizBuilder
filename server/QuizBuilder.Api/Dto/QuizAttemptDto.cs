@@ -6,6 +6,13 @@ public record ResponseFileDto
     public required string DataUrl { get; init; }
 }
 
+public record PuzzlePlacementDto
+{
+    public required int PieceIndex { get; init; }
+    public required int CellIndex { get; init; }
+    public required int RotationDegrees { get; init; }
+}
+
 public record QuestionResponseDto
 {
     public required string QuestionId { get; init; }
@@ -15,6 +22,7 @@ public record QuestionResponseDto
     public List<string>? Blanks { get; init; }
     public Dictionary<string, string>? Matches { get; init; }
     public ResponseFileDto? File { get; init; }
+    public List<PuzzlePlacementDto>? PuzzlePlacements { get; init; }
 }
 
 public record QuestionReportEntryDto

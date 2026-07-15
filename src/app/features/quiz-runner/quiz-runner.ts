@@ -31,7 +31,13 @@ import {
 } from '../../core/models/quiz-access';
 import { paginateQuestions } from '../../core/models/quiz-pages';
 import { AttemptScore, buildAttemptReport, scoreAttempt } from '../../core/models/quiz-scoring';
-import { Question, QuestionResponse, Quiz, QuizAttempt } from '../../core/models/quiz.models';
+import {
+  PuzzlePlacement,
+  Question,
+  QuestionResponse,
+  Quiz,
+  QuizAttempt,
+} from '../../core/models/quiz.models';
 import { ATTEMPT_REPOSITORY } from '../../core/repositories/attempt-repository';
 import { QuizStore } from '../../core/state/quiz-store';
 import { ConstantSumRunner } from './question-runners/constant-sum-runner';
@@ -42,6 +48,7 @@ import { FillInTheBlankRunner } from './question-runners/fill-in-the-blank-runne
 import { HotspotRunner } from './question-runners/hotspot-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
 import { ImageGridRunner } from './question-runners/image-grid-runner';
+import { PuzzleRunner } from './question-runners/puzzle-runner';
 import { MatchingRunner } from './question-runners/matching-runner';
 import { MatrixRunner } from './question-runners/matrix-runner';
 import { MultipleChoiceRunner } from './question-runners/multiple-choice-runner';
@@ -69,6 +76,7 @@ import { WordChoiceRunner } from './question-runners/word-choice-runner';
     HotspotRunner,
     ImageChoiceRunner,
     ImageGridRunner,
+    PuzzleRunner,
     MatchingRunner,
     MatrixRunner,
     MultipleChoiceRunner,
@@ -358,6 +366,10 @@ export class QuizRunner {
     return this.responses()[questionId]?.file;
   }
 
+  puzzlePlacements(questionId: string): PuzzlePlacement[] {
+    return this.responses()[questionId]?.puzzlePlacements ?? [];
+  }
+
   setSelection(questionId: string, selectedOptionIds: string[]): void {
     this.responses.update((responses) => ({
       ...responses,
@@ -388,6 +400,14 @@ export class QuizRunner {
     this.responses.update((responses) => ({
       ...responses,
       [questionId]: { questionId, matches },
+    }));
+    this.clearValidationError(questionId);
+  }
+
+  setPuzzlePlacements(questionId: string, puzzlePlacements: PuzzlePlacement[]): void {
+    this.responses.update((responses) => ({
+      ...responses,
+      [questionId]: { questionId, puzzlePlacements },
     }));
     this.clearValidationError(questionId);
   }
