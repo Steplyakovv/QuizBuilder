@@ -52,7 +52,8 @@ export type Question =
   | MatrixQuestion
   | HotspotQuestion
   | FileUploadQuestion
-  | PuzzleQuestion;
+  | PuzzleQuestion
+  | PuzzleHolesQuestion;
 
 export interface QuestionCondition {
   /** id of an earlier question that must be answered before this question is shown. */
@@ -229,6 +230,18 @@ export interface PuzzleQuestion extends BaseQuestion {
   pieceCount: number;
 }
 
+/**
+ * Same rows x columns grid (derived from pieceCount) as PuzzleQuestion, but only holeCount of
+ * those cells are actual holes - the rest of the image stays intact, uncut. Correctness is
+ * structural (piece i belongs in hole i), no rotation.
+ */
+export interface PuzzleHolesQuestion extends BaseQuestion {
+  type: 'puzzle-holes';
+  imageUrl: string;
+  pieceCount: number;
+  holeCount: number;
+}
+
 export interface QuizAttempt {
   id: string;
   quizId: string;
@@ -263,6 +276,13 @@ export interface PuzzlePlacement {
   rotationDegrees: number;
 }
 
+export interface PuzzleHolePlacement {
+  /** Also the one correct hole's cell index for this piece - no rotation, so no ambiguity. */
+  pieceIndex: number;
+  /** Hole cell the piece currently occupies. */
+  cellIndex: number;
+}
+
 export interface QuestionResponse {
   questionId: string;
   selectedOptionIds?: string[];
@@ -274,4 +294,6 @@ export interface QuestionResponse {
   file?: { name: string; dataUrl: string };
   /** Only placed pieces appear here; a piece absent from this array is still in the tray. */
   puzzlePlacements?: PuzzlePlacement[];
+  /** Only placed pieces appear here; a piece absent from this array is still in the tray. */
+  puzzleHolePlacements?: PuzzleHolePlacement[];
 }

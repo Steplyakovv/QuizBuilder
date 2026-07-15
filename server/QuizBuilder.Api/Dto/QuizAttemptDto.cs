@@ -13,6 +13,12 @@ public record PuzzlePlacementDto
     public required int RotationDegrees { get; init; }
 }
 
+public record PuzzleHolePlacementDto
+{
+    public required int PieceIndex { get; init; }
+    public required int CellIndex { get; init; }
+}
+
 public record QuestionResponseDto
 {
     public required string QuestionId { get; init; }
@@ -23,6 +29,7 @@ public record QuestionResponseDto
     public Dictionary<string, string>? Matches { get; init; }
     public ResponseFileDto? File { get; init; }
     public List<PuzzlePlacementDto>? PuzzlePlacements { get; init; }
+    public List<PuzzleHolePlacementDto>? PuzzleHolePlacements { get; init; }
 }
 
 public record QuestionReportEntryDto

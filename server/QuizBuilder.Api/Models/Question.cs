@@ -131,3 +131,15 @@ public class PuzzleQuestion : Question
     public required string ImageUrl { get; set; }
     public int PieceCount { get; set; }
 }
+
+/// <summary>
+/// Same rows x columns grid as PuzzleQuestion, but only HoleCount of those cells are actual
+/// holes - the rest of the image stays intact. Correctness is structural (piece i belongs in
+/// hole i), no rotation.
+/// </summary>
+public class PuzzleHolesQuestion : Question
+{
+    public required string ImageUrl { get; set; }
+    public int PieceCount { get; set; }
+    public int HoleCount { get; set; }
+}

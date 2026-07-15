@@ -1,0 +1,54 @@
+.puzzle-holes-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.image-url-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.image-url-field {
+  flex: 1;
+}
+
+.count-fields-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.piece-count-field,
+.hole-count-field {
+  max-width: 12rem;
+}
+
+.grid-hint {
+  margin: -0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.puzzle-holes-preview {
+  position: relative;
+  max-width: 100%;
+  background-size: 100% 100%;
+  border: 1px solid var(--mat-sys-outline);
+}
+
+.puzzle-holes-preview-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.puzzle-holes-preview-hole {
+  fill: var(--mat-sys-primary);
+  fill-opacity: 0.35;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
+}

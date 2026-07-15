@@ -209,6 +209,29 @@ public class QuestionMapperTests
     }
 
     [Fact]
+    public void Puzzle_holes_question_round_trips_image_url_piece_count_and_hole_count()
+    {
+        var dto = new PuzzleHolesQuestionDto
+        {
+            Id = Guid.NewGuid().ToString(),
+            Prompt = "Fill the gaps",
+            ImageUrl = "data:image/png;base64,abc",
+            PieceCount = 9,
+            HoleCount = 3,
+        };
+
+        var entity = Assert.IsType<PuzzleHolesQuestion>(mapper.ToEntity(mapper.FromDto(dto, 0), Guid.NewGuid()));
+        Assert.Equal(dto.ImageUrl, entity.ImageUrl);
+        Assert.Equal(9, entity.PieceCount);
+        Assert.Equal(3, entity.HoleCount);
+
+        var result = Assert.IsType<PuzzleHolesQuestionDto>(mapper.ToDto(mapper.FromEntity(entity)));
+        Assert.Equal(dto.ImageUrl, result.ImageUrl);
+        Assert.Equal(9, result.PieceCount);
+        Assert.Equal(3, result.HoleCount);
+    }
+
+    [Fact]
     public void Fill_in_the_blank_question_round_trips_ordered_answers_including_a_blank_one()
     {
         var dto = new FillInTheBlankQuestionDto

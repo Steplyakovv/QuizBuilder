@@ -25,6 +25,7 @@ export const QUESTION_TYPES: QuestionType[] = [
   'hotspot',
   'file-upload',
   'puzzle',
+  'puzzle-holes',
 ];
 
 export function createQuestion(type: QuestionType): Question {
@@ -70,6 +71,8 @@ export function createQuestion(type: QuestionType): Question {
       return { id, type, prompt: '', required: true };
     case 'puzzle':
       return { id, type, prompt: '', required: true, imageUrl: '', pieceCount: 9 };
+    case 'puzzle-holes':
+      return { id, type, prompt: '', required: true, imageUrl: '', pieceCount: 9, holeCount: 2 };
   }
 }
 

@@ -85,6 +85,11 @@ public class AttemptMappingProfile : Profile
                 s.PuzzlePlacements.Count == 0 ? null : s.PuzzlePlacements.Select(p => new PuzzlePlacementDto
                 {
                     PieceIndex = p.PieceIndex, CellIndex = p.CellIndex, RotationDegrees = p.RotationDegrees,
+                }).ToList()))
+            .ForMember(d => d.PuzzleHolePlacements, opt => opt.MapFrom(s =>
+                s.PuzzleHolePlacements.Count == 0 ? null : s.PuzzleHolePlacements.Select(p => new PuzzleHolePlacementDto
+                {
+                    PieceIndex = p.PieceIndex, CellIndex = p.CellIndex,
                 }).ToList()));
 
         CreateMap<QuestionResponseDto, QuestionResponse>()
@@ -103,6 +108,11 @@ public class AttemptMappingProfile : Profile
                 (s.PuzzlePlacements ?? new List<PuzzlePlacementDto>()).Select(p => new ResponsePuzzlePlacement
                 {
                     Id = Guid.NewGuid(), PieceIndex = p.PieceIndex, CellIndex = p.CellIndex, RotationDegrees = p.RotationDegrees,
+                })))
+            .ForMember(d => d.PuzzleHolePlacements, opt => opt.MapFrom(s =>
+                (s.PuzzleHolePlacements ?? new List<PuzzleHolePlacementDto>()).Select(p => new ResponsePuzzleHolePlacement
+                {
+                    Id = Guid.NewGuid(), PieceIndex = p.PieceIndex, CellIndex = p.CellIndex,
                 })));
 
         CreateMap<ResponseFile, ResponseFileDto>()

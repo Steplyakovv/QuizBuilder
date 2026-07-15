@@ -142,6 +142,13 @@
     "pieceCountLabel": "Кількість шматочків",
     "gridHint": "Сітка: {{rows}} × {{columns}}"
   },
+  "puzzleHolesEditor": {
+    "imageUrlLabel": "URL зображення",
+    "uploadFile": "Завантажити файл",
+    "pieceCountLabel": "Загальна кількість комірок сітки",
+    "holeCountLabel": "Кількість дірок",
+    "gridHint": "Сітка: {{rows}} × {{columns}}"
+  },
   "optionListEditor": {
     "correctAnswer": "Правильна відповідь",
     "markCorrect": "Позначити як правильний",
@@ -157,7 +164,9 @@
     "hotspotRegion": "Область №{{index}}",
     "anyAnswer": "[будь-яка відповідь]",
     "puzzleCorrectAnswer": "Усі шматочки на своїх місцях, без повороту",
-    "puzzlePartial": "{{correct}} з {{total}} шматочків на своїх місцях"
+    "puzzlePartial": "{{correct}} з {{total}} шматочків на своїх місцях",
+    "puzzleHolesCorrectAnswer": "Усі дірки заповнені правильними шматочками",
+    "puzzleHolesPartial": "{{correct}} з {{total}} дірок заповнено правильно"
   },
   "quizResults": {
     "resultsTitle": "Результати: {{title}}",
@@ -213,6 +222,14 @@
     "returnToTray": "Повернути в лоток",
     "showReference": "Показати картинку",
     "hideReference": "Сховати картинку"
+  },
+  "puzzleHolesRunner": {
+    "pieceLabel": "Шматочок {{index}}",
+    "pickedUp": "вибрано, очікує дірку",
+    "notPicked": "не вибрано",
+    "holeLabel": "Дірка {{index}}",
+    "trayLabel": "Відсутні шматочки",
+    "returnToTray": "Повернути в лоток"
   },
   "fileUploadRunner": {
     "replaceFile": "Замінити файл",
@@ -278,7 +295,8 @@
     "matrix": "Таблиця (матриця)",
     "hotspot": "Область на зображенні",
     "file-upload": "Завантаження файлу",
-    "puzzle": "Пазл"
+    "puzzle": "Пазл",
+    "puzzle-holes": "Пазл з дірками"
   },
   "paginator": {
     "itemsPerPage": "Показувати по:",

@@ -23,6 +23,7 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
     public DbSet<ResponseBlank> ResponseBlanks => Set<ResponseBlank>();
     public DbSet<ResponseMatch> ResponseMatches => Set<ResponseMatch>();
     public DbSet<ResponsePuzzlePlacement> ResponsePuzzlePlacements => Set<ResponsePuzzlePlacement>();
+    public DbSet<ResponsePuzzleHolePlacement> ResponsePuzzleHolePlacements => Set<ResponsePuzzleHolePlacement>();
     public DbSet<ResponseFile> ResponseFiles => Set<ResponseFile>();
 
     public DbSet<AttemptQuestionSnapshot> AttemptQuestionSnapshots => Set<AttemptQuestionSnapshot>();
@@ -89,7 +90,8 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
                 .HasValue<MatrixQuestion>("matrix")
                 .HasValue<HotspotQuestion>("hotspot")
                 .HasValue<FileUploadQuestion>("file-upload")
-                .HasValue<PuzzleQuestion>("puzzle");
+                .HasValue<PuzzleQuestion>("puzzle")
+                .HasValue<PuzzleHolesQuestion>("puzzle-holes");
 
             entity.HasMany(q => q.Options)
                 .WithOne(o => o.Question)
@@ -115,12 +117,17 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
             .HasForeignKey(r => r.QuestionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // HotspotQuestion.ImageUrl and PuzzleQuestion.ImageUrl are independently-declared
-        // properties with the same name - without an explicit shared column, EF's default TPH
-        // disambiguation silently moves one of them to a new (empty) column, orphaning existing
-        // hotspot image URLs. Pin both to the same "image_url" column explicitly instead.
+        // HotspotQuestion.ImageUrl, PuzzleQuestion.ImageUrl and PuzzleHolesQuestion.ImageUrl are
+        // independently-declared properties with the same name - without an explicit shared
+        // column, EF's default TPH disambiguation silently moves them to separate (empty)
+        // columns, orphaning existing image URLs. Pin all three to the same "image_url" column
+        // explicitly instead. PieceCount has the same pitfall between PuzzleQuestion and
+        // PuzzleHolesQuestion - pin that too.
         modelBuilder.Entity<HotspotQuestion>().Property(q => q.ImageUrl).HasColumnName("image_url");
         modelBuilder.Entity<PuzzleQuestion>().Property(q => q.ImageUrl).HasColumnName("image_url");
+        modelBuilder.Entity<PuzzleHolesQuestion>().Property(q => q.ImageUrl).HasColumnName("image_url");
+        modelBuilder.Entity<PuzzleQuestion>().Property(q => q.PieceCount).HasColumnName("piece_count");
+        modelBuilder.Entity<PuzzleHolesQuestion>().Property(q => q.PieceCount).HasColumnName("piece_count");
 
         // SingleChoiceQuestion.CorrectOptionId, DropdownQuestion.CorrectOptionId and
         // HotspotQuestion.CorrectRegionId, Question.ConditionQuestionId are plain Guid
@@ -165,6 +172,11 @@ public class QuizBuilderDbContext(DbContextOptions<QuizBuilderDbContext> options
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasMany(r => r.PuzzlePlacements)
+                .WithOne(p => p.Response)
+                .HasForeignKey(p => p.ResponseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(r => r.PuzzleHolePlacements)
                 .WithOne(p => p.Response)
                 .HasForeignKey(p => p.ResponseId)
                 .OnDelete(DeleteBehavior.Cascade);

@@ -45,6 +45,8 @@ export function isQuestionAnswered(
       return !!response?.file;
     case 'puzzle':
       return (response?.puzzlePlacements?.length ?? 0) === question.pieceCount;
+    case 'puzzle-holes':
+      return (response?.puzzleHolePlacements?.length ?? 0) === question.holeCount;
     default:
       return !!response?.selectedOptionIds && response.selectedOptionIds.length > 0;
   }
@@ -133,6 +135,15 @@ export function formatResponse(
         (p) => p.cellIndex === p.pieceIndex && p.rotationDegrees % 360 === 0,
       ).length;
       return translate('quizAttempt.puzzlePartial', { correct, total: question.pieceCount });
+    }
+    case 'puzzle-holes': {
+      const placed = response?.puzzleHolePlacements ?? [];
+      if (placed.length === 0) return '—';
+      const correct = placed.filter((p) => p.cellIndex === p.pieceIndex).length;
+      return translate('quizAttempt.puzzleHolesPartial', {
+        correct,
+        total: question.holeCount,
+      });
     }
     default: {
       const selectedIds = response?.selectedOptionIds ?? [];

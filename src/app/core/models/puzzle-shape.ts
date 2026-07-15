@@ -100,6 +100,22 @@ function pointsToPathCommands(points: Point[]): string {
   return out;
 }
 
+const HOLE_SALT = 53;
+
+/**
+ * Deterministically picks which `holeCount` cells (of `totalCells`) are holes, given only the
+ * question's own fields - no persisted selection needed, since the editor preview, runner and
+ * scoring all call this with the same (pieceCount, holeCount) and agree.
+ */
+export function selectedHoleIndices(totalCells: number, holeCount: number): number[] {
+  const n = Math.max(1, Math.floor(totalCells));
+  const count = Math.min(Math.max(1, Math.floor(holeCount)), n);
+  return Array.from({ length: n }, (_, i) => i)
+    .sort((a, b) => hash(a, count, HOLE_SALT) - hash(b, count, HOLE_SALT) || a - b)
+    .slice(0, count)
+    .sort((a, b) => a - b);
+}
+
 /**
  * SVG path `d` tracing a piece's outline clockwise (top, right, bottom, left) in a
  * [0, coreSize + 2*margin] box, with the core coreSize x coreSize square centred in it. `margin`

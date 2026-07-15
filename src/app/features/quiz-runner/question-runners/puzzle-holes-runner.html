@@ -1,0 +1,67 @@
+<div class="puzzle-holes-runner">
+  <div class="puzzle-holes-grid" [style]="gridContainerStyle()">
+    <div class="puzzle-holes-base-image" [style]="baseImageStyle()"></div>
+
+    @for (cellIndex of holeIndices(); track cellIndex) {
+      <div class="puzzle-hole-wrap" [style]="holeWrapStyle(cellIndex)">
+        @if (occupantOf(cellIndex) !== null) {
+          <button
+            type="button"
+            class="puzzle-hole-surface puzzle-hole-surface--filled"
+            [class.puzzle-hole-surface--picked]="isPicked(occupantOf(cellIndex)!)"
+            [attr.aria-pressed]="isPicked(occupantOf(cellIndex)!)"
+            [attr.aria-label]="pieceLabel(occupantOf(cellIndex)!)"
+            draggable="true"
+            (dragstart)="onDragStart(occupantOf(cellIndex)!)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDropOnCell(cellIndex, $event)"
+            (click)="onTileClick(occupantOf(cellIndex)!)"
+          >
+            <span class="puzzle-hole-image" [style]="pieceStyle(occupantOf(cellIndex)!)"></span>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="puzzle-hole-surface puzzle-hole-surface--empty"
+            [style]="placeholderStyle(cellIndex)"
+            [attr.aria-label]="holeLabel(cellIndex)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDropOnCell(cellIndex, $event)"
+            (click)="placeInCell(cellIndex)"
+          ></button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (picked() !== null) {
+    <button type="button" class="puzzle-holes-return-button" (click)="returnToTray()">
+      {{ returnToTrayLabel() }}
+    </button>
+  }
+
+  @if (tray().length > 0) {
+    <div
+      class="puzzle-holes-tray"
+      role="group"
+      [attr.aria-label]="trayLabel()"
+      (dragover)="$event.preventDefault()"
+      (drop)="onDropOnTray($event)"
+    >
+      @for (pieceIndex of tray(); track pieceIndex) {
+        <button
+          type="button"
+          class="puzzle-hole-surface puzzle-hole-surface--tray"
+          [class.puzzle-hole-surface--picked]="isPicked(pieceIndex)"
+          [attr.aria-pressed]="isPicked(pieceIndex)"
+          [attr.aria-label]="pieceLabel(pieceIndex)"
+          draggable="true"
+          (dragstart)="onDragStart(pieceIndex)"
+          (click)="onTileClick(pieceIndex)"
+        >
+          <span class="puzzle-hole-image" [style]="pieceStyle(pieceIndex)"></span>
+        </button>
+      }
+    </div>
+  }
+</div>

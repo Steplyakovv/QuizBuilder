@@ -39,7 +39,13 @@ public class QuestionMapper : IQuestionMapper
         MaxLength = (q as TextQuestion)?.MaxLength,
         Multiple = (q as ImageChoiceQuestion)?.Multiple,
         Columns = (q as ImageGridQuestion)?.Columns,
-        PieceCount = (q as PuzzleQuestion)?.PieceCount,
+        PieceCount = q switch
+        {
+            PuzzleQuestion pc => pc.PieceCount,
+            PuzzleHolesQuestion phc => phc.PieceCount,
+            _ => null,
+        },
+        HoleCount = (q as PuzzleHolesQuestion)?.HoleCount,
         CorrectAnswer = (q as TrueFalseQuestion)?.CorrectAnswer,
         CorrectOptionId = q switch
         {
@@ -68,6 +74,7 @@ public class QuestionMapper : IQuestionMapper
         {
             HotspotQuestion hs => hs.ImageUrl,
             PuzzleQuestion pz => pz.ImageUrl,
+            PuzzleHolesQuestion pzh => pzh.ImageUrl,
             _ => null,
         },
         CorrectRegionId = (q as HotspotQuestion)?.CorrectRegionId,
@@ -91,6 +98,7 @@ public class QuestionMapper : IQuestionMapper
         Multiple = s.Multiple,
         Columns = s.Columns,
         PieceCount = s.PieceCount,
+        HoleCount = s.HoleCount,
         CorrectAnswer = s.CorrectAnswer,
         CorrectOptionId = s.CorrectOptionId,
         Min = s.Min,
@@ -124,6 +132,7 @@ public class QuestionMapper : IQuestionMapper
         HotspotQuestion => "hotspot",
         FileUploadQuestion => "file-upload",
         PuzzleQuestion => "puzzle",
+        PuzzleHolesQuestion => "puzzle-holes",
         _ => throw new NotSupportedException($"Unknown question entity type {q.GetType()}"),
     };
 
@@ -159,7 +168,13 @@ public class QuestionMapper : IQuestionMapper
                 _ => null,
             },
             Columns = (dto as ImageGridQuestionDto)?.Columns,
-            PieceCount = (dto as PuzzleQuestionDto)?.PieceCount,
+            PieceCount = dto switch
+            {
+                PuzzleQuestionDto pc => pc.PieceCount,
+                PuzzleHolesQuestionDto phc => phc.PieceCount,
+                _ => (int?)null,
+            },
+            HoleCount = (dto as PuzzleHolesQuestionDto)?.HoleCount,
             CorrectAnswer = (dto as TrueFalseQuestionDto)?.CorrectAnswer,
             CorrectOptionId = dto switch
             {
@@ -188,6 +203,7 @@ public class QuestionMapper : IQuestionMapper
             {
                 HotspotQuestionDto h => h.ImageUrl,
                 PuzzleQuestionDto p => p.ImageUrl,
+                PuzzleHolesQuestionDto ph => ph.ImageUrl,
                 _ => null,
             },
             CorrectRegionId = dto is HotspotQuestionDto h2 && h2.CorrectRegionId is not null ? Guid.Parse(h2.CorrectRegionId) : null,
@@ -238,6 +254,7 @@ public class QuestionMapper : IQuestionMapper
         HotspotQuestionDto => "hotspot",
         FileUploadQuestionDto => "file-upload",
         PuzzleQuestionDto => "puzzle",
+        PuzzleHolesQuestionDto => "puzzle-holes",
         _ => throw new NotSupportedException($"Unknown question dto type {dto.GetType()}"),
     };
 
@@ -359,6 +376,11 @@ public class QuestionMapper : IQuestionMapper
                 Id = id, Prompt = v.Prompt, Required = v.Required, Condition = condition, PageId = pageId,
                 ImageUrl = v.ImageUrl ?? "", PieceCount = v.PieceCount ?? 9,
             },
+            "puzzle-holes" => new PuzzleHolesQuestionDto
+            {
+                Id = id, Prompt = v.Prompt, Required = v.Required, Condition = condition, PageId = pageId,
+                ImageUrl = v.ImageUrl ?? "", PieceCount = v.PieceCount ?? 9, HoleCount = v.HoleCount ?? 2,
+            },
             _ => throw new NotSupportedException($"Unknown question type '{v.Type}'"),
         };
     }
@@ -410,6 +432,10 @@ public class QuestionMapper : IQuestionMapper
             },
             "file-upload" => new FileUploadQuestion { Prompt = v.Prompt },
             "puzzle" => new PuzzleQuestion { ImageUrl = v.ImageUrl ?? "", PieceCount = v.PieceCount ?? 9, Prompt = v.Prompt },
+            "puzzle-holes" => new PuzzleHolesQuestion
+            {
+                ImageUrl = v.ImageUrl ?? "", PieceCount = v.PieceCount ?? 9, HoleCount = v.HoleCount ?? 2, Prompt = v.Prompt,
+            },
             _ => throw new NotSupportedException($"Unknown question type '{v.Type}'"),
         };
 
@@ -442,6 +468,7 @@ public class QuestionMapper : IQuestionMapper
         Multiple = v.Multiple,
         Columns = v.Columns,
         PieceCount = v.PieceCount,
+        HoleCount = v.HoleCount,
         CorrectAnswer = v.CorrectAnswer,
         CorrectOptionId = v.CorrectOptionId,
         Min = v.Min,

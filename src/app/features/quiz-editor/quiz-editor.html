@@ -292,6 +292,11 @@
               />
             } @else if (question.type === 'puzzle') {
               <app-puzzle-editor [question]="question" (questionChange)="saveQuestion($event)" />
+            } @else if (question.type === 'puzzle-holes') {
+              <app-puzzle-holes-editor
+                [question]="question"
+                (questionChange)="saveQuestion($event)"
+              />
             }
           </div>
 

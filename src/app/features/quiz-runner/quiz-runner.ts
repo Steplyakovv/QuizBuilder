@@ -32,6 +32,7 @@ import {
 import { paginateQuestions } from '../../core/models/quiz-pages';
 import { AttemptScore, buildAttemptReport, scoreAttempt } from '../../core/models/quiz-scoring';
 import {
+  PuzzleHolePlacement,
   PuzzlePlacement,
   Question,
   QuestionResponse,
@@ -49,6 +50,7 @@ import { HotspotRunner } from './question-runners/hotspot-runner';
 import { ImageChoiceRunner } from './question-runners/image-choice-runner';
 import { ImageGridRunner } from './question-runners/image-grid-runner';
 import { PuzzleRunner } from './question-runners/puzzle-runner';
+import { PuzzleHolesRunner } from './question-runners/puzzle-holes-runner';
 import { MatchingRunner } from './question-runners/matching-runner';
 import { MatrixRunner } from './question-runners/matrix-runner';
 import { MultipleChoiceRunner } from './question-runners/multiple-choice-runner';
@@ -77,6 +79,7 @@ import { WordChoiceRunner } from './question-runners/word-choice-runner';
     ImageChoiceRunner,
     ImageGridRunner,
     PuzzleRunner,
+    PuzzleHolesRunner,
     MatchingRunner,
     MatrixRunner,
     MultipleChoiceRunner,
@@ -370,6 +373,10 @@ export class QuizRunner {
     return this.responses()[questionId]?.puzzlePlacements ?? [];
   }
 
+  puzzleHolePlacements(questionId: string): PuzzleHolePlacement[] {
+    return this.responses()[questionId]?.puzzleHolePlacements ?? [];
+  }
+
   setSelection(questionId: string, selectedOptionIds: string[]): void {
     this.responses.update((responses) => ({
       ...responses,
@@ -408,6 +415,14 @@ export class QuizRunner {
     this.responses.update((responses) => ({
       ...responses,
       [questionId]: { questionId, puzzlePlacements },
+    }));
+    this.clearValidationError(questionId);
+  }
+
+  setPuzzleHolePlacements(questionId: string, puzzleHolePlacements: PuzzleHolePlacement[]): void {
+    this.responses.update((responses) => ({
+      ...responses,
+      [questionId]: { questionId, puzzleHolePlacements },
     }));
     this.clearValidationError(questionId);
   }

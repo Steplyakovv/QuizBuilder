@@ -1,0 +1,67 @@
+<div class="puzzle-holes-editor">
+  <div class="image-url-row">
+    <mat-form-field appearance="outline" class="image-url-field">
+      <mat-label>{{ imageUrlLabel() }}</mat-label>
+      <input matInput [value]="question().imageUrl" (blur)="updateImageUrl($any($event.target).value)" />
+    </mat-form-field>
+    <button mat-stroked-button type="button" (click)="fileInput.click()">
+      <mat-icon>upload</mat-icon>
+      {{ uploadFileLabel() }}
+    </button>
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onFileSelected($any($event.target).files); $any($event.target).value = ''"
+    />
+  </div>
+
+  <div class="count-fields-row">
+    <mat-form-field appearance="outline" class="piece-count-field">
+      <mat-label>{{ pieceCountLabel() }}</mat-label>
+      <input
+        matInput
+        type="number"
+        min="2"
+        [value]="question().pieceCount"
+        (blur)="onPieceCountChange($any($event.target).value)"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="hole-count-field">
+      <mat-label>{{ holeCountLabel() }}</mat-label>
+      <input
+        matInput
+        type="number"
+        min="1"
+        [value]="question().holeCount"
+        (blur)="onHoleCountChange($any($event.target).value)"
+      />
+    </mat-form-field>
+  </div>
+  <p class="grid-hint">{{ gridHintLabel() }}</p>
+
+  @if (question().imageUrl) {
+    <div
+      class="puzzle-holes-preview"
+      [style.background-image]="'url(' + question().imageUrl + ')'"
+      [style.width.px]="previewSize().width"
+      [style.height.px]="previewSize().height"
+    >
+      <svg
+        class="puzzle-holes-preview-lines"
+        [attr.viewBox]="'0 0 ' + previewSize().width + ' ' + previewSize().height"
+      >
+        @for (piece of gridCells(); track piece) {
+          @if (isHole(piece)) {
+            <path
+              class="puzzle-holes-preview-hole"
+              [attr.transform]="pieceTransform(piece)"
+              [attr.d]="piecePathFor(piece)"
+            />
+          }
+        }
+      </svg>
+    </div>
+  }
+</div>

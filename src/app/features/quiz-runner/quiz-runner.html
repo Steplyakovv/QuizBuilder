@@ -203,6 +203,12 @@
                 [placements]="puzzlePlacements(question.id)"
                 (placementsChange)="setPuzzlePlacements(question.id, $event)"
               />
+            } @else if (question.type === 'puzzle-holes') {
+              <app-puzzle-holes-runner
+                [question]="question"
+                [placements]="puzzleHolePlacements(question.id)"
+                (placementsChange)="setPuzzleHolePlacements(question.id, $event)"
+              />
             }
 
             @if (validationErrors().has(question.id)) {

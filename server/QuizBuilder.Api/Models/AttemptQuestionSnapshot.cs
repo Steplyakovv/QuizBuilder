@@ -23,6 +23,7 @@ public class AttemptQuestionSnapshot
     public bool? Multiple { get; set; }
     public int? Columns { get; set; }
     public int? PieceCount { get; set; }
+    public int? HoleCount { get; set; }
     public bool? CorrectAnswer { get; set; }
     public Guid? CorrectOptionId { get; set; }
     public decimal? Min { get; set; }

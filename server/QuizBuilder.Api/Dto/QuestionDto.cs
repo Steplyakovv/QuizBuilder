@@ -158,3 +158,10 @@ public record PuzzleQuestionDto : QuestionDto
     public required string ImageUrl { get; init; }
     public int PieceCount { get; init; }
 }
+
+public record PuzzleHolesQuestionDto : QuestionDto
+{
+    public required string ImageUrl { get; init; }
+    public int PieceCount { get; init; }
+    public int HoleCount { get; init; }
+}

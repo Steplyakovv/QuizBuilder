@@ -44,6 +44,7 @@ public class QuestionResponse
     public List<ResponseMatch> Matches { get; set; } = [];
     public ResponseFile? File { get; set; }
     public List<ResponsePuzzlePlacement> PuzzlePlacements { get; set; } = [];
+    public List<ResponsePuzzleHolePlacement> PuzzleHolePlacements { get; set; } = [];
 }
 
 public class ResponseSelectedOption
@@ -94,6 +95,17 @@ public class ResponsePuzzlePlacement
     public int PieceIndex { get; set; }
     public int CellIndex { get; set; }
     public int RotationDegrees { get; set; }
+
+    public QuestionResponse? Response { get; set; }
+}
+
+/// <summary>Which hole a puzzle-holes piece currently occupies; correct when CellIndex == PieceIndex. No rotation.</summary>
+public class ResponsePuzzleHolePlacement
+{
+    public Guid Id { get; set; }
+    public Guid ResponseId { get; set; }
+    public int PieceIndex { get; set; }
+    public int CellIndex { get; set; }
 
     public QuestionResponse? Response { get; set; }
 }

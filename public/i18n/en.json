@@ -142,6 +142,13 @@
     "pieceCountLabel": "Number of pieces",
     "gridHint": "Grid: {{rows}} × {{columns}}"
   },
+  "puzzleHolesEditor": {
+    "imageUrlLabel": "Image URL",
+    "uploadFile": "Upload file",
+    "pieceCountLabel": "Total grid cells",
+    "holeCountLabel": "Number of holes",
+    "gridHint": "Grid: {{rows}} × {{columns}}"
+  },
   "optionListEditor": {
     "correctAnswer": "Correct answer",
     "markCorrect": "Mark as correct",
@@ -157,7 +164,9 @@
     "hotspotRegion": "Region #{{index}}",
     "anyAnswer": "[any answer]",
     "puzzleCorrectAnswer": "All pieces are in place, unrotated",
-    "puzzlePartial": "{{correct}} of {{total}} pieces in place"
+    "puzzlePartial": "{{correct}} of {{total}} pieces in place",
+    "puzzleHolesCorrectAnswer": "All holes are filled with the correct pieces",
+    "puzzleHolesPartial": "{{correct}} of {{total}} holes filled correctly"
   },
   "quizResults": {
     "resultsTitle": "Results: {{title}}",
@@ -213,6 +222,14 @@
     "returnToTray": "Return to tray",
     "showReference": "Show picture",
     "hideReference": "Hide picture"
+  },
+  "puzzleHolesRunner": {
+    "pieceLabel": "Piece {{index}}",
+    "pickedUp": "picked up, waiting for a hole",
+    "notPicked": "not picked up",
+    "holeLabel": "Hole {{index}}",
+    "trayLabel": "Missing pieces",
+    "returnToTray": "Return to tray"
   },
   "fileUploadRunner": {
     "replaceFile": "Replace file",
@@ -278,7 +295,8 @@
     "matrix": "Matrix table",
     "hotspot": "Image hotspot",
     "file-upload": "File upload",
-    "puzzle": "Jigsaw puzzle"
+    "puzzle": "Jigsaw puzzle",
+    "puzzle-holes": "Puzzle with holes"
   },
   "paginator": {
     "itemsPerPage": "Items per page:",

@@ -28,6 +28,7 @@ public sealed record QuestionFieldValues
     public bool? Multiple { get; init; }
     public int? Columns { get; init; }
     public int? PieceCount { get; init; }
+    public int? HoleCount { get; init; }
     public bool? CorrectAnswer { get; init; }
     public Guid? CorrectOptionId { get; init; }
     public decimal? Min { get; init; }

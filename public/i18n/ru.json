@@ -142,6 +142,13 @@
     "pieceCountLabel": "Количество кусочков",
     "gridHint": "Сетка: {{rows}} × {{columns}}"
   },
+  "puzzleHolesEditor": {
+    "imageUrlLabel": "URL картинки",
+    "uploadFile": "Загрузить файл",
+    "pieceCountLabel": "Общее число ячеек сетки",
+    "holeCountLabel": "Число дырок",
+    "gridHint": "Сетка: {{rows}} × {{columns}}"
+  },
   "optionListEditor": {
     "correctAnswer": "Правильный ответ",
     "markCorrect": "Отметить как правильный",
@@ -157,7 +164,9 @@
     "hotspotRegion": "Область №{{index}}",
     "anyAnswer": "[любой ответ]",
     "puzzleCorrectAnswer": "Все кусочки на своих местах, без поворота",
-    "puzzlePartial": "{{correct}} из {{total}} кусочков на своих местах"
+    "puzzlePartial": "{{correct}} из {{total}} кусочков на своих местах",
+    "puzzleHolesCorrectAnswer": "Все дырки заполнены правильными кусочками",
+    "puzzleHolesPartial": "{{correct}} из {{total}} дырок заполнено правильно"
   },
   "quizResults": {
     "resultsTitle": "Результаты: {{title}}",
@@ -213,6 +222,14 @@
     "returnToTray": "Вернуть в лоток",
     "showReference": "Показать картинку",
     "hideReference": "Скрыть картинку"
+  },
+  "puzzleHolesRunner": {
+    "pieceLabel": "Кусочек {{index}}",
+    "pickedUp": "выбран, ожидает дырки",
+    "notPicked": "не выбран",
+    "holeLabel": "Дырка {{index}}",
+    "trayLabel": "Недостающие кусочки",
+    "returnToTray": "Вернуть в лоток"
   },
   "fileUploadRunner": {
     "replaceFile": "Заменить файл",
@@ -278,7 +295,8 @@
     "matrix": "Таблица (матрица)",
     "hotspot": "Область на изображении",
     "file-upload": "Загрузка файла",
-    "puzzle": "Пазл"
+    "puzzle": "Пазл",
+    "puzzle-holes": "Пазл с дырками"
   },
   "paginator": {
     "itemsPerPage": "Показывать по:",

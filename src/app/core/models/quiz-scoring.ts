@@ -1,6 +1,7 @@
 import { splitTemplate } from './fill-in-the-blank';
 import { isQuestionVisible } from './question-condition';
 import { formatResponse } from './quiz-attempt';
+import { selectedHoleIndices } from './puzzle-shape';
 import { Question, QuestionReportEntry, QuestionResponse, Quiz } from './quiz.models';
 
 export interface AttemptScore {
@@ -31,6 +32,10 @@ export function hasCorrectAnswer(question: Question): boolean {
       return !!question.correctRegionId;
     case 'puzzle':
       return !!question.imageUrl && question.pieceCount > 1;
+    case 'puzzle-holes':
+      return (
+        !!question.imageUrl && question.holeCount >= 1 && question.holeCount <= question.pieceCount
+      );
     case 'text':
     case 'number':
     case 'date':
@@ -86,6 +91,14 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
       return (
         placements.length === question.pieceCount &&
         placements.every((p) => p.cellIndex === p.pieceIndex && p.rotationDegrees % 360 === 0)
+      );
+    }
+    case 'puzzle-holes': {
+      const holes = selectedHoleIndices(question.pieceCount, question.holeCount);
+      const placements = response?.puzzleHolePlacements ?? [];
+      return (
+        placements.length === holes.length &&
+        placements.every((p) => p.cellIndex === p.pieceIndex)
       );
     }
     case 'text':
@@ -146,6 +159,8 @@ export function formatCorrectAnswer(
     }
     case 'puzzle':
       return translate('quizAttempt.puzzleCorrectAnswer');
+    case 'puzzle-holes':
+      return translate('quizAttempt.puzzleHolesCorrectAnswer');
     default:
       return undefined;
   }
