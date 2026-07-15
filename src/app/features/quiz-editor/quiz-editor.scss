@@ -78,7 +78,11 @@
 }
 
 .webhook-url-field {
-  width: 100%;
+  // Matches the combined width of a paired-field row above (two 260px fields plus
+  // the row's 1rem gap), so its right edge lines up with them instead of stretching
+  // to the full settings-panel width.
+  width: calc(2 * 260px + 1rem);
+  max-width: 100%;
 }
 
 .quiz-pages {
