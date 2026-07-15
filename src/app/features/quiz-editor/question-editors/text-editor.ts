@@ -9,6 +9,7 @@ import { TextQuestion } from '../../../core/models/quiz.models';
   selector: 'app-text-editor',
   imports: [MatCheckboxModule, MatFormFieldModule, MatInputModule],
   templateUrl: './text-editor.html',
+  styleUrl: './text-editor.scss',
 })
 export class TextEditor {
   readonly question = input.required<TextQuestion>();
