@@ -59,6 +59,17 @@ export class PuzzleRunner {
   // lost on remount, which is fine since only placed-piece rotation counts toward correctness.
   private readonly trayRotationOverrides = signal<Record<number, number>>({});
 
+  protected readonly showReference = signal(false);
+
+  toggleReference(): void {
+    this.showReference.update((shown) => !shown);
+  }
+
+  referenceLabel(): string {
+    const key = this.showReference() ? 'puzzleRunner.hideReference' : 'puzzleRunner.showReference';
+    return this.transloco.translate(key);
+  }
+
   private deterministicTrayRotation(pieceIndex: number): number {
     return ((pieceIndex * 73 + 41) % 4) * 90;
   }

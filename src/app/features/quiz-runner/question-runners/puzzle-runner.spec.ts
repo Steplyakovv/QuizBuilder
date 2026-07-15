@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
+import { TranslocoService } from '@jsverse/transloco';
 import { PuzzlePlacement, PuzzleQuestion } from '../../../core/models/quiz.models';
 import { provideTestTransloco } from '../../../core/testing/provide-test-transloco';
 import { PuzzleRunner } from './puzzle-runner';
@@ -18,6 +20,8 @@ describe('PuzzleRunner', () => {
       imports: [PuzzleRunner],
       providers: [provideTestTransloco()],
     }).compileComponents();
+    const transloco = TestBed.inject(TranslocoService);
+    await firstValueFrom(transloco.load(transloco.getActiveLang()));
     const fixture = TestBed.createComponent(PuzzleRunner);
     fixture.componentRef.setInput('question', question);
     fixture.componentRef.setInput('placements', placements);
@@ -103,6 +107,21 @@ describe('PuzzleRunner', () => {
     fixture.componentInstance.rotate(0, noopEvent);
 
     expect(fixture.componentInstance.rotationOf(0)).toBe(180);
+    expect(emitted).toBeUndefined();
+  });
+
+  it('toggles the reference image label without touching placements', async () => {
+    const fixture = await createComponent([]);
+    let emitted: PuzzlePlacement[] | undefined;
+    fixture.componentInstance.placementsChange.subscribe((v) => (emitted = v));
+
+    expect(fixture.componentInstance.referenceLabel()).toBe('Показать картинку');
+
+    fixture.componentInstance.toggleReference();
+    expect(fixture.componentInstance.referenceLabel()).toBe('Скрыть картинку');
+
+    fixture.componentInstance.toggleReference();
+    expect(fixture.componentInstance.referenceLabel()).toBe('Показать картинку');
     expect(emitted).toBeUndefined();
   });
 });

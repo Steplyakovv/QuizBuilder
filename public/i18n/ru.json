@@ -210,7 +210,9 @@
     "rotateLabel": "Повернуть на 90°",
     "emptyCell": "Пустая ячейка {{index}}",
     "trayLabel": "Нераспределённые кусочки",
-    "returnToTray": "Вернуть в лоток"
+    "returnToTray": "Вернуть в лоток",
+    "showReference": "Показать картинку",
+    "hideReference": "Скрыть картинку"
   },
   "fileUploadRunner": {
     "replaceFile": "Заменить файл",

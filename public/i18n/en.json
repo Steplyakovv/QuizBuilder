@@ -210,7 +210,9 @@
     "rotateLabel": "Rotate 90°",
     "emptyCell": "Empty cell {{index}}",
     "trayLabel": "Unplaced pieces",
-    "returnToTray": "Return to tray"
+    "returnToTray": "Return to tray",
+    "showReference": "Show picture",
+    "hideReference": "Hide picture"
   },
   "fileUploadRunner": {
     "replaceFile": "Replace file",

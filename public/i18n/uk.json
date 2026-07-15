@@ -210,7 +210,9 @@
     "rotateLabel": "Повернути на 90°",
     "emptyCell": "Порожня комірка {{index}}",
     "trayLabel": "Нерозподілені шматочки",
-    "returnToTray": "Повернути в лоток"
+    "returnToTray": "Повернути в лоток",
+    "showReference": "Показати картинку",
+    "hideReference": "Сховати картинку"
   },
   "fileUploadRunner": {
     "replaceFile": "Замінити файл",

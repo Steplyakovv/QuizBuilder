@@ -1,4 +1,18 @@
 <div class="puzzle-runner">
+  <button
+    type="button"
+    class="puzzle-peek-button"
+    [attr.aria-pressed]="showReference()"
+    (click)="toggleReference()"
+  >
+    <mat-icon>{{ showReference() ? 'visibility_off' : 'visibility' }}</mat-icon>
+    {{ referenceLabel() }}
+  </button>
+
+  @if (showReference()) {
+    <img class="puzzle-reference-image" [src]="question().imageUrl" alt="" />
+  }
+
   <div class="puzzle-grid" [style]="gridContainerStyle()">
     @for (cellIndex of cellIndexes(); track cellIndex) {
       @if (grid()[cellIndex] !== null) {
