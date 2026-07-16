@@ -69,3 +69,9 @@ the wiped state.
 Any migration that adds a new table reachable from `quizzes`/`quiz_attempts`
 (e.g. a new question type's response/snapshot table) needs that table added to
 the `$tables` array too, or its data silently won't be backed up or restored.
+This is now enforced automatically by
+`server/QuizBuilder.Api.Tests/Data/BackupScriptTableCoverageTests.cs` (part of
+`dotnet test`), which diffs the script's list against the real EF model and
+fails with the exact missing/stale table names — added after
+`response_puzzle_placements`/`response_puzzle_hole_placements` went
+unbacked-up for a while unnoticed.
