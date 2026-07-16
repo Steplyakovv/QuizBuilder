@@ -425,7 +425,10 @@ describe('scoreAttempt', () => {
 
     expect(
       scoreAttempt(quiz, [
-        { questionId: 'q1', puzzlePlacements: [{ pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 }] },
+        {
+          questionId: 'q1',
+          puzzlePlacements: [{ pieceIndex: 0, cellIndex: 0, rotationDegrees: 0 }],
+        },
       ]),
     ).toEqual({ correct: 0, total: 1 });
   });
@@ -441,9 +444,7 @@ describe('scoreAttempt', () => {
       pieceCount: 4,
     });
 
-    expect(
-      scoreAttempt(quiz, [{ questionId: 'q1', puzzlePlacements: [] }]),
-    ).toBeUndefined();
+    expect(scoreAttempt(quiz, [{ questionId: 'q1', puzzlePlacements: [] }])).toBeUndefined();
   });
 
   it('excludes a conditionally hidden question from the gradable total', () => {

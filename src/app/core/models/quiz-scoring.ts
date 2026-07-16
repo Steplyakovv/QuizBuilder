@@ -97,8 +97,7 @@ export function isCorrect(question: Question, response: QuestionResponse | undef
       const holes = selectedHoleIndices(question.pieceCount, question.holeCount);
       const placements = response?.puzzleHolePlacements ?? [];
       return (
-        placements.length === holes.length &&
-        placements.every((p) => p.cellIndex === p.pieceIndex)
+        placements.length === holes.length && placements.every((p) => p.cellIndex === p.pieceIndex)
       );
     }
     case 'text':

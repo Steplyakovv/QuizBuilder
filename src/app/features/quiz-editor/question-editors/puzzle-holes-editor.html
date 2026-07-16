@@ -2,7 +2,11 @@
   <div class="image-url-row">
     <mat-form-field appearance="outline" class="image-url-field">
       <mat-label>{{ imageUrlLabel() }}</mat-label>
-      <input matInput [value]="question().imageUrl" (blur)="updateImageUrl($any($event.target).value)" />
+      <input
+        matInput
+        [value]="question().imageUrl"
+        (blur)="updateImageUrl($any($event.target).value)"
+      />
     </mat-form-field>
     <button mat-stroked-button type="button" (click)="fileInput.click()">
       <mat-icon>upload</mat-icon>
