@@ -1,5 +1,7 @@
 # Quiz Builder
 
+[![CI](https://github.com/Steplyakovv/QuizBuilder/actions/workflows/ci.yml/badge.svg)](https://github.com/Steplyakovv/QuizBuilder/actions/workflows/ci.yml)
+
 Конструктор опросников: разные типы вопросов (одиночный/множественный выбор,
 текст, выбор картинки и др.), сборка опросника, прохождение и результаты.
 Angular-фронтенд + ASP.NET Core backend с PostgreSQL.

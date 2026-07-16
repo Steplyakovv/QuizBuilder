@@ -212,11 +212,20 @@
   «Максимум символов» в text-редакторе, ширина и выравнивание поля
   «URL вебхука» относительно соседних полей настроек
 
-## Phase 18 — CI/инфраструктура ⬜
+## Phase 18 — CI/инфраструктура ✅
 
-- Расширить GitHub Actions workflow на полный `npm run verify`
-  (format:check, lint, unit-тесты, build), а не только e2e
-- Бейдж статуса сборки в README
+- Репозиторий опубликован на GitHub (`Steplyakovv/QuizBuilder`)
+- CI (`.github/workflows/ci.yml`, заменяет прежний узкий `playwright.yml`)
+  теперь гоняет на каждый push/PR в `main` весь пайплайн последовательно:
+  `format:check` → `lint` → unit-тесты (Vitest) → `build` → `dotnet test`
+  (backend) → e2e (Playwright) — раньше CI проверял только e2e, и PR со
+  сломанным lint/юнит-тестами/сборкой мог пройти зелёным
+- Для e2e-шага поднимается настоящий backend + Postgres-сервис
+  (`postgres:17`, креды совпадают с `appsettings.json`, override не нужен) —
+  раньше backend в CI вообще не запускался, хотя e2e-тесты требуют его
+  начиная с Phase 15 (сам workflow до этого, судя по всему, ни разу не
+  запускался — у репозитория не было GitHub-remote)
+- Бейдж статуса сборки в README, ссылается на `ci.yml`
 
 ## Phase 19 — Редактор: качество жизни ⬜
 
